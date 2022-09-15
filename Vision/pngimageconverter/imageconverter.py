@@ -10,6 +10,7 @@ for file in os.listdir(image_dir):
     img = Image.open(file)
     file_name, file_ext = os.path.splitext(file)
     img.save(file_name+'.png')
+    img.close()
     os.remove(file_name+file_ext)
 
 

@@ -25,3 +25,6 @@
 *.la
 *.a
 *.lib
+
+#vscode stuff
+.vscode/

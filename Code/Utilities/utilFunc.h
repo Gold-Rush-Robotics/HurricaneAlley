@@ -1,0 +1,1 @@
+double constrain(double minN, double maxN, double val);

@@ -10,6 +10,7 @@
 #include <math.h>
 #include <cstdio>
 #include <cstdint>
+#include <signal.h>
 
 using namespace std;
 
@@ -19,7 +20,7 @@ using namespace std;
 #include "pca9685.h"
 
 // compiler command
-// g++ -o mecanumTest mecanumTest.cpp -lwiringPi -lpthread -I "../../rpidmx512/lib-pca9685/include/" -L "../../rpidmx512/lib-pca9685/lib_linux/" -l pca9685 -l bcm2835
+// g++ -o mecanumTest mecanumTest.cpp -lpthread -I "../../rpidmx512/lib-pca9685/include/" -L "../../rpidmx512/lib-pca9685/lib_linux/" -l pca9685 -l bcm2835; sudo ./mecanumTest
 
 #define NORM_SPEED 0.5
 #define SLOW_SPEED 0.3
@@ -37,7 +38,7 @@ enum motor
     motorBL = 2,
     motorBR = 3
 };
-
+volatile sig_atomic_t flag = 1;
 // Encoder layout as follows: encoder A pin, encoder B pin
 static int odoPins[3][2] = {{21, 20}, {16, 12}, {25, 24}};
 static int odoCount = 3;
@@ -280,9 +281,11 @@ void setPower(int motorNum, double power, PCA9685 pca9685)
 
     // digitalWrite(motorPins[motorNum][0], direct);
     if (direct) {
+        printf("setting pin #%d to HIGH\n", motorPins[motorNum][0]);
         bcm2835_gpio_set(motorPins[motorNum][0]);
     }
     else {
+        printf("setting pin #%d to LOW\n", motorPins[motorNum][0]);
         bcm2835_gpio_clr(motorPins[motorNum][0]);
     }
     pca9685.Write(CHANNEL(motorPins[motorNum][1]), VALUE(absPower * (PCA9685_VALUE_MAX - 1)));
@@ -356,13 +359,10 @@ int main(int argc, char *argv[]) {
     pca9685.SetFrequency(1000);
 
     // Sets up pinouts for drivebase
-    // for (int i = 0; i < motorCount; i++)
-    // {
-    //     // printf("Creating software PWM #%.1d on pin %.1d\n", i, motorPins[i][1]);
-    //     // softPwmCreate(motorPins[i][1], 0, 100);
-    //     pinMode(motorPins[i][0], OUTPUT);
-    //     // pinMode(motorPins[i][1], OUTPUT);
-    // }
+    for (int i = 0; i < motorCount; i++){
+        bcm2835_gpio_fsel(motorPins[i][0], BCM2835_GPIO_FSEL_OUTP);
+        bcm2835_gpio_set_pud(motorPins[i][0], BCM2835_GPIO_PUD_DOWN);
+    }
 
     /* Create odometry thread. Things to consider: If we get corrupted values from odo and drive accessing position at same time we
     can add semaphores to block off the variable while its being accessed. Can also add core affinity to allow odo to favor a less

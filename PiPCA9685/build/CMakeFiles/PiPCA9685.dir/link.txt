@@ -1,0 +1,2 @@
+/usr/bin/ar qc libPiPCA9685.a CMakeFiles/PiPCA9685.dir/src/PCA9685.cpp.o CMakeFiles/PiPCA9685.dir/src/I2CPeripheral.cpp.o
+/usr/bin/ranlib libPiPCA9685.a

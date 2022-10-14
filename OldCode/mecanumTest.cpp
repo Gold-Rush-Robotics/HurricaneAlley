@@ -38,7 +38,14 @@ enum motor
     motorBL = 2,
     motorBR = 3
 };
+
+
 volatile sig_atomic_t flag = 1;
+void onInterupt(int sig){
+    flag = 0;
+}
+
+
 // Encoder layout as follows: encoder A pin, encoder B pin
 static int odoPins[3][2] = {{21, 20}, {16, 12}, {25, 24}};
 static int odoCount = 3;
@@ -340,6 +347,8 @@ int main(int argc, char *argv[]) {
     ps5Controller ctr = ps5Controller();
     pthread_t odoTID;
     pthread_t printTID;
+    signal(SIGINT, onInterupt); 
+
 
     // Set up pwm hat connection
     if (getuid() != 0)
@@ -384,7 +393,7 @@ int main(int argc, char *argv[]) {
         perror("Could not open joystick");
 
     /* This loop will exit if the controller is unplugged. */
-    while (read_event(js, &event) == 0)
+    while (read_event(js, &event) == 0 && flag)
     {
         ctr.eventHandler(&event);
 
@@ -410,4 +419,8 @@ int main(int argc, char *argv[]) {
 
         fflush(stdout);
     }
+    for (int i = 0; i < motorCount; i++){
+        setPower(i, 0, pca9685);
+    }
+    pca9685.Dump();
 }

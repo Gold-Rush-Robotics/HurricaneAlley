@@ -33,5 +33,5 @@ void Encoder::isr(){
 }
 
 long Encoder::getPos(){
-    return pos
+    return pos;
 }

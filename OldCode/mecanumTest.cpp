@@ -284,15 +284,15 @@ void setPower(int motorNum, double power, PCA9685 pca9685)
     double absPower = (double)abs(power);
     int direct = (((double)motorPins[motorNum][2] * power) > 0) ? 1 : 0;
 
-    printf("motor: %.1d direct: %.1d power: %f pwmChannel: %d\n", motorNum, direct, power, motorPins[motorNum][1]);
+    //printf("motor: %.1d direct: %.1d power: %f pwmChannel: %d\n", motorNum, direct, power, motorPins[motorNum][1]);
 
     // digitalWrite(motorPins[motorNum][0], direct);
     if (direct) {
-        printf("setting pin #%d to HIGH\n", motorPins[motorNum][0]);
+        //printf("setting pin #%d to HIGH\n", motorPins[motorNum][0]);
         bcm2835_gpio_set(motorPins[motorNum][0]);
     }
     else {
-        printf("setting pin #%d to LOW\n", motorPins[motorNum][0]);
+        //printf("setting pin #%d to LOW\n", motorPins[motorNum][0]);
         bcm2835_gpio_clr(motorPins[motorNum][0]);
     }
     pca9685.Write(CHANNEL(motorPins[motorNum][1]), VALUE(absPower * (PCA9685_VALUE_MAX - 1)));
@@ -368,7 +368,7 @@ int main(int argc, char *argv[]) {
     pca9685.SetFrequency(1000);
 
     // Sets up pinouts for drivebase
-    for (int i = 0; i < motorCount; i++){
+    for (int i = 0; i < motorCount; i++) {
         bcm2835_gpio_fsel(motorPins[i][0], BCM2835_GPIO_FSEL_OUTP);
         bcm2835_gpio_set_pud(motorPins[i][0], BCM2835_GPIO_PUD_DOWN);
     }
@@ -379,7 +379,7 @@ int main(int argc, char *argv[]) {
     //pthread_create(&odoTID, NULL, odometry, (void *)NULL);
 
     // Thread for printing things without having to be in the loop where they print so fast they are cut off
-    // pthread_create(&printTID, NULL, printPeriodically, (void * )NULL);
+    pthread_create(&printTID, NULL, printPeriodically, (void * )NULL);
 
     // Selects correct controller device
     if (argc > 1)
@@ -393,19 +393,16 @@ int main(int argc, char *argv[]) {
         perror("Could not open joystick");
 
     /* This loop will exit if the controller is unplugged. */
-    while (read_event(js, &event) == 0 && flag)
-    {
+    while (read_event(js, &event) == 0 && flag) {
         ctr.eventHandler(&event);
 
         // ctr.printStates();
 
         double multiplier = NORM_SPEED;
-        if (ctr.lBump)
-        {
+        if (ctr.lBump) {
             multiplier = FAST_SPEED;
         }
-        else if (ctr.lTrigBool)
-        {
+        else if (ctr.lTrigBool) {
             multiplier = SLOW_SPEED;
         }
 
@@ -419,7 +416,8 @@ int main(int argc, char *argv[]) {
 
         fflush(stdout);
     }
-    for (int i = 0; i < motorCount; i++){
+
+    for (int i = 0; i < motorCount; i++) {
         setPower(i, 0, pca9685);
     }
     pca9685.Dump();

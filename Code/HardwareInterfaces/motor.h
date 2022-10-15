@@ -4,7 +4,8 @@ class Motor{
     int directionPin;
     int speedPin;
     bool reversed;
-    Motor(int directionPin, int speedPin);
+    PCA9685 pca9685;
+    Motor(int directionPin, int speedPin, PCA9685 pca9685);
     void reverse();
     bool isReversed();
     void setPower(double power);

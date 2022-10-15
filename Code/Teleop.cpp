@@ -1,5 +1,8 @@
-#include "robot.h"
+#include "Robot/robot.h"
+
 #include <linux/joystick.h>
+#include "ps5Controller.cpp"
+
 
 // Reads controller event and insures it is of correct type
 int read_event(int fd, struct js_event *event)
@@ -16,8 +19,19 @@ int read_event(int fd, struct js_event *event)
 }
 
 
-int main(){
+int main(int argc, char *argv[]){
+    if (getuid() != 0)
+    {
+        fprintf(stderr, "Program is not started as \'root\' (sudo)\n");
+        return -1;
+    }
     Robot robot = Robot();
+    const char *device;
+    int js;
+    struct js_event event;
+    ps5Controller ctr = ps5Controller();
+    pthread_t odoTID;
+    pthread_t printTID;
     double multiplier = .7;
 
     if (argc > 1)
@@ -36,7 +50,7 @@ int main(){
 
         // ctr.printStates();
 
-        double multiplier = NORM_SPEED;
+        double multiplier = .75;
         if (ctr.lBump) {
             multiplier = 1;
         }
@@ -49,8 +63,5 @@ int main(){
         fflush(stdout);
     }
 
-    for (int i = 0; i < motorCount; i++) {
-        setPower(i, 0, pca9685);
-    }
-    pca9685.Dump();
+    robot.stop();
 }

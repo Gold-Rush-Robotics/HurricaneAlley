@@ -1,0 +1,6 @@
+class Drivetrain{
+    public:
+
+    private:
+        
+}

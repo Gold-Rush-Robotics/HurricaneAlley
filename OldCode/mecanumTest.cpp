@@ -50,8 +50,7 @@ void onInterupt(int sig){
 static int odoPins[3][2] = {{21, 20}, {16, 12}, {25, 24}};
 static int odoCount = 3;
 
-enum odo
-{
+enum odo {
     odoL = 0,
     odoR = 1,
     odoB = 2
@@ -335,7 +334,7 @@ void *printPeriodically(void *ignore)
 {
     while (true)
     {
-        delay(500);
+        sleep(1);
         printf("posX: %f posY: %f posH: %f\n", position.x, position.y, position.h);
     }
 }
@@ -373,6 +372,15 @@ int main(int argc, char *argv[]) {
         bcm2835_gpio_set_pud(motorPins[i][0], BCM2835_GPIO_PUD_DOWN);
     }
 
+    // Sets up pin inputs for odometry
+    for (int i = 0; i < odoCount; i++) {
+        bcm2835_gpio_fsel(odoPins[i][0], BCM2835_GPIO_FSEL_INPT);
+        bcm2835_gpio_set_pud(odoPins[i][0], BCM2835_GPIO_PUD_DOWN);
+
+        bcm2835_gpio_fsel(odoPins[i][1], BCM2835_GPIO_FSEL_INPT);
+        bcm2835_gpio_set_pud(odoPins[i][1], BCM2835_GPIO_PUD_DOWN);
+    }
+
     /* Create odometry thread. Things to consider: If we get corrupted values from odo and drive accessing position at same time we
     can add semaphores to block off the variable while its being accessed. Can also add core affinity to allow odo to favor a less
     utilized core if necessary.*/
@@ -389,8 +397,11 @@ int main(int argc, char *argv[]) {
 
     js = open(device, O_RDONLY);
 
-    if (js == -1)
+    if (js == -1) {
         perror("Could not open joystick");
+        flag = 0;
+    }
+
 
     /* This loop will exit if the controller is unplugged. */
     while (read_event(js, &event) == 0 && flag) {
@@ -406,9 +417,9 @@ int main(int argc, char *argv[]) {
             multiplier = SLOW_SPEED;
         }
 
-        mVec.y = multiplier * ctr.lx;
-        mVec.x = multiplier * ctr.ly;
-        mVec.h = multiplier * -ctr.rx;
+        mVec.x = multiplier * ctr.ly;   // Drive
+        mVec.y = multiplier * ctr.lx;   // Strafe
+        mVec.h = multiplier * -ctr.rx;  // Turn
 
         drive(mVec.x, mVec.y, mVec.h, pca9685);
 
@@ -421,4 +432,6 @@ int main(int argc, char *argv[]) {
         setPower(i, 0, pca9685);
     }
     pca9685.Dump();
+    printTID.~pthread_t();
+
 }

@@ -1,5 +1,5 @@
-#include "motor.h"
-#include "encoder.h"
+#include "HardwareInterfaces/motor.h"
+#include "HardwareInterfaces/encoder.h"
 
 #include "bcm2835.h"
 #include "pca9685.h"
@@ -8,8 +8,10 @@
 class Drivetrain{
     public:
         Drivetrain(PCA9685 pca9685);
-        void drivePow(double xPow, double yPow, double headPow);
+        Drivetrain();
+        void drivePow(double forward, double strafe, double turn);
         void drive(double dx, double dy, double dTheta);
+        void stop();
 
 
     private:

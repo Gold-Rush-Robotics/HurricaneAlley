@@ -1,0 +1,7 @@
+/home/pi/2023/PiPCA9685/build/CMakeFiles/PiPCA9685.dir
+/home/pi/2023/PiPCA9685/build/CMakeFiles/edit_cache.dir
+/home/pi/2023/PiPCA9685/build/CMakeFiles/rebuild_cache.dir
+/home/pi/2023/PiPCA9685/build/CMakeFiles/list_install_components.dir
+/home/pi/2023/PiPCA9685/build/CMakeFiles/install.dir
+/home/pi/2023/PiPCA9685/build/CMakeFiles/install/local.dir
+/home/pi/2023/PiPCA9685/build/CMakeFiles/install/strip.dir

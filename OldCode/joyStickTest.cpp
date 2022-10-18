@@ -86,7 +86,8 @@ int buttonHandler(buttonStore butH, struct js_event *event) {
         butH.lBump = event->value;
         printf(event->value ? "4 pressed" : "4 released");
     }
-    
+
+    return 0;
 }
 
 /**

@@ -28,3 +28,12 @@
 
 #vscode stuff
 .vscode/
+
+build/
+CMakeFiles/
+
+*.cmake
+*.tcl
+CMakeCache.txt
+Makefile
+

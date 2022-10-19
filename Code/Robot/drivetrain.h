@@ -1,5 +1,4 @@
-#include "HardwareInterfaces/motor.h"
-#include "HardwareInterfaces/encoder.h"
+#include "HardwareInterfaces/hardware.h"
 
 #include "bcm2835.h"
 #include "pca9685.h"
@@ -16,7 +15,7 @@ class Drivetrain{
 
     private:
         Motor motors[4];
-        Encoder encoders[3];
+        //Encoder encoders[3];
         PCA9685 pca9685;
         void driveM(double fl, double fr, double bl, double br);
 };

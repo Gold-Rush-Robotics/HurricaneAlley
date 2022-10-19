@@ -9,8 +9,11 @@ Motor::Motor(int directionPin, int speedPin, PCA9685 pca9685){
     Motor::directionPin = directionPin;
     Motor::speedPin = speedPin;
     Motor::pca9685 = pca9685;
-    bcm2835_gpio_fsel(4, BCM2835_GPIO_FSEL_OUTP);
-    bcm2835_gpio_set_pud(4, BCM2835_GPIO_PUD_DOWN);
+    bcm2835_gpio_fsel(directionPin, BCM2835_GPIO_FSEL_OUTP);
+    bcm2835_gpio_set_pud(directionPin, BCM2835_GPIO_PUD_DOWN);
+}
+Motor::Motor(){
+    
 }
 void Motor::reverse(){
     reversed = !reversed;
@@ -29,13 +32,14 @@ void Motor::setPower(double power){
 Encoder::Encoder(int aPin, int bPin){
     Encoder::aPin = aPin;
     Encoder::bPin = bPin;
-    gpioSetMode(aPin, PI_INPUT);
-    gpioSetMode(bPin, PI_INPUT);
+    bcm2835_gpio_fsel(aPin, BCM2835_GPIO_FSEL_INPT);
+    bcm2835_gpio_fsel(bPin, BCM2835_GPIO_FSEL_INPT);
+    
 }
 /**DONT UNDERSTAND... THEORETICALLY WORKS*/
 void Encoder::isr(){
-    uint8_t p1val = gpioRead(aPin);
-    uint8_t p2val = gpioRead(bPin);
+    uint8_t p1val = 0; //gpioRead(aPin);
+    uint8_t p2val = 0; //gpioRead(bPin);
     uint8_t s = state & 3;
     if (p1val) s |= 4;
     if (p2val) s |= 8;

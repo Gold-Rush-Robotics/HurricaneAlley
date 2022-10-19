@@ -13,13 +13,17 @@ enum motorNums
 
 
 Drivetrain::Drivetrain(PCA9685 pca9685){
-    Drivetrain::motors[0] = Motor(4, 0, pca9685);
+    Drivetrain::motors[0] = Motor( 4, 0, pca9685);
     Drivetrain::motors[1] = Motor(17, 1, pca9685);
-    Drivetrain::motors[2] = Motor(22,3,pca9685);
-    Drivetrain::motors[3] = Motor(27,2,pca9685);
+    Drivetrain::motors[2] = Motor(22, 3, pca9685);
+    Drivetrain::motors[3] = Motor(27, 2, pca9685);
     motors[0].reverse();
     motors[2].reverse();
     motors[3].reverse();
+}
+
+Drivetrain::Drivetrain(){
+    
 }
 
 void Drivetrain::drivePow(double forward, double strafe, double turn){

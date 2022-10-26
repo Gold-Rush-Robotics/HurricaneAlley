@@ -2,6 +2,20 @@
 
 #include <linux/joystick.h>
 #include "ps5Controller.cpp"
+#include <iostream>
+
+int main(int argc, char *argv[]){
+    std::cout << "spot 0" << std::endl;
+    if (getuid() != 0)
+    {
+        fprintf(stderr, "Program is not started as \'root\' (sudo)\n");
+        return -1;
+    }
+    std::cout << "spot 1" << std::endl;
+    Robot* robot;
+    std::cout << "spot 123" << std::endl;
+    robot->start();
+}
 
 
 // Reads controller event and insures it is of correct type
@@ -14,22 +28,26 @@ int read_event(int fd, struct js_event *event)
     if (bytes == sizeof(*event))
         return 0;
 
-    /* Error, could not read full event. */
+    // Error, could not read full event. 
     return -1;
 }
 
-
+/**
 int main(int argc, char *argv[]){
+    std::cout << "spot 0";
     if (getuid() != 0)
     {
         fprintf(stderr, "Program is not started as \'root\' (sudo)\n");
         return -1;
     }
+    std::cout << "spot 1";
     Robot robot = Robot();
     const char *device;
+    std::cout << "spot 2";
     int js;
     struct js_event event;
     ps5Controller ctr = ps5Controller();
+    std::cout << "spot 3";
     pthread_t odoTID;
     pthread_t printTID;
     double multiplier = .7;
@@ -39,12 +57,14 @@ int main(int argc, char *argv[]){
     else
         device = "/dev/input/js0";
 
+    std::cout << "spot 4";
     js = open(device, O_RDONLY);
+    std::cout << "spot 5";
 
     if (js == -1)
         perror("Could not open joystick");
 
-    /* This loop will exit if the controller is unplugged. */
+    // This loop will exit if the controller is unplugged. 
     while (read_event(js, &event) == 0) {
         ctr.eventHandler(&event);
 
@@ -65,3 +85,4 @@ int main(int argc, char *argv[]){
 
     robot.stop();
 }
+*/

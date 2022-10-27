@@ -1,5 +1,6 @@
 #include "drivetrain.h"
 #include <algorithm>
+#include <iostream>
 
 
 // Pink zip tie is front, Purple zip tie is back
@@ -11,25 +12,37 @@ enum motorNums
     motorBR = 3
 };
 
-
-Drivetrain::init(){
-    Drivetrain::motors[0] = Motor( 4, 0, pca9685);
-    Drivetrain::motors[1] = Motor(17, 1, pca9685);
-    Drivetrain::motors[2] = Motor(22, 3, pca9685);
-    Drivetrain::motors[3] = Motor(27, 2, pca9685);
-    motors[0].reverse();
-    motors[2].reverse();
-    motors[3].reverse();
+void Drivetrain::init(PCA9685 pca9685){
+    Drivetrain::fl.init(4, 0, pca9685);
+    Drivetrain::fr.init(17, 1, pca9685);
+    Drivetrain::bl.init(22, 3, pca9685);
+    Drivetrain::br.init(27, 2, pca9685);
+    fl.reverse();
+    bl.reverse();
+    br.reverse();
 }
 
 
 void Drivetrain::drivePow(double forward, double strafe, double turn){
+
+    std::cout << forward << "|" << strafe << "|" << turn << std::endl;
+
     double powerFL = forward + strafe - turn;
     double powerFR = forward - strafe + turn;
     double powerBL = forward - strafe - turn;
     double powerBR = forward + strafe + turn;
 
-    double powerMax = std::max(abs(powerFL), std::max(abs(powerFR), std::max(abs(powerBL), std::abs(powerBR))));
+    std::cout << powerFL << "|" << powerFR << "|" << powerBL << "|" << powerBR << std::endl;
+
+    double powerMax = std::max(
+        abs(powerFL), 
+        std::max(
+            abs(powerFR), 
+            std::max(
+                abs(powerBL), 
+                abs(powerBR))));
+
+    std::cout << powerMax << std::endl;
 
     if (powerMax > 1.0)
     {
@@ -44,22 +57,19 @@ void Drivetrain::drivePow(double forward, double strafe, double turn){
     powerBL = constrain(-1.0, 1.0, powerBL);
     powerBR = constrain(-1.0, 1.0, powerBR);
 
-    // printf("\n\n\nfl: %.2f fr: %.2f\n\nbl: %.2f br: %.2f\n", powerFL, powerFR, powerBL, powerBR);
+    printf("\n\n\nfl: %.2f fr: %.2f\n\nbl: %.2f br: %.2f\n", powerFL, powerFR, powerBL, powerBR);
 
     driveM(powerFL, powerFR, powerBL, powerBR);
 }
 
 
 void Drivetrain::driveM(double fl, double fr, double bl, double br){
-    motors[motorFL].setPower(fl);
-    motors[motorFR].setPower(fr);
-    motors[motorBL].setPower(bl);
-    motors[motorBR].setPower(br);
+    Drivetrain::fl.setPower(fl);
+    Drivetrain::fr.setPower(fr);
+    Drivetrain::bl.setPower(bl);
+    Drivetrain::br.setPower(br);
 }
 
 void Drivetrain::stop(){
-    motors[motorFL].setPower(0);
-    motors[motorFR].setPower(0);
-    motors[motorBL].setPower(0);
-    motors[motorBR].setPower(0);
+    driveM(0,0,0,0);
 }

@@ -4,6 +4,20 @@
 #include "ps5Controller.cpp"
 #include <iostream>
 
+// Reads controller event and insures it is of correct type
+int read_event(int fd, struct js_event *event)
+{
+    ssize_t bytes;
+
+    bytes = read(fd, event, sizeof(*event));
+
+    if (bytes == sizeof(*event))
+        return 0;
+
+    /* Error, could not read full event. */
+    return -1;
+}
+
 int main(int argc, char *argv[]){
     if (getuid() != 0)
     {

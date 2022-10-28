@@ -12,11 +12,13 @@ enum motorNums
     motorBR = 3
 };
 
-void Drivetrain::init(PCA9685 pca9685){
-    Drivetrain::fl.init(4, 0, pca9685);
-    Drivetrain::fr.init(17, 1, pca9685);
-    Drivetrain::bl.init(22, 3, pca9685);
-    Drivetrain::br.init(27, 2, pca9685);
+void Drivetrain::init(PCA9685* pca9685A){
+    std::cout << "AAAA" << std::endl;
+    Drivetrain::fl.init(4, 0);
+    std::cout << "AAAA" << std::endl;
+    Drivetrain::fr.init(17, 1);
+    Drivetrain::bl.init(22, 3);
+    Drivetrain::br.init(27, 2);
     fl.reverse();
     bl.reverse();
     br.reverse();
@@ -64,10 +66,10 @@ void Drivetrain::drivePow(double forward, double strafe, double turn){
 
 
 void Drivetrain::driveM(double fl, double fr, double bl, double br){
-    Drivetrain::fl.setPower(fl);
-    Drivetrain::fr.setPower(fr);
-    Drivetrain::bl.setPower(bl);
-    Drivetrain::br.setPower(br);
+    Drivetrain::fl.setPower(fl, pca9685);
+    Drivetrain::fr.setPower(fr, pca9685);
+    Drivetrain::bl.setPower(bl, pca9685);
+    Drivetrain::br.setPower(br, pca9685);
 }
 
 void Drivetrain::stop(){

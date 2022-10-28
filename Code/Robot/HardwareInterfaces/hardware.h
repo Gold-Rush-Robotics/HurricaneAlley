@@ -16,12 +16,12 @@ class Encoder{
 
 class Motor{
     public:
-        PCA9685 pca9685;
+        PCA9685* pca9685;
         int directionPin = 0;
         int speedPin = 0;
         bool reversed;
-        void init(int directionPin, int speedPin, PCA9685 pca9685);
+        void init(int directionPin, int speedPin);
         void reverse();
         bool isReversed();
-        void setPower(double power);
+        void setPower(double power, PCA9685* pca9685A);
 };

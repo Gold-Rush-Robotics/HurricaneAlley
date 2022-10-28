@@ -20,16 +20,14 @@ Robot::Robot(){
     std::cout << "robot init" << std::endl;
 }
 */
-
 void Robot::start(){
-    // Set up pwm hat connection
     if (bcm2835_init() != 1)
     {
         fprintf(stderr, "bcm2835_init() failed\n");
     }
-    PCA9685 pca9685;
-    pca9685.Dump();
-    pca9685.SetFrequency(1000);
+    PCA9685* pca9685 = new PCA9685();
+    pca9685->Dump();
+    pca9685->SetFrequency(1000);
     drivetrain->init(pca9685);
 }
 

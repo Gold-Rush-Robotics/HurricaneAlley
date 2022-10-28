@@ -3,14 +3,15 @@
 #include "utilFunc.h"
 #include "pigpio.h"
 #include <iostream>
+#include "bcm2835.h"
+#include "pca9685.h"
 
 
 using namespace std;
 
-void Motor::init(int directionPin, int speedPin, PCA9685 pca9685){
+void Motor::init(int directionPin, int speedPin){
     this->directionPin << directionPin;
     this->speedPin << speedPin;
-    Motor::pca9685 = pca9685;
     bcm2835_gpio_fsel(directionPin, BCM2835_GPIO_FSEL_OUTP);
     bcm2835_gpio_set_pud(directionPin, BCM2835_GPIO_PUD_DOWN);
 }
@@ -20,13 +21,25 @@ void Motor::reverse(){
 bool Motor::isReversed(){
     return this->reversed;
 }
-void Motor::setPower(double power){
+void Motor::setPower(double power, PCA9685* pca9685A){
     power = constrain(-1.0, 1.0, power);
     double absPower = abs(power);
     std::cout << absPower * (PCA9685_VALUE_MAX - 1) << std::endl;
-    int direct = int(reversed) * power >= 0 ? 0 : 1;
-    direct? bcm2835_gpio_set(directionPin) : bcm2835_gpio_clr(directionPin);
-    this->pca9685.Write(CHANNEL(speedPin), VALUE(absPower * (PCA9685_VALUE_MAX - 1)));
+    bool direct = (power > 0);
+    std::cout << "aaaaa" << std::endl;
+    int pin = 0;
+    pin << this->directionPin;
+    if(direct){
+        bcm2835_gpio_set(pin);
+    } else {
+        bcm2835_gpio_clr(pin);
+    }
+    pin << this->speedPin;
+    std::cout << "aaaaa" << std::endl;
+    power = absPower * (PCA9685_VALUE_MAX - 1);
+    std::cout << "aaaaa" << std::endl;
+    pca9685->Write(CHANNEL(pin), VALUE(power));
+    std::cout << "aaaaa" << std::endl;
 }
 
 void Encoder::init(int aPin, int bPin){

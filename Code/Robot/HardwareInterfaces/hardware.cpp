@@ -35,7 +35,6 @@ void Motor::setPower(double power, PCA9685* pca9685A){
         bcm2835_gpio_clr(pin);
     }
     pin << this->speedPin;
-    std::cout << "aaaaa" << std::endl;
     power = absPower * (PCA9685_VALUE_MAX - 1);
     std::cout << "aaaaa" << std::endl;
     pca9685->Write(CHANNEL(pin), VALUE(power));

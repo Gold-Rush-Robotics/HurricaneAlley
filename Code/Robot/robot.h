@@ -10,7 +10,7 @@ class Drivetrain{
         Motor bl;
         Motor br;
         PCA9685* pca9685;
-        void init();
+        void init(PCA9685* pca);
         void drivePow(double forward, double strafe, double turn);
         void drive(double dx, double dy, double dTheta);
         void stop();

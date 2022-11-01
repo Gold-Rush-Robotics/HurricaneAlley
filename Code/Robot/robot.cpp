@@ -26,10 +26,10 @@ void Robot::start(){
     {
         fprintf(stderr, "bcm2835_init() failed\n");
     }
-    //Robot::pca9685 = new PCA9685();
-    Robot::pca9685->Dump();
-    Robot::pca9685->SetFrequency(1000);
-    drivetrain->init();
+    pca9685 = new PCA9685();
+    pca9685->Dump();
+    pca9685->SetFrequency(1000);
+    drivetrain->init(pca9685);
 }
 
 void Robot::driveController(double s1y, double s1x, double s2y, double s2x, double multiplier){
@@ -50,9 +50,9 @@ enum motorNums
     motorBR = 3
 };
 
-void Drivetrain::init(){
+void Drivetrain::init(PCA9685* pca){
     std::cout << "AAAA" << std::endl;
-    Drivetrain::pca9685 = Robot::pca9685;
+    Drivetrain::pca9685 = pca;
     std::cout << "AAAA" << std::endl;
     Drivetrain::fl.init(4, 0);
     Drivetrain::fr.init(17, 1);

@@ -1,4 +1,5 @@
 #include <stdint.h>
+#include <memory>
 #include "utilFunc.h"
 #include "bcm2835.h"
 #include "pca9685.h"

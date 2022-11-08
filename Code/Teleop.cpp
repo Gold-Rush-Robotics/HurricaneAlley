@@ -24,8 +24,8 @@ int main(int argc, char *argv[]){
         fprintf(stderr, "Program is not started as \'root\' (sudo)\n");
         return -1;
     }
-    Robot* robot;
-    robot->start();
+    Robot robot;
+    robot.start();
     const char *device;
     int js;
     struct js_event event;
@@ -57,12 +57,12 @@ int main(int argc, char *argv[]){
             multiplier = .5;
         }
 
-        robot->driveController(ctr.ly, ctr.lx, ctr.ry,ctr.rx, multiplier);
+        robot.driveController(ctr.ly, ctr.lx, ctr.ry,ctr.rx, multiplier);
 
         fflush(stdout);
     }
 
-    robot->stop();
+    robot.stop();
 }
 
 

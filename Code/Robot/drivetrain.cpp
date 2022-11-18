@@ -7,9 +7,7 @@ Drivetrain::Drivetrain(std::shared_ptr<PCA9685> pca){
     fr = std::make_shared<Motor>(17, 1, pca);
     bl = std::make_shared<Motor>(22, 3, pca);
     br = std::make_shared<Motor>(27, 2, pca);
-    fl->reverse();
-    bl->reverse();
-    br->reverse();
+    fr->reverse();
 }
 
 
@@ -20,14 +18,7 @@ void Drivetrain::drivePow(double forward, double strafe, double turn){
     double powerBL = forward - strafe - turn;
     double powerBR = forward + strafe + turn;
     std::cout << powerFL << "|" << powerFR << "|" << powerBL << "|" << powerBR << std::endl;
-    double powerMax = std::max(
-        abs(powerFL), 
-        std::max(
-            abs(powerFR), 
-            std::max(
-                abs(powerBL), 
-                abs(powerBR))));
-    std::cout << powerMax << std::endl;
+    double powerMax = std::max(abs(powerFL), std::max(abs(powerFR), std::max(abs(powerBL), abs(powerBR))));
 
     if (powerMax > 1.0)
     {
@@ -42,7 +33,7 @@ void Drivetrain::drivePow(double forward, double strafe, double turn){
     powerBL = constrain(-1.0, 1.0, powerBL);
     powerBR = constrain(-1.0, 1.0, powerBR);
 
-    printf("\n\n\nfl: %.2f fr: %.2f\n\nbl: %.2f br: %.2f\n", powerFL, powerFR, powerBL, powerBR);
+    printf("\nfl: %.2f fr: %.2f\nbl: %.2f br: %.2f\n", powerFL, powerFR, powerBL, powerBR);
 
     driveM(powerFL, powerFR, powerBL, powerBR);
 }

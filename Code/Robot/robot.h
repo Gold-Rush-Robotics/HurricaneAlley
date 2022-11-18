@@ -1,5 +1,4 @@
 #include <iostream>
-#include "../HardwareInterfaces/hardware.h"
 #include "bcm2835.h"
 #include "pca9685.h"
 #include "drivetrain.h"

@@ -12,16 +12,32 @@
 #define OCTOQUAD_I2C_ADDR 0x30
 #define OCTOQUAD_DRIVER_SUPPORTED_FW_VERSION_MAJ 2
 
+/*! Reads data from reg on addr to dst
+        \param[in] addr The I2C slave Addres
+        \param[in] reg The register to begin reading from
+        \param[in] n the number of bytes to read
+        \param[out] dst a pointer that will be filled with the bytes
+        \return true if sucessful, False on error
+*/
 static bool platform_i2c_read_registers(const uint8_t addr, const uint8_t reg, uint8_t n, uint8_t *const dst)
 {
     bcm2835_i2c_setSlaveAddress(addr);
     char buf[1] = {reg};
-    bcm2835_i2c_write(buf, 1);
-    bcm2835_i2c_read((char *)dst, n);
+    uint8_t reason1 = BCM2835_I2C_REASON_OK;
+    uint8_t reason2 = BCM2835_I2C_REASON_OK;
+    reason1 = bcm2835_i2c_write(buf, 1);
+    reason2 = bcm2835_i2c_read((char *)dst, n);
     // uint8_t reason = bcm2835_i2c_read_register_rs((char*) &reg, (char*) dst, n);
-    return true;
+    return reason1 == BCM2835_I2C_REASON_OK && uint8_t reason2 = BCM2835_I2C_REASON_OK;
 }
 
+/*! writes data to reg on addr from src
+        \param[in] addr The I2C slave Addres
+        \param[in] reg The register to begin writing to
+        \param[in] src a pointer to the bytes to write
+        \param[in] n the number of bytes to write
+        \return True if sucessful, False on error
+*/
 static bool platform_i2c_write_registers(const uint8_t addr, const uint8_t reg, const uint8_t *const src, const uint8_t n)
 {
     // std::cout << "writing " << std::to_string(n) << " Bytes to " << std::to_string(reg) << std::endl;
@@ -35,25 +51,9 @@ static bool platform_i2c_write_registers(const uint8_t addr, const uint8_t reg, 
     bcm2835_i2c_write(buf, n + 1);
     return true;
 }
-
-static void platform_sleep_us(const uint16_t us)
-{
-    struct timespec req;
-    req.tv_nsec = us * 1000;
-    req.tv_sec = 0;
-    clock_nanosleep(CLOCK_MONOTONIC, 0, &req, NULL);
-}
-
-void platform_sleep_ms(uint16_t ms)
-{
-    struct timespec req;
-    req.tv_nsec = ms * 1000 * 1000;
-    req.tv_sec = 0;
-    clock_nanosleep(CLOCK_MONOTONIC, 0, &req, NULL);
-}
-
 static OctoQuadInterface INTERFACE_CHOICE = OCTOQUAD_INTERFACE_I2C;
 
+/*Initialize Encoder Handler and print out setupvalues*/
 void EncoderHandler::init()
 {
     if (bcm2835_i2c_begin() != 1)
@@ -66,9 +66,7 @@ void EncoderHandler::init()
     // Define the platform HAL implementation for the OctoQuad driver
     OctoQuadPlatformImpl platform = {
         .i2c_read_registers = &platform_i2c_read_registers,
-        .i2c_write_registers = &platform_i2c_write_registers,
-        .sleep_us = &platform_sleep_us,
-        .sleep_ms = &platform_sleep_ms};
+        .i2c_write_registers = &platform_i2c_write_registers};
     octoquad_init(INTERFACE_CHOICE, platform);
 
     // Check the CHIP_ID
@@ -146,12 +144,15 @@ void EncoderHandler::init()
     octoquad_reset_all_positions();
 }
 
+/*Reset All Encoder Positions*/
 bool EncoderHandler::resetPositions()
 {
-    printf("----- RESET -------");
     return octoquad_reset_all_positions();
 }
 
+/*! Get all the Values
+    \return returns a pointer to an 16 slot array, with the first 8 having positions and the last 8 having velocities
+*/
 int32_t *EncoderHandler::getValues()
 {
     int32_t counts[8];
@@ -172,7 +173,10 @@ int32_t *EncoderHandler::getValues()
     return value;
 }
 
-long EncoderHandler::getPos(int encoder)
+/*! gets the counts from a single encoder 0-7
+    \return the count from encoder
+*/
+int32_t EncoderHandler::getPos(int encoder)
 {
     if (!ENCODER_IDX_IN_RANGE(encoder))
     {
@@ -184,6 +188,7 @@ long EncoderHandler::getPos(int encoder)
     return values[0];
 }
 
+/*prints the encoder counts and velocities in a readable fashion*/
 void EncoderHandler::printReadable()
 {
     int32_t counts[8] = {0xFFFFFF, 0xFFFFFF, 0xFFFFFF, 0xFFFFFF, 0xFFFFFF, 0xFFFFFF, 0xFFFFFF, 0xFFFFFF};

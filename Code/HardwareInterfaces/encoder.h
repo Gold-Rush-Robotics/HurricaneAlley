@@ -6,7 +6,7 @@
 class EncoderHandler{
     public:
         void init();
-        long getPos(int encoder);
+        int32_t getPos(int encoder);
         int32_t* getValues();
         void printReadable();
         bool resetPositions();

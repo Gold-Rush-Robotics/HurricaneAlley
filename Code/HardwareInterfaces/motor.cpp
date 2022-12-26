@@ -22,23 +22,19 @@ bool Motor::isReversed(){
 }
 
 void Motor::setPower(double power){
-    std::cout << "power IN: " << power << std::endl;
     power = constrain(-1.0, 1.0, power);
     double absPower = abs(power);
 
     if(reversed && power < 0){
         bcm2835_gpio_clr(directionPin);
-        std::cout << "INV: " << reversed << std::endl;
     } else if(reversed && power > 0) {
         bcm2835_gpio_set(directionPin);
     } else if(!reversed && power < 0){
         bcm2835_gpio_set(directionPin);
     } else {
         bcm2835_gpio_clr(directionPin);
-        std::cout << "FWD: " << reversed << std::endl;
     }
 
     power = absPower * (PCA9685_VALUE_MAX - 1);
-    std::cout << "Power OUT: " << power << std::endl;
     pca9685->Write(CHANNEL(speedPin), VALUE(power));
 }

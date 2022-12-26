@@ -1,5 +1,6 @@
 #include <iostream>
 #include "../HardwareInterfaces/motor.h"
+#include "../HardwareInterfaces/encoder.h"
 #include "bcm2835.h"
 #include "pca9685.h"
 

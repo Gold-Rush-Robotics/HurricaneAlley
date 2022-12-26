@@ -12,12 +12,11 @@ Drivetrain::Drivetrain(std::shared_ptr<PCA9685> pca){
 
 
 void Drivetrain::drivePow(double forward, double strafe, double turn){
-    std::cout << forward << "|" << strafe << "|" << turn << std::endl;
+    //std::cout << forward << "|" << strafe << "|" << turn << std::endl;
     double powerFL = forward + strafe - turn;
     double powerFR = forward - strafe + turn;
     double powerBL = forward - strafe - turn;
     double powerBR = forward + strafe + turn;
-    std::cout << powerFL << "|" << powerFR << "|" << powerBL << "|" << powerBR << std::endl;
     double powerMax = std::max(abs(powerFL), std::max(abs(powerFR), std::max(abs(powerBL), abs(powerBR))));
 
     if (powerMax > 1.0)
@@ -33,7 +32,7 @@ void Drivetrain::drivePow(double forward, double strafe, double turn){
     powerBL = constrain(-1.0, 1.0, powerBL);
     powerBR = constrain(-1.0, 1.0, powerBR);
 
-    printf("\nfl: %.2f fr: %.2f\nbl: %.2f br: %.2f\n", powerFL, powerFR, powerBL, powerBR);
+    //printf("\nfl: %.2f fr: %.2f\nbl: %.2f br: %.2f\n", powerFL, powerFR, powerBL, powerBR);
 
     driveM(powerFL, powerFR, powerBL, powerBR);
 }

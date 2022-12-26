@@ -1,11 +1,15 @@
 #include <stdint.h>
+#include <memory>
+#include "utilFunc.h"
+#include "bcm2835.h"
 
-class Encoder{
-    int aPin;
-    int bPin;
-    volatile long pos = 0;
-    volatile uint8_t state;
-    Encoder(int aPin, int bPin);
-    void isr();
-    long getPos();
+class EncoderHandler{
+    public:
+        void init();
+        long getPos(int encoder);
+        int32_t* getValues();
+        void printReadable();
+        bool resetPositions();
+    private:
+        
 };

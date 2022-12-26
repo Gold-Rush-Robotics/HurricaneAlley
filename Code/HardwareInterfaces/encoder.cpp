@@ -1,37 +1,216 @@
-#include "encoder.h";
-#include "pigpio.h";
+#include "encoder.h"
+#include <iostream>
+#include "bcm2835.h"
+#include "octoquad.h"
+#include <stdio.h>
+#include <linux/joystick.h>
 
-Encoder::Encoder(int aPin, int bPin){
-    Encoder::aPin = aPin;
-    Encoder::bPin = bPin;
-    gpioSetMode(aPin, PI_INPUT);
-    gpioSetMode(bPin, PI_INPUT);
+#define NUM_ENCODERS 8
+#define ENCODER_IDX_MIN 0
+#define ENCODER_IDX_MAX (NUM_ENCODERS - 1)
+#define ENCODER_IDX_IN_RANGE(val) ((val >= ENCODER_IDX_MIN && val <= ENCODER_IDX_MAX))
+#define OCTOQUAD_I2C_ADDR 0x30
+#define OCTOQUAD_DRIVER_SUPPORTED_FW_VERSION_MAJ 2
+
+static bool platform_i2c_read_registers(const uint8_t addr, const uint8_t reg, uint8_t n, uint8_t *const dst)
+{
+    bcm2835_i2c_setSlaveAddress(addr);
+    char buf[1] = {reg};
+    bcm2835_i2c_write(buf, 1);
+    bcm2835_i2c_read((char *)dst, n);
+    // uint8_t reason = bcm2835_i2c_read_register_rs((char*) &reg, (char*) dst, n);
+    return true;
 }
-/**DONT UNDERSTAND... THEORETICALLY WORKS*/
-void Encoder::isr(){
-    uint8_t p1val = gpioRead(aPin);
-    uint8_t p2val = gpioRead(bPin);
-    uint8_t s = state & 3;
-    if (p1val) s |= 4;
-    if (p2val) s |= 8;
-    state = (s >> 2);
-    
-    switch (s) {
-        case 1: case 7: case 8: case 14:
-            pos++;
-            return;
-        case 2: case 4: case 11: case 13:
-            pos--;
-            return;
-        case 3: case 12:
-            pos += 2;
-            return;
-        case 6: case 9:
-            pos -= 2;
-            return;
+
+static bool platform_i2c_write_registers(const uint8_t addr, const uint8_t reg, const uint8_t *const src, const uint8_t n)
+{
+    // std::cout << "writing " << std::to_string(n) << " Bytes to " << std::to_string(reg) << std::endl;
+    bcm2835_i2c_setSlaveAddress(addr);
+    char buf[n + 1];
+    buf[0] = reg;
+    for (int i = 1; i <= n + 1; i++)
+    {
+        buf[i] = src[i - 1];
     }
+    bcm2835_i2c_write(buf, n + 1);
+    return true;
 }
 
-long Encoder::getPos(){
-    return pos
+static void platform_sleep_us(const uint16_t us)
+{
+    struct timespec req;
+    req.tv_nsec = us * 1000;
+    req.tv_sec = 0;
+    clock_nanosleep(CLOCK_MONOTONIC, 0, &req, NULL);
+}
+
+void platform_sleep_ms(uint16_t ms)
+{
+    struct timespec req;
+    req.tv_nsec = ms * 1000 * 1000;
+    req.tv_sec = 0;
+    clock_nanosleep(CLOCK_MONOTONIC, 0, &req, NULL);
+}
+
+static OctoQuadInterface INTERFACE_CHOICE = OCTOQUAD_INTERFACE_I2C;
+
+void EncoderHandler::init()
+{
+    if (bcm2835_i2c_begin() != 1)
+    {
+        fprintf(stderr, "i2c failed to begin\n probably not run as root\n");
+        exit(1);
+    }
+    bcm2835_i2c_setSlaveAddress(OCTOQUAD_I2C_ADDR);
+
+    // Define the platform HAL implementation for the OctoQuad driver
+    OctoQuadPlatformImpl platform = {
+        .i2c_read_registers = &platform_i2c_read_registers,
+        .i2c_write_registers = &platform_i2c_write_registers,
+        .sleep_us = &platform_sleep_us,
+        .sleep_ms = &platform_sleep_ms};
+    octoquad_init(INTERFACE_CHOICE, platform);
+
+    // Check the CHIP_ID
+    uint8_t chipId;
+    if (!octoquad_get_chip_id(&chipId))
+    {
+        printf("ERROR reading chip ID");
+    }
+
+    if (chipId == OCTOQUAD_CHIP_ID)
+    {
+        printf("CHIP_ID reports 0x%X as expected\r\n", chipId);
+    }
+    else
+    {
+        printf("CHIP_ID check failed, got 0x%X expect 0x%X\r\n", chipId, OCTOQUAD_CHIP_ID);
+    }
+
+    // Read the firmware version
+    OctoQuadFwVersion firmwareVersion;
+
+    octoquad_get_fw_version(&firmwareVersion);
+
+    // Print to console
+    printf("OctoQuad Reports FW v%d.%d.%d\r\n", firmwareVersion.maj, firmwareVersion.min, firmwareVersion.eng);
+
+    // Check if that FW version is compatible
+    if (firmwareVersion.maj != OCTOQUAD_DRIVER_SUPPORTED_FW_VERSION_MAJ)
+    {
+        printf("Cannot continue: The connected OctoQuad is running a firmware with a different major version than this program expects (got %d, expect %d)\r\n", firmwareVersion.maj, OCTOQUAD_DRIVER_SUPPORTED_FW_VERSION_MAJ);
+    }
+
+    OctoQuadChannelBankMode channelBankMode = OCTOQUAD_CHANNEL_BANK_MODE_ALL_QUADRATURE;
+    if (!octoquad_get_channel_bank_mode(&channelBankMode))
+    {
+        printf("Error getting channel bank mode");
+    }
+    printf("Channel Bank Mode = %x\r\n", channelBankMode);
+
+    OctoQuadI2cRecoveryMode recoveryMode = OCTOQUAD_I2C_RECOVERY_MODE_NONE;
+    if (!octoquad_get_i2c_recovery_mode(&recoveryMode))
+    {
+        printf("Error getting i2c recovery mode");
+    }
+    printf("I2C Recovery Mode = %d\r\n", recoveryMode);
+
+    for (int i = ENCODER_IDX_MIN; i <= ENCODER_IDX_MAX; i++)
+    {
+        uint8_t intvl = 0;
+        if (!octoquad_get_velocity_measurement_intvl(i, &intvl))
+        {
+            printf("error egging velocity measurement interval");
+        }
+        printf("Channel %d velocity sample interval = %d\r\n", i, intvl);
+    }
+
+    for (int i = ENCODER_IDX_MIN; i <= ENCODER_IDX_MAX; i++)
+    {
+        OctoQuadChannelPulseWidthParams params;
+        if (!octoquad_get_channel_pulse_width_params(i, &params))
+        {
+            printf("Error getting channel pulse width params");
+        }
+        printf("Channel %d pulse min/max = %d/%d\r\n", i, params.min, params.max);
+    }
+
+    bool channelDirections[8];
+    octoquad_get_all_channel_directions(channelDirections);
+
+    for (int i = ENCODER_IDX_MIN; i <= ENCODER_IDX_MAX; i++)
+    {
+        printf("Channel %d reverse = %d\r\n", i, channelDirections[i]);
+    }
+
+    octoquad_reset_all_positions();
+}
+
+bool EncoderHandler::resetPositions()
+{
+    printf("----- RESET -------");
+    return octoquad_reset_all_positions();
+}
+
+int32_t *EncoderHandler::getValues()
+{
+    int32_t counts[8];
+    int16_t vels[8];
+    if (!octoquad_read_all_positions(counts))
+        ;
+    if (!octoquad_read_all_velocities(vels))
+        ;
+
+    printf("C: %d %d %d \n", counts[0], counts[1], counts[2]);
+
+    static int32_t value[16];
+    for (int i = 0; i < 8; i++)
+    {
+        value[i] = counts[i];
+        value[i + 8] = vels[i];
+    }
+    return value;
+}
+
+long EncoderHandler::getPos(int encoder)
+{
+    if (!ENCODER_IDX_IN_RANGE(encoder))
+    {
+        std::cout << "Invalid Encoder ID:" << encoder << std::endl;
+        exit(1);
+    }
+    int32_t *values;
+    octoquad_read_single_position(0, values);
+    return values[0];
+}
+
+void EncoderHandler::printReadable()
+{
+    int32_t counts[8] = {0xFFFFFF, 0xFFFFFF, 0xFFFFFF, 0xFFFFFF, 0xFFFFFF, 0xFFFFFF, 0xFFFFFF, 0xFFFFFF};
+    int16_t vels[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+    if (!octoquad_read_all_positions(counts))
+    {
+        printf("Error reading position");
+    }
+    if (!octoquad_read_all_velocities(vels))
+    {
+        printf("Error reading velocities");
+    }
+    printf("POS[%d,%d,%d,%d,%d,%d,%d,%d] VEL[%d,%d,%d,%d,%d,%d,%d,%d]\r\n",
+           counts[0],
+           counts[1],
+           counts[2],
+           counts[3],
+           counts[4],
+           counts[5],
+           counts[6],
+           counts[7],
+           vels[0],
+           vels[1],
+           vels[2],
+           vels[3],
+           vels[4],
+           vels[5],
+           vels[6],
+           vels[7]);
 }

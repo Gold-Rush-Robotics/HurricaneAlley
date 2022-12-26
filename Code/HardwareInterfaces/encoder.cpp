@@ -1,9 +1,9 @@
 #include "encoder.h"
 #include <iostream>
-#include "bcm2835.h"
 #include "octoquad.h"
 #include <stdio.h>
 #include <linux/joystick.h>
+#include "../Utilities/I2C.h"
 
 #define NUM_ENCODERS 8
 #define ENCODER_IDX_MIN 0
@@ -12,45 +12,6 @@
 #define OCTOQUAD_I2C_ADDR 0x30
 #define OCTOQUAD_DRIVER_SUPPORTED_FW_VERSION_MAJ 2
 
-/*! Reads data from reg on addr to dst
-        \param[in] addr The I2C slave Addres
-        \param[in] reg The register to begin reading from
-        \param[in] n the number of bytes to read
-        \param[out] dst a pointer that will be filled with the bytes
-        \return true if sucessful, False on error
-*/
-static bool platform_i2c_read_registers(const uint8_t addr, const uint8_t reg, uint8_t n, uint8_t *const dst)
-{
-    bcm2835_i2c_setSlaveAddress(addr);
-    char buf[1] = {reg};
-    uint8_t reason1 = BCM2835_I2C_REASON_OK;
-    uint8_t reason2 = BCM2835_I2C_REASON_OK;
-    reason1 = bcm2835_i2c_write(buf, 1);
-    reason2 = bcm2835_i2c_read((char *)dst, n);
-    // uint8_t reason = bcm2835_i2c_read_register_rs((char*) &reg, (char*) dst, n);
-    return reason1 == BCM2835_I2C_REASON_OK && uint8_t reason2 = BCM2835_I2C_REASON_OK;
-}
-
-/*! writes data to reg on addr from src
-        \param[in] addr The I2C slave Addres
-        \param[in] reg The register to begin writing to
-        \param[in] src a pointer to the bytes to write
-        \param[in] n the number of bytes to write
-        \return True if sucessful, False on error
-*/
-static bool platform_i2c_write_registers(const uint8_t addr, const uint8_t reg, const uint8_t *const src, const uint8_t n)
-{
-    // std::cout << "writing " << std::to_string(n) << " Bytes to " << std::to_string(reg) << std::endl;
-    bcm2835_i2c_setSlaveAddress(addr);
-    char buf[n + 1];
-    buf[0] = reg;
-    for (int i = 1; i <= n + 1; i++)
-    {
-        buf[i] = src[i - 1];
-    }
-    bcm2835_i2c_write(buf, n + 1);
-    return true;
-}
 static OctoQuadInterface INTERFACE_CHOICE = OCTOQUAD_INTERFACE_I2C;
 
 /*Initialize Encoder Handler and print out setupvalues*/
@@ -65,8 +26,8 @@ void EncoderHandler::init()
 
     // Define the platform HAL implementation for the OctoQuad driver
     OctoQuadPlatformImpl platform = {
-        .i2c_read_registers = &platform_i2c_read_registers,
-        .i2c_write_registers = &platform_i2c_write_registers};
+        .i2c_read_registers = &I2C::readRegisters,
+        .i2c_write_registers = &I2C::writeRegisters};
     octoquad_init(INTERFACE_CHOICE, platform);
 
     // Check the CHIP_ID

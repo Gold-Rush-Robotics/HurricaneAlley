@@ -28,7 +28,7 @@ int main(){
     bcm2835_i2c_read(address , length);
     for(int i=0 ; i<length ; i++)
     {
-        std::cout << "val: " << std::bitset<8>(buffer[i]).to_string() << std::endl;
+        std::cout << "val: " << std::bitset<8>(buffer[i]).to_ulong() << std::endl;
     }
 
     return 0;

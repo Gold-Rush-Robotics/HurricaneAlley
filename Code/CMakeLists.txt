@@ -5,16 +5,21 @@ include(CTest)
 enable_testing()
 
 
-include_directories(./Utilities/ ../../rpidmx512/lib-pca9685/include/ ../OldCode/ Robot/HardwareInterfaces/)
+include_directories(./Utilities/ ../../rpidmx512/lib-pca9685/include/ ../OldCode/ Opmodes/ Robot/HardwareInterfaces/)
 
 set(HARDWARE HardwareInterfaces/motor.cpp HardwareInterfaces/octoquad.cpp HardwareInterfaces/encoder.cpp)
 set(ROBOT Robot/drivetrain.cpp Robot/robot.cpp)
 set(UTILITIES Utilities/utilFunc.cpp Utilities/I2C.cpp)
-set(RUNNER Teleop.cpp)
+set(TELEOP Teleop.cpp Runner.cpp)
+set(AUTO Auto.cpp Runner.cpp)
+set(SIMPLE SimpleDrive.cpp)
 
-set(SOURCES ${HARDWARE} ${ROBOT} ${UTILITIES} ${RUNNER})
+set(SOURCES ${HARDWARE} ${ROBOT} ${UTILITIES})
 
-add_executable(CART ${SOURCES})
+add_executable(GoldRushTele ${SOURCES} ${TELEOP})
+add_executable(GoldRushAuto ${SOURCES} ${AUTO})
+add_executable(GoldRushDrive ${SOURCES} ${SIMPLE})
+
 target_link_libraries(CART -L"../../rpidmx512/lib-pca9685/lib_linux/" -lpigpio -lrt -lpca9685 -lbcm2835 -lpthread)
 
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})

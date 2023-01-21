@@ -1,8 +1,9 @@
+
 class GoldRushAction{
     public:
         void setNext(GoldRushAction action);
         void setLast(GoldRushAction action);
-        GoldRushAction run();
+        virtual GoldRushAction run();
     private:
         GoldRushAction nextAction;
 }

@@ -15,7 +15,9 @@ class Revolver{
         int release_can();
         int store_can();
 
+        int store_marshmallow(MARSHMALLOWS color);
         int load_marshmallow(MARSHMALLOWS color);
+        int load_marshmallow_stack(MARSHMALLOWS color);
 
         enum MARSHMALLOWS { 
             EMPTY,
@@ -31,11 +33,13 @@ class Revolver{
         std::shared_ptr<Motor> agitator, motor_revolver;
         
         MARSHMALLOWS revolver[5], can[3];
-        int32_t chambers[5];
+        int32_t chambers[5];    //Encoder values for each chamber position basing it off of the loader for the pringle can
         
         int rotate_revolver(int pos);
+        int get_current_chamber();
+        int contains_color(MARSHMALLOWS color);
 
         int32_t encoder_ticks;
-
+        int check_can;
 
 };

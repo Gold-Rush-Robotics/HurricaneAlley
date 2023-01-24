@@ -18,6 +18,10 @@ Revolver::Revolver(std::shared_ptr<PCA9685> pca, std::shared_ptr<EncoderHandler>
     can = [EMPTY, EMPTY, EMPTY]; // 0 is the top position (the first loaded)
     //TODO Find encoder ticks for each position
     chambers = [0, 1, 2, 3, 4];
+
+    opener = false;
+    dropper = false;
+    finger_in_revolver = false;
 }
 
 // Look at the name
@@ -32,26 +36,10 @@ Revolver::turn_off_agitator()
     Revolver::agitator->setPower(0.0);
 }
 
-Revolver::get_current_chamber()
-{
-    //TODO Find the encoder number for revolver
-    encoder_ticks = enc->getPos(3);
-
-    //TODO add some kind of range that each chamber is inbetween
-    if (encoder_ticks == chambers[0])
-        return 0;
-    if (encoder_ticks == chambers[1])
-        return 1;
-    if (encoder_ticks == chambers[2])
-        return 2;
-    if (encoder_ticks == chambers[3])
-        return 3;
-    if (encoder_ticks == chambers[4])
-        return 4;
-}
-
-// Rotates the revolver to one of the chambers (int pos)
-// TODO Edit how the rotation logic works
+/*  Rotates the revolver to one of the chambers (int pos)
+    TODO Edit how the rotation logic works
+    @param int pos (location in encoder ticks of where it needs to go)
+*/
 Revolver::rotate_revolver(int pos)
 { 
     //TODO Find Suitable Power to run the motor at and which direction it should turn
@@ -66,60 +54,54 @@ Revolver::rotate_revolver(int pos)
     motor_revolver->setPower(0.0);
 }
 
-// TODO for release and store can add some kind of delay to make sure that servo did the thing
-Revolver::release_can()
+// Toggles the servo in control of dropping/storing the can
+Revolver::toggle_drop_servo()
 {
-    //TODO Find Position for Servo and max Angle
-    dropper->setPosition(0, 270);
-    opener->setPosition(0, 270);
-
-    for (int i = 0; i < 3; i++)
+    if (dropper)
     {
-        can[i] = EMPTY;
+        dropper->setPosition(0, 270);
+        dropper = false;
     }
-    check_can = 3;
+    else
+    {
+        dropper->setPosition(270, 270);
+        dropper = true;
+    }
 }
 
-Revolver::store_can()
+// Toggles the servo in control of opening/closing the can
+// Resets can and check_can if it opens
+Revolver::toggle_open_servo()
 {
-    //TODO Find Position for Servo and max Angle
-    dropper->setPosition(270, 270);
-    opener->setPosition(270, 270);
+    if (opener)
+    {
+        opener->setPosition(0, 270);
+        opener = false;
+    }
+    else
+    {
+        opener->setPosition(270, 270);
+        opener = true;
+        for (int i = 0; i < 3; i++)
+        {
+            can[i] = EMPTY;
+        }
+        check_can = 3;
+    }
 }
 
-// TODO Make it not rotate one loop to findout that there's an available chamber
-//      ( contains_color(empty) )
+
 Revolver::store_marshmallow(MARSHMALLOWS color)
 {
-    int initial_chamber = 5;
-    int current_chamber = get_current_chamber();
-    //TODO find the modifier of ticks between chambers from the loader to the agitator
-    //     Maybe find a more optimal way of storing marshmallows other than first come first serve
-    while (revolver[current_chamber] != EMPTY && initial_chamber != current_chamber)
-    {
-        if (initial_chamber == 5)
-            initial_chamber = current_chamber;
-        
-        if (current_chamber + 1 > 4)
-            current_chamber = 0;
-        
-        rotate_revolver(current_chamber + 1);
-        current_chamber = get_current_chamber();
-    }
-    
-    if (initial_chamber == current_chamber)
-    {
-        // This means that there wasn't an open slot
+    int goal_chamber = get_color_pos(EMPTY);
+    if (goal_chamber == -1)
         return -1;
-    }
-    else 
-    {
-        revolver[current_chamber] = color;
-        return 1;
-    }
+    
+    rotate_revolver(chambers[goal_chamber] + agitator_mod);
+    return 1;
 }
 
-Revolver::contains_color(MARSHMALLOWS color)
+Revolver::get_color_pos(MARSHMALLOWS color)
 {
     for (int i = 0; i < 5; i++)
     {
@@ -129,16 +111,33 @@ Revolver::contains_color(MARSHMALLOWS color)
     return -1;
 }
 
+// There might be a problem with load_marshmallow where the finger used to load the can
+// will need to retract before the next time rotate_revolver is called (which should
+// be in load_marshmallow (or possibly store_marshmallow) but the finger might not 
+// have enough time to get out of the way of the chamber revolving which is why I had 
+// to get rid of load_marshmallow_stack ;(
+
+Revolver::retract_loader()
+{
+    loader->setPosition(0, 270);
+    finger_in_revolver = false;
+}
+
+Revolver::get_finger_in_revolver()
+{
+    return finger_in_revolver;
+}
+
 Revolver::load_marshmallow(MARSHMALLOWS color)
 {
-    int chamber = contains_color(color);
+    int chamber = get_color_pos(color);
     // The color wasn't loaded in the revolver
     if (chamber == -1)
         return -1;
     
     rotate_revolver(chamber);
     loader->setPosition(270, 270); // Again need to adjust servo values
-    loader->setPosition(0, 270);
+    finger_in_revolver = true;
     revolver[chamber] = EMPTY;
 
 
@@ -153,51 +152,7 @@ Revolver::load_marshmallow(MARSHMALLOWS color)
     return count;
 }
 
-//TODO maybe have a method to store one at a time instead of waiting to have both a white and a green at least
-//     also maybe have optimized storage
 // Three tall Statue: base level – white, second level – green, third level – red
 // with a pink duck on top in the middle of the pond
 // Two Tall Statue: base level – white, second level – green
 // with a yellow duck on top on the outside pond locations
-Revolver::load_marshmallow_stack(int stack_size)
-{
-    if (check_can != 3)
-        return -1;
-
-    if (stack_size == 2)
-    {
-        // Load the green first        
-        check_can = load_marshmallow(GREEN);
-        if (check_can == -1)
-            return -2;
-        // Load the white second
-        check_can = load_marshmallow(WHITE);
-        if (check_can == -1)
-            return -3;
-
-        return 2;
-    }
-
-    if (stack_size == 3)
-    {
-        // Load the red first
-        check_can = load_marshmallow(RED);
-        if (check_can == -1)
-            return -4;
-        
-        // Load the green second
-        check_can = load_marshmallow(GREEN);
-        if (check_can == -1)
-            return -5;
-        
-        // Load the white third
-        check_can = load_marshmallow(WHITE);
-        if (check_can == -1)
-            return -6;
-
-        return 3;
-    }
-
-    // Nothing got loaded because of an invalid stack size
-    return 0;
-}

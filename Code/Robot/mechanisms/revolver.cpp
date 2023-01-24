@@ -3,11 +3,7 @@
 
 Revolver::Revolver(std::shared_ptr<PCA9685> pca, std::shared_ptr<EncoderHandler> h)
 {
-    pca9685 = pca;
     enc = h;
-    
-    // Initializing Encoder stuff here until phillip says it's wrong
-    enc->init();
 
     //TODO: Update Pins
     motor_revolver = std::make_shared<Motor>(17, 0, pca);
@@ -55,6 +51,7 @@ Revolver::get_current_chamber()
 }
 
 // Rotates the revolver to one of the chambers (int pos)
+// TODO Edit how the rotation logic works
 Revolver::rotate_revolver(int pos)
 { 
     //TODO Find Suitable Power to run the motor at and which direction it should turn
@@ -69,6 +66,7 @@ Revolver::rotate_revolver(int pos)
     motor_revolver->setPower(0.0);
 }
 
+// TODO for release and store can add some kind of delay to make sure that servo did the thing
 Revolver::release_can()
 {
     //TODO Find Position for Servo and max Angle
@@ -87,10 +85,10 @@ Revolver::store_can()
     //TODO Find Position for Servo and max Angle
     dropper->setPosition(270, 270);
     opener->setPosition(270, 270);
-
-    //Find out if we need to drive backwards to avoid destroying the statue
 }
 
+// TODO Make it not rotate one loop to findout that there's an available chamber
+//      ( contains_color(empty) )
 Revolver::store_marshmallow(MARSHMALLOWS color)
 {
     int initial_chamber = 5;

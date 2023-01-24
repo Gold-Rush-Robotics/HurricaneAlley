@@ -2,6 +2,7 @@
 #include "../../HardwareInterfaces/servo.h"
 #include "../../HardwareInterfaces/motor.h"
 #include "../../HardwareInterfaces/encoder.h"
+#include "../../Utilities/utilFunc.h"
 #include "pca9685.h"
 
 
@@ -17,7 +18,7 @@ class Revolver{
 
         int store_marshmallow(MARSHMALLOWS color);
         int load_marshmallow(MARSHMALLOWS color);
-        int load_marshmallow_stack(MARSHMALLOWS color);
+        int load_marshmallow_stack(int stack_size);
 
         enum MARSHMALLOWS { 
             EMPTY,
@@ -27,7 +28,6 @@ class Revolver{
         };
     
     private:
-        std::shared_ptr<PCA9685> pca9685;
         std::shared_ptr<EncoderHandler> enc;
         std::shared_ptr<Servo> loader, opener, dropper;
         std::shared_ptr<Motor> agitator, motor_revolver;

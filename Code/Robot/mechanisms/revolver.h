@@ -13,12 +13,13 @@ class Revolver{
         int turn_on_agitator();
         int turn_off_agitator();
         
-        int release_can();
-        int store_can();
+        int toggle_drop_servo();
+        int toggle_open_servo();
 
         int store_marshmallow(MARSHMALLOWS color);
         int load_marshmallow(MARSHMALLOWS color);
-        int load_marshmallow_stack(int stack_size);
+
+        bool get_finger_in_revolver();
 
         enum MARSHMALLOWS { 
             EMPTY,
@@ -36,10 +37,14 @@ class Revolver{
         int32_t chambers[5];    //Encoder values for each chamber position basing it off of the loader for the pringle can
         
         int rotate_revolver(int pos);
-        int get_current_chamber();
-        int contains_color(MARSHMALLOWS color);
+        int get_color_pos(MARSHMALLOWS color);
+        int retract_loader();
 
         int32_t encoder_ticks;
+        int agitator_mod;
         int check_can;
 
+        bool dropper;
+        bool opener;
+        bool finger_in_revolver;
 };

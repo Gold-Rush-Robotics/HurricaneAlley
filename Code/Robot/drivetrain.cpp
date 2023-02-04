@@ -3,16 +3,17 @@
 
 Drivetrain::Drivetrain(std::shared_ptr<PCA9685> pca){
     pca9685 = pca;
-    fl = std::make_shared<Motor>(4, 0, pca);
-    fr = std::make_shared<Motor>(17, 1, pca);
-    bl = std::make_shared<Motor>(22, 3, pca);
-    br = std::make_shared<Motor>(27, 2, pca);
+    fl = std::make_shared<Motor>(25, 3, pca);
+    fr = std::make_shared<Motor>(23, 1, pca);
+    bl = std::make_shared<Motor>(24, 2, pca);
+    br = std::make_shared<Motor>(18, 0, pca);
+    br->reverse();
     fr->reverse();
 }
 
 
 void Drivetrain::drivePow(double forward, double strafe, double turn){
-    //std::cout << forward << "|" << strafe << "|" << turn << std::endl;
+    std::cout << forward << "|" << strafe << "|" << turn << std::endl;
     double powerFL = forward + strafe - turn;
     double powerFR = forward - strafe + turn;
     double powerBL = forward - strafe - turn;

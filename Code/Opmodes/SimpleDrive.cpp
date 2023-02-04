@@ -1,4 +1,4 @@
-#include "Robot/robot.h"
+#include "../Robot/robot.h"
 
 #include <linux/joystick.h>
 #include "ps5Controller.cpp"
@@ -45,7 +45,7 @@ int main(int argc, char *argv[])
     double s2x = 0.0;
     double s1y = 0.0;
     double s2y = 0.0;
-    /*
+    
         if (argc > 1)
             device = argv[1];
         else
@@ -54,7 +54,7 @@ int main(int argc, char *argv[])
         js = open(device, O_RDONLY);
 
         if (js == -1)
-            perror("Could not open joystick"); */
+            perror("Could not open joystick");
     //robot.printEncodersLoop();
 
     while(true){

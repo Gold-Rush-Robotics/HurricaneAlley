@@ -6,9 +6,9 @@ class Runner{
     public:
         int seconds = 0;
         Robot robot;
-        virtual int init();
-        virtual int loop();
-        virtual int initLoop();
+        int init(int argc, char *argv[]);
+        int loop(int argc, char *argv[]);
+        int initLoop(int argc, char *argv[]);
     private:
-        GoldRushAction currentAction;
+        GoldRushAction* currentAction;
 };

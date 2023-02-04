@@ -1,22 +1,22 @@
 #include "GoldRushAction.h"
 
-void GoldRushAction::setLast(GoldRushAction action){
+void GoldRushAction::setLast(GoldRushAction *action){
     if(nextAction == nullptr){
         nextAction = action;
     } else {
-        nextAction.setNext(action);
+        nextAction->setNext(action);
     }
 }
 
-void GoldRushAction::setNext(GoldRushAction action){
+void GoldRushAction::setNext(GoldRushAction *action){
     if(nextAction == nullptr){
         nextAction = action;
     } else {
-        action.setNext(nextAction);
+        action->setNext(nextAction);
         nextAction = action;
     }
 }
 
-GoldRushAction GoldRushAction::run(){
+GoldRushAction* GoldRushAction::run(){
     return nextAction;
 }

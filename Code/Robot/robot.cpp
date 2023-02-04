@@ -29,7 +29,7 @@ void Robot::start(){
 }
 
 void Robot::driveController(double s1y, double s1x, double s2y, double s2x, double multiplier){
-    encoderHandler->printReadable();
+    //std::cout << multiplier * s1y << " | " << multiplier * s1x << " | " << multiplier * -s2x << std::endl;
     drivetrain->drivePow(multiplier * s1y, multiplier * s1x, multiplier * -s2x);
 }
 void Robot::reset(){

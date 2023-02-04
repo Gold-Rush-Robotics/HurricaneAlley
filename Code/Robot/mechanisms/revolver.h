@@ -16,9 +16,6 @@ class Revolver{
         int toggle_drop_servo();
         int toggle_open_servo();
 
-        int store_marshmallow(MARSHMALLOWS color);
-        int load_marshmallow(MARSHMALLOWS color);
-
         bool get_finger_in_revolver();
 
         enum MARSHMALLOWS { 
@@ -27,6 +24,9 @@ class Revolver{
             GREEN, 
             WHITE
         };
+
+        int store_marshmallow(MARSHMALLOWS color);
+        int load_marshmallow(MARSHMALLOWS color);
     
     private:
         std::shared_ptr<EncoderHandler> enc;

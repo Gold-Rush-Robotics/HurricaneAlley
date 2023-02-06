@@ -19,3 +19,7 @@ Base behavior: Imediately die*/
 int Runner::loop(int argc, char *argv[]){
     return 0;
 }
+
+int Runner::spawnThreads(){
+    return 0;
+}

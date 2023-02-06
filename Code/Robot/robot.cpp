@@ -23,9 +23,10 @@ void Robot::start(){
     pca9685 = std::make_shared<PCA9685>();
     pca9685->Dump();
     pca9685->SetFrequency(1000);
-    drivetrain = std::make_shared<Drivetrain>(pca9685);
+    
     encoderHandler = std::make_shared<EncoderHandler>();
     encoderHandler->init();
+    drivetrain = std::make_shared<Drivetrain>(pca9685, encoderHandler);
 }
 
 void Robot::driveController(double s1y, double s1x, double s2y, double s2x, double multiplier){

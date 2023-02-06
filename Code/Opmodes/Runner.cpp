@@ -1,4 +1,5 @@
 #include "Runner.h"
+#include <pthread.h>
 
 /* This function initializes all the needed values
 Base Behavior: initialize robot and advance to the initLoop*/
@@ -21,5 +22,6 @@ int Runner::loop(int argc, char *argv[]){
 }
 
 int Runner::spawnThreads(){
+    pthread_create(&encoder, NULL, Drivetrain::encoderThread, NULL);
     return 0;
 }

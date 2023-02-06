@@ -9,6 +9,7 @@ class Runner{
         int init(int argc, char *argv[]);
         int loop(int argc, char *argv[]);
         int initLoop(int argc, char *argv[]);
+        int spawnThreads();
     protected:
         GoldRushAction* currentAction;
 };

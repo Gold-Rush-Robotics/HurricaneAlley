@@ -31,6 +31,7 @@ class Teleop : Runner
         int init(int argc, char *argv[])
         {
             robot.start();
+            spawnThreads();
             loop(argc, argv);
             return 0;
         }

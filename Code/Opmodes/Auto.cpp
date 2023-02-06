@@ -6,6 +6,7 @@ class Auto : Runner
     int init(int argc, char *argv[])
     {
         Runner::init(argc, argv);
+        spawnThreads();
         return initLoop(argc, argv);;
     }
     int loop(int argc, char *argv[])

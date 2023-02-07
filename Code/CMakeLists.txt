@@ -5,7 +5,7 @@ include(CTest)
 enable_testing()
 
 
-include_directories(./Utilities/ ../../rpidmx512/lib-pca9685/include/ ../OldCode/ Opmodes/ Robot/ Robot/HardwareInterfaces/)
+include_directories(./Utilities/ ../../rpidmx512/lib-pca9685/include/ ../OldCode/ Opmodes/ Robot/ HardwareInterfaces/ Robot/mechanisms/)
 
 set(HARDWARE HardwareInterfaces/motor.cpp HardwareInterfaces/octoquad.cpp HardwareInterfaces/encoder.cpp)
 set(ROBOT Robot/drivetrain.cpp Robot/robot.cpp)

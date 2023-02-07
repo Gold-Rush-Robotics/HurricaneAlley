@@ -61,7 +61,7 @@ static double CM_PER_TICK = 2.0 * M_PI * ODO_R / ODO_N;
 static double ODO_L = 18.225; // Tuneable Distance between Left and Right Encoders
 static double ODO_B = 9.5;    // Tuneable Distance between Back Encoder to center of robot (only in the X direction)
 
-static void* encoderWrapper(void *object) {
+void* Drivetrain::encoderWrapper(void *object) {
     reinterpret_cast<Drivetrain*>(object)->encoderThread();
     return 0;
 }
@@ -76,13 +76,16 @@ void Drivetrain::encoderThread(){
     int32_t oldH; // back
     
     while (true){
+        std::cout << "from a thread" << std::endl;
         oldL = posL;
         oldR = posR;
         oldH = posH;
-
-        posL = encoderHandler->getPos(0);
-        posR = encoderHandler->getPos(1);
-        posH = encoderHandler->getPos(2);
+        std::cout << "hang here?" << std::endl;
+        int32_t* e = encoderHandler->getValues();
+        posL = e[0];
+        posR = e[1];
+        posH = e[2];
+        std::cout << "hang here?" << std::endl;
 
         // Delta change in odometers since last loop
         long dR = posR - oldR;

@@ -30,8 +30,12 @@ class Teleop : Runner
         }
         int init(int argc, char *argv[])
         {
+            std::cout << "HELLO " << std::endl;
             robot.start();
-            spawnThreads();
+            std::cout << "HELLO " << std::endl;
+            //spawnThreads();
+            std::cout << "HELLO " << std::endl;
+
             loop(argc, argv);
             return 0;
         }
@@ -51,6 +55,7 @@ class Teleop : Runner
                 perror("Could not open joystick");
             while (read_event(js, &event) == 0)
             {
+                std::cout << "printtttt" << std::endl;
                 ctr.eventHandler(&event);
                 robot.driveController(ctr.ly, ctr.lx, ctr.ry, ctr.rx, multiplier);
                 if (ctr.x)
@@ -91,6 +96,8 @@ class Teleop : Runner
 
 int main(int argc, char *argv[])
 {
+    std::cout << "HELLO " << std::endl;
+    fflush(stdout);
     Teleop t;
     t.init(argc, argv);
     return 0;

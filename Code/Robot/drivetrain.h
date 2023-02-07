@@ -10,7 +10,8 @@ class Drivetrain{
         void drivePow(double forward, double strafe, double turn);
         void drive(double dx, double dy, double dTheta);
         void stop();
-        void *encoderThread(void *arguments);
+        void encoderThread();
+        static void* encoderWrapper(void *object);
         struct mecanumVector{
             double x, y, h;
         };

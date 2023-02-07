@@ -11,7 +11,7 @@ class Robot{
         void stop();
         void reset();
         void printEncoders();
-    private:
         std::shared_ptr<Drivetrain> drivetrain;
+    private:
         std::shared_ptr<EncoderHandler> encoderHandler;
 };

@@ -22,6 +22,6 @@ int Runner::loop(int argc, char *argv[]){
 }
 
 int Runner::spawnThreads(){
-    pthread_create(&encoder, NULL, Drivetrain::encoderThread, NULL);
+    pthread_create(&encoder, NULL, Drivetrain::encoderWrapper, static_cast<void*>(robot.drivetrain.get()));
     return 0;
 }

@@ -61,8 +61,12 @@ static double CM_PER_TICK = 2.0 * M_PI * ODO_R / ODO_N;
 static double ODO_L = 18.225; // Tuneable Distance between Left and Right Encoders
 static double ODO_B = 9.5;    // Tuneable Distance between Back Encoder to center of robot (only in the X direction)
 
+static void* encoderWrapper(void *object) {
+    reinterpret_cast<Drivetrain*>(object)->encoderThread();
+    return 0;
+}
 
-void *Drivetrain::encoderThread(void *arguments){
+void Drivetrain::encoderThread(){
     encoderHandler->resetPositions();
     int32_t posL; // left
     int32_t posR; // right

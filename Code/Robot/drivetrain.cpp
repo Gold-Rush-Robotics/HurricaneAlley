@@ -81,10 +81,11 @@ void Drivetrain::encoderThread(){
         oldR = posR;
         oldH = posH;
         std::cout << "hang here?" << std::endl;
-        int32_t* e = encoderHandler->getValues();
-        posL = e[0];
-        posR = e[1];
-        posH = e[2];
+        encoderHandler->getPos(0);
+        // int32_t* e = encoderHandler->getValues();
+        // posL = e[0];
+        // posR = e[1];
+        // posH = e[2];
         std::cout << "hang here?" << std::endl;
 
         // Delta change in odometers since last loop

@@ -10,6 +10,7 @@ class EncoderHandler{
         int32_t* getValues();
         void printReadable();
         bool resetPositions();
+        void doNothing();
     private:
         
 };

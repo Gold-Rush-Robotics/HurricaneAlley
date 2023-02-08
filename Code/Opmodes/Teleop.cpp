@@ -33,7 +33,7 @@ class Teleop : Runner
             std::cout << "HELLO " << std::endl;
             robot.start();
             std::cout << "HELLO " << std::endl;
-            //spawnThreads();
+            spawnThreads();
             std::cout << "HELLO " << std::endl;
 
             loop(argc, argv);

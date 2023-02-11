@@ -6,12 +6,12 @@ Revolver::Revolver(std::shared_ptr<PCA9685> pca, std::shared_ptr<EncoderHandler>
     enc = h;
 
     //TODO: Update Pins
-    motor_revolver = std::make_shared<Motor>(17, 0, pca);
-    agitator = std::make_shared<Motor>(17, 0, pca);
+    motor_revolver = std::make_shared<Motor>(11, 7, pca);
+    agitator = std::make_shared<Motor>(19, 6, pca);
 
-    loader = std::make_shared<Servo>(17, pca);
-    opener = std::make_shared<Servo>(17, pca);
-    dropper = std::make_shared<Servo>(17, pca);
+    loader = std::make_shared<Servo>(17, pca); // This Pin needs to be updated
+    opener = std::make_shared<Servo>(5, pca);
+    dropper = std::make_shared<Servo>(4, pca);
 
     //Initializing Revolver and Can to Empty
     revolver = [EMPTY, EMPTY, EMPTY, EMPTY, EMPTY];

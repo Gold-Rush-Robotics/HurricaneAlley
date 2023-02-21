@@ -113,10 +113,10 @@ while True:
                 cv2.rectangle(img, (x,y),(x + w, y+ h ),(0,255,0,),3)
 
 
-    cv2.imshow("ymask",ymask)
-    cv2.imshow("pmask2",pmask)
-    cv2.imshow("rmask",rmask)
-    cv2.imshow("gmask2",gmask)
+    #cv2.imshow("ymask",ymask)
+    #cv2.imshow("pmask2",pmask)
+    #cv2.imshow("rmask",rmask)
+    #cv2.imshow("gmask2",gmask)
     cv2.imshow("webcam", img)
 
     cv2.waitKey(1)

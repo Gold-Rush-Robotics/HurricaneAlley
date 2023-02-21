@@ -51,10 +51,29 @@ class Teleop : Runner
             while (read_event(js, &event) == 0)
             {
                 ctr.eventHandler(&event);
+
                 if (ctr.x)
                 {
-                    robot.revolver.turn_on_agitator();
+                    robot.revolver->turn_on_agitator();
+                } else {
+                    robot.revolver->turn_off_agitator();
                 }
+                if (ctr.t)
+                {
+                    robot.revolver->toggle_drop_servo();
+                }
+                else if (ctr.s)
+                {
+                    robot.revolver->toggle_open_servo();
+                }
+                else if (ctr.c)
+                {
+                    robot.revolver->rotate_revolver(1);
+                } else {
+                    robot.revolver->rotate_revolver(0);
+                }
+                
+
                 fflush(stdout);
             }
             robot.stop();

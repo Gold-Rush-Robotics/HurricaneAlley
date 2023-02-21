@@ -7,8 +7,8 @@ enable_testing()
 
 include_directories(./Utilities/ ../../rpidmx512/lib-pca9685/include/ ../OldCode/ Opmodes/ Robot/ Robot/HardwareInterfaces/)
 
-set(HARDWARE HardwareInterfaces/motor.cpp HardwareInterfaces/octoquad.cpp HardwareInterfaces/encoder.cpp)
-set(ROBOT Robot/drivetrain.cpp Robot/robot.cpp)
+set(HARDWARE HardwareInterfaces/motor.cpp HardwareInterfaces/servo.cpp HardwareInterfaces/octoquad.cpp HardwareInterfaces/encoder.cpp)
+set(ROBOT Robot/drivetrain.cpp Robot/robot.cpp Robot/mechanisms/revolver.cpp)
 set(UTILITIES Utilities/utilFunc.cpp Utilities/I2C.cpp)
 set(TELEOP Opmodes/Teleop.cpp Opmodes/Runner.cpp)
 set(AUTO Opmodes/Auto.cpp Opmodes/Runner.cpp)

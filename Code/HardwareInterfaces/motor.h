@@ -3,7 +3,8 @@
 #include "../Utilities/utilFunc.h"
 #include "bcm2835.h"
 #include "pca9685.h"
-
+#ifndef Motor_H
+#define Motor_H
 class Motor{
     private:
         std::shared_ptr<PCA9685> pca9685;
@@ -16,3 +17,4 @@ class Motor{
         bool isReversed();
         void setPower(double power);
 };
+#endif

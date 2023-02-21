@@ -2,7 +2,8 @@
 #include <memory>
 #include "utilFunc.h"
 #include "bcm2835.h"
-
+#ifndef ENCODERHANDLER_H
+#define ENCODERHANDLER_H
 class EncoderHandler{
     public:
         void init();
@@ -13,3 +14,4 @@ class EncoderHandler{
     private:
         
 };
+#endif

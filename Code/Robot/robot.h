@@ -2,7 +2,7 @@
 #include "bcm2835.h"
 #include "pca9685.h"
 #include "drivetrain.h"
-#include "/mechanisms/revolver.h"
+#include "mechanisms/revolver.h"
 
 class Robot{
     public:

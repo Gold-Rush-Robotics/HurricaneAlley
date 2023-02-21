@@ -1,37 +1,33 @@
 #include "revolver.h"
 #include <memory>
+#include <iostream>
 
 Revolver::Revolver(std::shared_ptr<PCA9685> pca, std::shared_ptr<EncoderHandler> h)
 {
     enc = h;
 
     //TODO: Update Pins
-    motor_revolver = std::make_shared<Motor>(11, 7, pca);
-    agitator = std::make_shared<Motor>(19, 6, pca);
-
+    motor_revolver = std::make_shared<Motor>(17, 7, pca);
+    agitator = std::make_shared<Motor>(27, 6, pca);
+    
     loader = std::make_shared<Servo>(8, pca); // This Pin needs to be updated
     opener = std::make_shared<Servo>(5, pca);
     dropper = std::make_shared<Servo>(4, pca);
 
-    //Initializing Revolver and Can to Empty
-    revolver = [EMPTY, EMPTY, EMPTY, EMPTY, EMPTY];
-    can = [EMPTY, EMPTY, EMPTY]; // 0 is the top position (the first loaded)
     //TODO Find encoder ticks for each position
-    chambers = [0, 1, 2, 3, 4];
-
-    opener = false;
-    dropper = false;
+    is_open = false;
+    dropper_up = false;
     finger_in_revolver = false;
 }
 
 // Look at the name
-Revolver::turn_on_agitator()
+void Revolver::turn_on_agitator()
 {
-    Revolver::agitator->setPower(1.0);
+    Revolver::agitator->setPower(0.5);
 }
 
 // Look at the name
-Revolver::turn_off_agitator()
+void Revolver::turn_off_agitator()
 {
     Revolver::agitator->setPower(0.0);
 }
@@ -40,58 +36,57 @@ Revolver::turn_off_agitator()
     TODO Edit how the rotation logic works
     @param int pos (location in encoder ticks of where it needs to go)
 */
-Revolver::rotate_revolver(int pos)
+void Revolver::rotate_revolver(double pos)
 { 
     //TODO Find Suitable Power to run the motor at and which direction it should turn
-    double power = (encoder_ticks - chambers[pos] < 0) ? 1.0 : -1.0;
+    //double power = (encoder_ticks - chambers[pos] < 0) ? 1.0 : -1.0;
 
-    
-    while (get_current_position() != pos)
-    {
-        motor_revolver->setPower(power);
-    }
+    //make it work
 
-    motor_revolver->setPower(0.0);
+    motor_revolver->setPower(pos);
 }
 
 // Toggles the servo in control of dropping/storing the can
-Revolver::toggle_drop_servo()
+void Revolver::toggle_drop_servo()
 {
-    if (dropper)
+    
+    if (dropper_up)
     {
-        dropper->setPosition(0, 270);
-        dropper = false;
+        dropper->setPosition(1800, 300);
+        dropper_up = false;
     }
     else
     {
-        dropper->setPosition(270, 270);
-        dropper = true;
+        std::cout << "hello" << std::endl;
+        dropper->setPosition(3750, 300);
+        dropper_up = true;
     }
 }
 
 // Toggles the servo in control of opening/closing the can
 // Resets can and check_can if it opens
-Revolver::toggle_open_servo()
+void Revolver::toggle_open_servo()
 {
-    if (opener)
+    if (is_open)
     {
-        opener->setPosition(0, 270);
-        opener = false;
+        opener->setPosition(1800, 300);
+        is_open = false;
     }
     else
     {
-        opener->setPosition(270, 270);
-        opener = true;
-        for (int i = 0; i < 3; i++)
+        std::cout << "1" << std::endl;
+        opener->setPosition(1400, 300); // 1470 pusher closed
+        is_open = true;
+        /* for (int i = 0; i < 3; i++)
         {
             can[i] = EMPTY;
         }
-        check_can = 3;
+        check_can = 3; */
     }
 }
 
 
-Revolver::store_marshmallow(MARSHMALLOWS color)
+int Revolver::store_marshmallow(MARSHMALLOWS color)
 {
     int goal_chamber = get_color_pos(EMPTY);
     if (goal_chamber == -1)
@@ -101,7 +96,7 @@ Revolver::store_marshmallow(MARSHMALLOWS color)
     return 1;
 }
 
-Revolver::get_color_pos(MARSHMALLOWS color)
+int Revolver::get_color_pos(MARSHMALLOWS color)
 {
     for (int i = 0; i < 5; i++)
     {
@@ -117,18 +112,18 @@ Revolver::get_color_pos(MARSHMALLOWS color)
 // have enough time to get out of the way of the chamber revolving which is why I had 
 // to get rid of load_marshmallow_stack ;(
 
-Revolver::retract_loader()
+void Revolver::retract_loader()
 {
     loader->setPosition(0, 270);
     finger_in_revolver = false;
 }
 
-Revolver::get_finger_in_revolver()
+bool Revolver::get_finger_in_revolver()
 {
     return finger_in_revolver;
 }
 
-Revolver::load_marshmallow(MARSHMALLOWS color)
+int Revolver::load_marshmallow(MARSHMALLOWS color)
 {
     int chamber = get_color_pos(color);
     // The color wasn't loaded in the revolver

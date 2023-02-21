@@ -22,9 +22,10 @@ void Robot::start(){
     }
     pca9685 = std::make_shared<PCA9685>();
     pca9685->Dump();
-    pca9685->SetFrequency(1000);
+    pca9685->SetFrequency(500);
     drivetrain = std::make_shared<Drivetrain>(pca9685);
     encoderHandler = std::make_shared<EncoderHandler>();
+    revolver = std::make_shared<Revolver>(pca9685, encoderHandler);
     encoderHandler->init();
 }
 

@@ -24,7 +24,7 @@ bool Motor::isReversed(){
 void Motor::setPower(double power){
     power = constrain(-1.0, 1.0, power);
     double absPower = abs(power);
-
+    
     if(reversed && power < 0){
         bcm2835_gpio_clr(directionPin);
     } else if(reversed && power > 0) {

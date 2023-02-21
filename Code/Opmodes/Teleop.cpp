@@ -51,18 +51,10 @@ class Teleop : Runner
             while (read_event(js, &event) == 0)
             {
                 ctr.eventHandler(&event);
-                // ctr.printStates();
-                double multiplier = .75;
-                if (ctr.lBump)
+                if (ctr.x)
                 {
-                    multiplier = 1;
+                    robot.revolver.turn_on_agitator();
                 }
-                else if (ctr.lTrigBool)
-                {
-                    multiplier = .5;
-                }
-                robot.driveController(ctr.ly, ctr.lx, ctr.ry, ctr.rx, multiplier);
-                robot.printEncoders();
                 fflush(stdout);
             }
             robot.stop();

@@ -28,6 +28,9 @@ class Revolver{
         int store_marshmallow(MARSHMALLOWS color);
         int load_marshmallow(MARSHMALLOWS color);
         void rotate_revolver(double pos);
+        void retract_loader();
+        void insert_loader();
+
     
     private:
         std::shared_ptr<EncoderHandler> enc;
@@ -40,7 +43,6 @@ class Revolver{
         
         
         int get_color_pos(MARSHMALLOWS color);
-        void retract_loader();
 
         int32_t encoder_ticks;
         int agitator_mod;

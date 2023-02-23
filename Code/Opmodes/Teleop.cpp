@@ -51,7 +51,7 @@ class Teleop : Runner
             while (read_event(js, &event) == 0)
             {
                 ctr.eventHandler(&event);
-
+                robot.driveController(ctr.ly, ctr.lx, ctr.ry, ctr.rx, multiplier);
                 if (ctr.x)
                 {
                     robot.revolver->turn_on_agitator();
@@ -69,8 +69,15 @@ class Teleop : Runner
                 else if (ctr.c)
                 {
                     robot.revolver->rotate_revolver(1);
+                } else if (ctr.lBump){
+                    robot.revolver->rotate_revolver(-1);
                 } else {
                     robot.revolver->rotate_revolver(0);
+                }
+                if (ctr.rBump) {
+                    robot.revolver->insert_loader();
+                } else {
+                    robot.revolver->retract_loader();
                 }
                 
 

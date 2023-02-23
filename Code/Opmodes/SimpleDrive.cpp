@@ -58,7 +58,7 @@ int main(int argc, char *argv[])
     //robot.printEncodersLoop();
 
     while(true){
-        robot.driveController(s1y, s1x, s2y, s2x, multiplier);
+        robot.printEncoders();
     }
     robot.stop();
 }

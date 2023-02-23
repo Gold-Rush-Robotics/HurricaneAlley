@@ -7,10 +7,10 @@ Revolver::Revolver(std::shared_ptr<PCA9685> pca, std::shared_ptr<EncoderHandler>
     enc = h;
 
     //TODO: Update Pins
-    motor_revolver = std::make_shared<Motor>(17, 7, pca);
-    agitator = std::make_shared<Motor>(27, 6, pca);
+    motor_revolver = std::make_shared<Motor>(27, 7, pca);
+    agitator = std::make_shared<Motor>(5, 9, pca); // 17 6 is for real agitator current values are duck
     
-    loader = std::make_shared<Servo>(8, pca); // This Pin needs to be updated
+    loader = std::make_shared<Servo>(10, pca); // This Pin needs to be updated
     opener = std::make_shared<Servo>(5, pca);
     dropper = std::make_shared<Servo>(4, pca);
 
@@ -23,7 +23,7 @@ Revolver::Revolver(std::shared_ptr<PCA9685> pca, std::shared_ptr<EncoderHandler>
 // Look at the name
 void Revolver::turn_on_agitator()
 {
-    Revolver::agitator->setPower(0.5);
+    Revolver::agitator->setPower(1); // .5
 }
 
 // Look at the name
@@ -114,8 +114,12 @@ int Revolver::get_color_pos(MARSHMALLOWS color)
 
 void Revolver::retract_loader()
 {
-    loader->setPosition(0, 270);
+    loader->setPosition(800, 270);
     finger_in_revolver = false;
+}
+
+void Revolver::insert_loader(){
+    loader->setPosition(2600, 270);
 }
 
 bool Revolver::get_finger_in_revolver()

@@ -30,11 +30,8 @@ class Teleop : Runner
         }
         int init(int argc, char *argv[])
         {
-            std::cout << "HELLO " << std::endl;
             robot.start();
-            std::cout << "HELLO " << std::endl;
             spawnThreads();
-            std::cout << "HELLO " << std::endl;
 
             loop(argc, argv);
             return 0;

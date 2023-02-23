@@ -11,6 +11,7 @@ Drivetrain::Drivetrain(std::shared_ptr<PCA9685> pca, std::shared_ptr<EncoderHand
     br = std::make_shared<Motor>(18, 0, pca);
     br->reverse();
     fr->reverse();
+    encoderHandler->resetPositions();
 }
 
 
@@ -61,22 +62,15 @@ static double CM_PER_TICK = 2.0 * M_PI * ODO_R / ODO_N;
 static double ODO_L = 18.225; // Tuneable Distance between Left and Right Encoders
 static double ODO_B = 9.5;    // Tuneable Distance between Back Encoder to center of robot (only in the X direction)
 
-void* Drivetrain::encoderWrapper(void *object) {
-    reinterpret_cast<Drivetrain*>(object)->encoderThread();
-    return 0;
-}
+int32_t posL; // left
+int32_t posR; // right
+int32_t posH; // back
+int32_t oldL; // left
+int32_t oldR; // right
+int32_t oldH; // back
 
-void Drivetrain::encoderThread(){
-    encoderHandler->resetPositions();
-    int32_t posL; // left
-    int32_t posR; // right
-    int32_t posH; // back
-    int32_t oldL; // left
-    int32_t oldR; // right
-    int32_t oldH; // back
-    
-    while (true){
-        std::cout << "from a thread" << std::endl;
+void Drivetrain::encoderLogic(){
+    std::cout << "from a thread" << std::endl;
         oldL = posL;
         oldR = posR;
         oldH = posH;
@@ -109,5 +103,4 @@ void Drivetrain::encoderThread(){
         position.x += dX * cosTempH - dY * sinTempH;
         position.y += dX * sinTempH + dY * cosTempH;
         position.h += dT;
-    }
 }

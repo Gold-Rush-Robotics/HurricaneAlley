@@ -84,6 +84,9 @@ class Teleop : Runner
                 }
                 
 
+                robot.driveController(ctr.ly, ctr.lx, ctr.ry, ctr.rx, multiplier);
+                robot.drivetrain->printPosition();
+                robot.drivetrain->encoderLogic();
                 fflush(stdout);
             }
             robot.stop();

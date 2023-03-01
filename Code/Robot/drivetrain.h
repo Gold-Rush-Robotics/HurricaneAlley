@@ -11,6 +11,7 @@ class Drivetrain{
         void drive(double dx, double dy, double dTheta);
         void stop();
         void encoderLogic();
+        void printPosition();
         struct mecanumVector{
             double x, y, h;
         };

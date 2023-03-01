@@ -65,7 +65,8 @@ class Teleop : Runner
                     multiplier = .5;
                 }
                 robot.driveController(ctr.ly, ctr.lx, ctr.ry, ctr.rx, multiplier);
-                robot.printEncoders();
+                robot.drivetrain->printPosition();
+                robot.drivetrain->encoderLogic();
                 fflush(stdout);
             }
             robot.stop();

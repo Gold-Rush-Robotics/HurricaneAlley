@@ -1,6 +1,8 @@
 #include "drivetrain.h"
 #include <math.h>
 #include <memory>
+#include <Eigen/Dense>
+
 
 Drivetrain::Drivetrain(std::shared_ptr<PCA9685> pca, std::shared_ptr<EncoderHandler> eH){
     pca9685 = pca;
@@ -12,8 +14,10 @@ Drivetrain::Drivetrain(std::shared_ptr<PCA9685> pca, std::shared_ptr<EncoderHand
     br->reverse();
     fr->reverse();
     encoderHandler->resetPositions();
+    position.x = 0;
+    position.y = 0;
+    position.h = 0;
 }
-
 
 void Drivetrain::drivePow(double forward, double strafe, double turn){
     std::cout << forward << "|" << strafe << "|" << turn << std::endl;
@@ -62,25 +66,21 @@ static double CM_PER_TICK = 2.0 * M_PI * ODO_R / ODO_N;
 static double ODO_L = 18.225; // Tuneable Distance between Left and Right Encoders
 static double ODO_B = 9.5;    // Tuneable Distance between Back Encoder to center of robot (only in the X direction)
 
-int32_t posL; // left
-int32_t posR; // right
-int32_t posH; // back
-int32_t oldL; // left
-int32_t oldR; // right
-int32_t oldH; // back
+int32_t posL = 0; // left
+int32_t posR = 0; // right
+int32_t posH = 0; // back
+int32_t oldL = 0; // left
+int32_t oldR = 0; // right
+int32_t oldH = 0; // back
 
 void Drivetrain::encoderLogic(){
-    std::cout << "from a thread" << std::endl;
         oldL = posL;
         oldR = posR;
         oldH = posH;
-        std::cout << "hang here?" << std::endl;
-        encoderHandler->getPos(0);
-        // int32_t* e = encoderHandler->getValues();
-        // posL = e[0];
-        // posR = e[1];
-        // posH = e[2];
-        std::cout << "hang here?" << std::endl;
+        int32_t* e = encoderHandler->getValues();
+        posL = e[0];
+        posR = e[1];
+        posH = e[2];
 
         // Delta change in odometers since last loop
         long dR = posR - oldR;
@@ -88,19 +88,40 @@ void Drivetrain::encoderLogic(){
         long dH = posH - posH;
 
         // Convert odometer changes to locally referenced position change
-        double dT = CM_PER_TICK * (dR - dL) / ODO_L;
-        double dX = CM_PER_TICK * (dR + dL) / 2;
-        double dY = CM_PER_TICK * (dH + (((dR - dL) / ODO_L) * ODO_B));
+        double fi = CM_PER_TICK * (dR - dL) / ODO_L;
+        double dXC = CM_PER_TICK * (dR + dL) / 2;
+        double dXh = CM_PER_TICK * (dH + (((dR - dL) / ODO_L) * ODO_B));
 
-        // Takes average heading change so that we get the most accurate change
-        double tempH = position.h + (dT / 2.0);
+        Eigen::Vector3d v(dXC, dXh, fi);
 
-        // Calculate triginometric functions once
-        double cosTempH = std::cos(tempH);
-        double sinTempH = std::sin(tempH);
+        
 
-        // Convert locally referenced position change to globally referenced position
-        position.x += dX * cosTempH - dY * sinTempH;
-        position.y += dX * sinTempH + dY * cosTempH;
-        position.h += dT;
+        // https://gm0.org/en/latest/docs/software/concepts/odometry.html
+        // this is just for rotating it by the heading at the begining 
+        Eigen::Matrix3d m1 {
+            {std::cos(position.h), -std::sin(position.h), 0},
+            {std::sin(position.h), std::cos(position.h),  0},
+            {0,                     0,                    1}
+        };
+        //this is a funky rotation to treat the vector as having moved along a curve
+        Eigen::Matrix3d m2 {
+            {std::sin(fi)/fi, (std::cos(fi)-1)/fi, 0},
+            {(1-std::cos(fi))/fi, std::sin(fi)/fi, 0},
+            {0,                     0,              1}
+        };
+
+        Eigen::Vector3d v2 = m1 * m2 * v;
+
+        std::cout << "V:"  << v << std::endl;
+        std::cout << "M1:" << m1 << std::endl;
+        std::cout << "M2:" << m2 << std::endl;
+        std::cout << "V2:" << v2 << std::endl;
+
+        position.x += v2(0);
+        position.y += v2(1);
+        position.h += v2(2);
+}
+
+void Drivetrain::printPosition(){
+    std::cout << position.x << " - " << position.y << " - " << position.h << std::endl;
 }

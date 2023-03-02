@@ -27,6 +27,7 @@ void Robot::start(){
     encoderHandler = std::make_shared<EncoderHandler>();
     revolver = std::make_shared<Revolver>(pca9685, encoderHandler);
     encoderHandler->init();
+    drivetrain = std::make_shared<Drivetrain>(pca9685, encoderHandler);
 }
 
 void Robot::driveController(double s1y, double s1x, double s2y, double s2x, double multiplier){

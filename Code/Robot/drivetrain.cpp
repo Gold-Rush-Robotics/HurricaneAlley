@@ -1,16 +1,23 @@
 #include "drivetrain.h"
+#include <math.h>
 #include <memory>
+#include <Eigen/Dense>
 
-Drivetrain::Drivetrain(std::shared_ptr<PCA9685> pca){
+
+Drivetrain::Drivetrain(std::shared_ptr<PCA9685> pca, std::shared_ptr<EncoderHandler> eH){
     pca9685 = pca;
+    encoderHandler = eH;
     fl = std::make_shared<Motor>(25, 3, pca);
     fr = std::make_shared<Motor>(23, 1, pca);
     bl = std::make_shared<Motor>(24, 2, pca);
     br = std::make_shared<Motor>(18, 0, pca);
     br->reverse();
     fr->reverse();
+    encoderHandler->resetPositions();
+    position.x = 0;
+    position.y = 0;
+    position.h = 0;
 }
-
 
 void Drivetrain::drivePow(double forward, double strafe, double turn){
     std::cout << forward << "|" << strafe << "|" << turn << std::endl;
@@ -48,4 +55,87 @@ void Drivetrain::driveM(double fl, double fr, double bl, double br){
 
 void Drivetrain::stop(){
     driveM(0,0,0,0);
+}
+
+
+// Update Values --Specifically Wheel radius, L and B
+static double ODO_R = 1.903190; // Wheel radius in cm
+static double ODO_N = 8192;     // Encoder ticks per Revolution
+static double CM_PER_TICK = 2.0 * M_PI * ODO_R / ODO_N;
+
+static double ODO_L = 23.6; // Tuneable Distance between Left and Right Encoders
+static double ODO_B = 11.5;    // Tuneable Distance between Back Encoder to center of robot (only in the X direction)
+
+int32_t posL = 0; // left
+int32_t posR = 0; // right
+int32_t posH = 0; // back
+int32_t oldL = 0; // left
+int32_t oldR = 0; // right
+int32_t oldH = 0; // back
+
+void Drivetrain::encoderLogic(){
+        oldL = posL;
+        oldR = posR;
+        oldH = posH;
+        int32_t* e = encoderHandler->getValues();
+        posL = e[0];
+        posR = -e[1];
+        posH = e[2];
+
+        // Delta change in odometers since last loop
+        long dR = posR - oldR;
+        long dL = posL - oldL;
+        long dH = posH - oldH;
+
+        
+
+        // Convert odometer changes to locally referenced position change
+        double fi = CM_PER_TICK * (dR - dL) / ODO_L;
+        double dXC = CM_PER_TICK * (dR + dL) / 2;
+        double dXh = CM_PER_TICK * (dH + (fi/CM_PER_TICK * ODO_B));
+
+        Eigen::Vector3d v(dXC, dXh, fi);
+
+        std::cout << dH << " " << posH << " " << oldH << std::endl;
+
+        std::cout << dXh << " " << dH << " " << (fi/CM_PER_TICK * ODO_B) << " " << (dH + (fi/CM_PER_TICK * ODO_B)) << std::endl;
+
+        // https://gm0.org/en/latest/docs/software/concepts/odometry.html
+        // this is just for rotating it by the heading at the begining 
+        Eigen::Matrix3d m1 {
+            {std::cos(position.h), -std::sin(position.h), 0},
+            {std::sin(position.h), std::cos(position.h),  0},
+            {0,                     0,                    1}
+        };
+
+        double sineTerm = 0;
+        double cosTerm = 0;
+
+        //avoid a devide by 0 erorr with an approximation (similar to l'hopital)
+        if(essentiallyEqual(fi, 0, 0.0001)){
+           sineTerm = 1.0 - fi * fi / 6.0;
+           cosTerm = fi / 2.0;
+        } else { 
+            sineTerm = std::sin(fi)/fi;
+            cosTerm = (1-std::cos(fi))/fi;
+        }
+
+
+        //this is a funky rotation to treat the vector as having moved along a curve
+        // sine term and cos term are defined above
+        Eigen::Matrix3d m2 {
+            {sineTerm, -cosTerm, 0},
+            {cosTerm , sineTerm, 0},
+            {0       , 0       , 1}
+        };
+
+        Eigen::Vector3d v2 = m1 * m2 * v;
+
+        position.x += v2(0);
+        position.y += v2(1);
+        position.h += v2(2);
+}
+
+void Drivetrain::printPosition(){
+    std::cout << position.x << " - " << position.y << " - " << position.h << std::endl;
 }

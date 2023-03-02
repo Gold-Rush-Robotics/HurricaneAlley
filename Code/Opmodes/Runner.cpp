@@ -1,4 +1,5 @@
 #include "Runner.h"
+#include <pthread.h>
 
 /* This function initializes all the needed values
 Base Behavior: initialize robot and advance to the initLoop*/
@@ -17,5 +18,9 @@ int Runner::initLoop(int argc, char *argv[]){
 /* Loops Forever, and handles the processes
 Base behavior: Imediately die*/
 int Runner::loop(int argc, char *argv[]){
+    return 0;
+}
+
+int Runner::spawnThreads(){
     return 0;
 }

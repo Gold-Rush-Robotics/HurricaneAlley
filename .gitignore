@@ -38,4 +38,6 @@ CMakeCache.txt
 Makefile
 
 #Car specific
-Code/CART
+Code/GoldRushAuto
+Code/GoldRushTele
+Code/GoldRushDrive

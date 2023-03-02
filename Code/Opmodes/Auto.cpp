@@ -2,27 +2,34 @@
 
 class Auto : Runner
 {
-    int init() override
+    public:
+    int init(int argc, char *argv[])
     {
-        Runner::init();
+        Runner::init(argc, argv);
+        spawnThreads();
+        return initLoop(argc, argv);;
     }
-    int loop() override
+    int loop(int argc, char *argv[])
     {
-        if(currentAction != nullptr){
-            currentAction = currentAction.run();
+
+        while(currentAction != nullptr){
+            currentAction = currentAction->run();
         }
+        return 0;
     }
-    int initLoop() override {
+    int initLoop(int argc, char *argv[]) {
         bool light = true;
         while(!light){
             
         }
-        loop();
+        
+        return loop(argc, argv);
     }
 };
 
-int main(int argc, char const *argv[])
+int main(int argc, char *argv[])
 {
-    Auto::init();
+    Auto a;
+    a.init(argc, argv);
     return 0;
 }

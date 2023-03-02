@@ -116,12 +116,13 @@ bool EncoderHandler::resetPositions()
 */
 int32_t *EncoderHandler::getValues()
 {
+    std::cout << "inside encoder " << std::endl;
     int32_t counts[8];
     int16_t vels[8];
     if (!octoquad_read_all_positions(counts))
-        ;
+        std::cout << "error reading" << std::endl;
     if (!octoquad_read_all_velocities(vels))
-        ;
+        std::cout << "error reading" << std::endl;
 
     printf("C: %d %d %d \n", counts[0], counts[1], counts[2]);
 
@@ -139,14 +140,24 @@ int32_t *EncoderHandler::getValues()
 */
 int32_t EncoderHandler::getPos(int encoder)
 {
+    
     if (!ENCODER_IDX_IN_RANGE(encoder))
     {
         std::cout << "Invalid Encoder ID:" << encoder << std::endl;
         exit(1);
     }
-    int32_t *values;
-    octoquad_read_single_position(0, values);
+    int32_t values[1] = {0};
+    std::cout << "inside encoder 1" << std::endl;
+    octoquad_read_single_position(encoder, values);
+    std::cout << "inside encoder 2" << std::endl;
     return values[0];
+}
+
+void EncoderHandler::doNothing(){
+    std::cout << "do Nothing" << std::endl;
+    OctoQuadFwVersion firmwareVersion;
+    octoquad_get_fw_version(&firmwareVersion);
+    printf("OctoQuad Reports FW v%d.%d.%d\r\n", firmwareVersion.maj, firmwareVersion.min, firmwareVersion.eng);
 }
 
 /*prints the encoder counts and velocities in a readable fashion*/

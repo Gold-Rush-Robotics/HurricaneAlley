@@ -17,6 +17,7 @@ class Auto : Runner
     {
         Robot* robotPtr = &robot;
         while(currentAction != nullptr){
+            currentAction->printName();
             robot.drivetrain->encoderLogic();
             currentAction = currentAction->run(robotPtr);
         }

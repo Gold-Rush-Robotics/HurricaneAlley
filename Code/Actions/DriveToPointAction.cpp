@@ -5,6 +5,7 @@ DriveToPointAction::DriveToPointAction(Pose* point, double distanceTolerance, do
         DriveToPointAction::point = point;
         disT = distanceTolerance;
         angT = angleTolerance;
+        name = "Drive to Point";
     }
 
 GoldRushAction* DriveToPointAction::run(Robot* robot){

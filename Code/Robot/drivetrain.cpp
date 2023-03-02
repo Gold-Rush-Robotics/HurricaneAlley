@@ -20,7 +20,6 @@ Drivetrain::Drivetrain(std::shared_ptr<PCA9685> pca, std::shared_ptr<EncoderHand
 }
 
 void Drivetrain::drivePow(double forward, double strafe, double turn){
-    std::cout << forward << "|" << strafe << "|" << turn << std::endl;
     double powerFL = forward + strafe - turn;
     double powerFR = forward - strafe + turn;
     double powerBL = forward - strafe - turn;
@@ -151,6 +150,10 @@ bool Drivetrain::driveToPoint(Pose* p, double distanceTolerance, double headingT
         double correction = rotatePID.calculate(0, position.getHeadingOffset(p));
         hComp += correction;
     }
+
+
+    std::cout << position.getDistance(p) << std::endl;
+    std::cout << xComp << " " << yComp << " " << hComp << std::endl;
 
     drivePow(xComp, yComp, hComp);
     return inDistance && inHeading;

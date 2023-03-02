@@ -11,7 +11,7 @@ include_directories(../eigen/)
 
 set(HARDWARE HardwareInterfaces/motor.cpp HardwareInterfaces/servo.cpp HardwareInterfaces/octoquad.cpp HardwareInterfaces/encoder.cpp)
 set(ROBOT Robot/drivetrain.cpp Robot/robot.cpp Robot/mechanisms/revolver.cpp)
-set(UTILITIES Utilities/utilFunc.cpp Utilities/I2C.cpp Utilities/pose.cpp)
+set(UTILITIES Utilities/utilFunc.cpp Utilities/I2C.cpp Utilities/pose.cpp Utilities/pid.cpp)
 set(TELEOP Opmodes/Teleop.cpp Opmodes/Runner.cpp)
 set(AUTO Opmodes/Auto.cpp Opmodes/Runner.cpp)
 set(SIMPLE Opmodes/SimpleDrive.cpp)

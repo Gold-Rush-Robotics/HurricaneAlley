@@ -1,3 +1,7 @@
+#ifndef RobotH
+#define RobotH
+
+
 #include <iostream>
 #include "bcm2835.h"
 #include "pca9685.h"
@@ -18,3 +22,5 @@ class Robot{
         std::shared_ptr<EncoderHandler> encoderHandler;
         
 };
+
+#endif

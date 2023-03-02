@@ -17,6 +17,10 @@ void GoldRushAction::setNext(GoldRushAction *action){
     }
 }
 
-GoldRushAction* GoldRushAction::run(){
-    return nextAction;
+GoldRushAction* GoldRushAction::run(Robot* robot){
+    return this;
+}
+
+void GoldRushAction::printName(){
+    std::cout << name << std::endl;
 }

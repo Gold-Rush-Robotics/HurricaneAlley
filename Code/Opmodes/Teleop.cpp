@@ -2,7 +2,6 @@
 
 #include <linux/joystick.h>
 #include "ps5Controller.cpp"
-#include <iostream>
 
 class Teleop : Runner
 {

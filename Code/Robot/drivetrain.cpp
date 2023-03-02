@@ -14,13 +14,12 @@ Drivetrain::Drivetrain(std::shared_ptr<PCA9685> pca, std::shared_ptr<EncoderHand
     br->reverse();
     fr->reverse();
     encoderHandler->resetPositions();
-    position.x = 0;
-    position.y = 0;
-    position.h = 0;
+    position.update(0,0,0);
+    translatePID = new PID(0.1, 0.5, -0.5, 1.0, 0.0, 0.0);
+    rotatePID = new PID(0.1, 0.5, -0.5, 1, 0.0, 0.0);
 }
 
 void Drivetrain::drivePow(double forward, double strafe, double turn){
-    std::cout << forward << "|" << strafe << "|" << turn << std::endl;
     double powerFL = forward + strafe - turn;
     double powerFR = forward - strafe + turn;
     double powerBL = forward - strafe - turn;
@@ -96,15 +95,11 @@ void Drivetrain::encoderLogic(){
 
         Eigen::Vector3d v(dXC, dXh, fi);
 
-        std::cout << dH << " " << posH << " " << oldH << std::endl;
-
-        std::cout << dXh << " " << dH << " " << (fi/CM_PER_TICK * ODO_B) << " " << (dH + (fi/CM_PER_TICK * ODO_B)) << std::endl;
-
         // https://gm0.org/en/latest/docs/software/concepts/odometry.html
         // this is just for rotating it by the heading at the begining 
         Eigen::Matrix3d m1 {
-            {std::cos(position.h), -std::sin(position.h), 0},
-            {std::sin(position.h), std::cos(position.h),  0},
+            {std::cos(position.theta), -std::sin(position.theta), 0},
+            {std::sin(position.theta), std::cos(position.theta),  0},
             {0,                     0,                    1}
         };
 
@@ -133,9 +128,37 @@ void Drivetrain::encoderLogic(){
 
         position.x += v2(0);
         position.y += v2(1);
-        position.h += v2(2);
+        position.theta += v2(2);
 }
 
 void Drivetrain::printPosition(){
-    std::cout << position.x << " - " << position.y << " - " << position.h << std::endl;
+    std::cout << position.x << " - " << position.y << " - " << position.theta << std::endl;
+}
+
+bool Drivetrain::driveToPoint(Pose* p, double distanceTolerance, double headingTolerance){
+    bool inDistance = std::abs(position.getDistance(p)) <= distanceTolerance;
+    bool inHeading = std::abs(position.getHeadingOffset(p)) <= headingTolerance;
+    double xComp = 0;
+    double yComp = 0;
+    double hComp = 0;
+    if(!inDistance){
+        double correction = translatePID->calculate(0, position.getDistance(p));
+        double heading = position.getDirection(p);
+        xComp -= correction * std::cos(heading);
+        yComp += correction * std::sin(heading);
+        std::cout << "Distance: " << position.getDistance(p) << " | Direction:" << position.getDirection(p) << " | Correction: " << correction << std::endl;
+    }
+
+    if(!inHeading){
+        double correction = rotatePID->calculate(0, position.getHeadingOffset(p));
+        hComp -= correction;
+    }
+
+
+    
+    position.printPosition();
+    std::cout << "Motor: " << xComp << " " << yComp << " " << hComp << std::endl;
+
+    drivePow(xComp, yComp, hComp);
+    return inDistance && inHeading;
 }

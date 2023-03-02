@@ -1,6 +1,8 @@
 #include "../Robot/robot.h"
 #include "../Actions/GoldRushAction.h"
 #include <pthread.h>
+#include <iostream>
+
 
 /*base runner class to be extended by teleop and auto*/
 class Runner{
@@ -13,7 +15,5 @@ class Runner{
         int spawnThreads();
         pthread_t encoder;
         pthread_t print;
-        
-    protected:
         GoldRushAction* currentAction;
 };

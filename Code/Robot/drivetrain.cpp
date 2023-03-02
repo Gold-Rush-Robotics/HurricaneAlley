@@ -14,9 +14,7 @@ Drivetrain::Drivetrain(std::shared_ptr<PCA9685> pca, std::shared_ptr<EncoderHand
     br->reverse();
     fr->reverse();
     encoderHandler->resetPositions();
-    position.x = 0;
-    position.y = 0;
-    position.h = 0;
+    position.update(0,0,0);
 }
 
 void Drivetrain::drivePow(double forward, double strafe, double turn){
@@ -103,8 +101,8 @@ void Drivetrain::encoderLogic(){
         // https://gm0.org/en/latest/docs/software/concepts/odometry.html
         // this is just for rotating it by the heading at the begining 
         Eigen::Matrix3d m1 {
-            {std::cos(position.h), -std::sin(position.h), 0},
-            {std::sin(position.h), std::cos(position.h),  0},
+            {std::cos(position.theta), -std::sin(position.theta), 0},
+            {std::sin(position.theta), std::cos(position.theta),  0},
             {0,                     0,                    1}
         };
 
@@ -131,11 +129,9 @@ void Drivetrain::encoderLogic(){
 
         Eigen::Vector3d v2 = m1 * m2 * v;
 
-        position.x += v2(0);
-        position.y += v2(1);
-        position.h += v2(2);
+        position.update(v2(0), v2(1), v2(2));
 }
 
 void Drivetrain::printPosition(){
-    std::cout << position.x << " - " << position.y << " - " << position.h << std::endl;
+    std::cout << position.x << " - " << position.y << " - " << position.theta << std::endl;
 }

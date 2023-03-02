@@ -3,6 +3,7 @@
 #include "../HardwareInterfaces/encoder.h"
 #include "bcm2835.h"
 #include "pca9685.h"
+#include "../Utilities/utilFunc.h"
 
 class Drivetrain{
     public:
@@ -12,13 +13,10 @@ class Drivetrain{
         void stop();
         void encoderLogic();
         void printPosition();
-        struct mecanumVector{
-            double x, y, h;
-        };
     private:
         std::shared_ptr<Motor> fl, fr, bl, br;
         std::shared_ptr<PCA9685> pca9685;
         std::shared_ptr<EncoderHandler> encoderHandler;
         void driveM(double fl, double fr, double bl, double br);
-        mecanumVector position;
+        Pose position;
 };

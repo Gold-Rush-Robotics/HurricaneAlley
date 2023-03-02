@@ -18,6 +18,12 @@ Pose::Pose(double x, double y, double theta){
     Pose::theta = theta;
 }
 
+Pose::Pose(){
+    x = 0;
+    y = 0;
+    theta = 0;
+}
+
 void Pose::update(double x, double y, double theta){
     Pose::x = x;
     Pose::y = y;
@@ -34,7 +40,6 @@ double degToRad(int deg){
 
 
 void Pose::normalizeHeading(){
-
     theta = degToRad(radtoDeg(theta) % 360);
 }
 

@@ -15,8 +15,8 @@ Drivetrain::Drivetrain(std::shared_ptr<PCA9685> pca, std::shared_ptr<EncoderHand
     fr->reverse();
     encoderHandler->resetPositions();
     position.update(0,0,0);
-    translatePID = PID(0.1, 1.0, -1.0, 1.0, 0.0, 0.0);
-    rotatePID = PID(0.1, 1.0, -1.0, 1.0, 0.0, 0.0);
+    translatePID = new PID(0.1, 0.5, -0.5, 1.0, 0.0, 0.0);
+    rotatePID = new PID(0.1, 0.5, -0.5, 1, 0.0, 0.0);
 }
 
 void Drivetrain::drivePow(double forward, double strafe, double turn){
@@ -126,7 +126,9 @@ void Drivetrain::encoderLogic(){
 
         Eigen::Vector3d v2 = m1 * m2 * v;
 
-        position.update(v2(0), v2(1), v2(2));
+        position.x += v2(0);
+        position.y += v2(1);
+        position.theta += v2(2);
 }
 
 void Drivetrain::printPosition(){
@@ -140,20 +142,22 @@ bool Drivetrain::driveToPoint(Pose* p, double distanceTolerance, double headingT
     double yComp = 0;
     double hComp = 0;
     if(!inDistance){
-        double correction = translatePID.calculate(0, position.getDistance(p));
+        double correction = translatePID->calculate(0, position.getDistance(p));
         double heading = position.getDirection(p);
-        xComp += correction * std::sin(heading);
-        yComp += correction * std::cos(heading);
+        xComp -= correction * std::cos(heading);
+        yComp += correction * std::sin(heading);
+        std::cout << "Distance: " << position.getDistance(p) << " | Direction:" << position.getDirection(p) << " | Correction: " << correction << std::endl;
     }
 
     if(!inHeading){
-        double correction = rotatePID.calculate(0, position.getHeadingOffset(p));
-        hComp += correction;
+        double correction = rotatePID->calculate(0, position.getHeadingOffset(p));
+        hComp -= correction;
     }
 
 
-    std::cout << position.getDistance(p) << std::endl;
-    std::cout << xComp << " " << yComp << " " << hComp << std::endl;
+    
+    position.printPosition();
+    std::cout << "Motor: " << xComp << " " << yComp << " " << hComp << std::endl;
 
     drivePow(xComp, yComp, hComp);
     return inDistance && inHeading;

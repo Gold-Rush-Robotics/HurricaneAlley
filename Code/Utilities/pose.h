@@ -9,6 +9,7 @@ class Pose{
         double getDirection(Pose *p);
         double getHeadingOffset(Pose *p);
         void normalizeHeading();
+        void printPosition();
         void update(double x, double y, double theta);
         double x, y, theta;   
 };

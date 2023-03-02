@@ -10,7 +10,9 @@ class Auto : Runner
     {
         Runner::init(argc, argv);
         spawnThreads();
-        currentAction = new DriveToPointAction(new Pose(20,0,0),1,1);
+        currentAction = new DriveToPointAction(new Pose(20,0,0),6,0.1);
+        currentAction->setNext(new DriveToPointAction(new Pose(0, 0, 0), 2, .1));
+        
         return initLoop(argc, argv);;
     }
     int loop(int argc, char *argv[])

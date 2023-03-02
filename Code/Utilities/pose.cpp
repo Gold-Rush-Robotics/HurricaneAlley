@@ -1,6 +1,7 @@
 #include "pose.h"
 #include <algorithm> 
 #include <math.h>
+#include <iostream>
 
 
 Pose::Pose(double x, double y, double theta){
@@ -29,6 +30,9 @@ double degToRad(int deg){
     return deg * (M_PI/180.0);
 }
 
+void Pose::printPosition(){
+    std::cout << "X:" << x << " - Y:" << y << " - Theta:" << theta << std::endl;
+}
 
 void Pose::normalizeHeading(){
     theta = degToRad(radtoDeg(theta) % 360);
@@ -38,11 +42,11 @@ void Pose::normalizeHeading(){
 double Pose::getDirection(Pose* p){
     double xLength = p->x - x;
     double yLength = p->y - y;
-    return std::atan(yLength/xLength);
+    return std::atan2(yLength, xLength);
 }
 
 double Pose::getDistance(Pose* p){
-    return std::sqrt(std::pow(p->x-x, 2) + std::pow(p->y-y, 2));
+    return std::sqrt(std::pow(x-p->x, 2) + std::pow(y-p->y, 2));
 }
 
 double Pose::getHeadingOffset(Pose* p){

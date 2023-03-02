@@ -21,6 +21,6 @@ class Drivetrain{
         std::shared_ptr<EncoderHandler> encoderHandler;
         void driveM(double fl, double fr, double bl, double br);
         Pose position;
-        PID translatePID;
-        PID rotatePID;
+        PID* translatePID;
+        PID* rotatePID;
 };

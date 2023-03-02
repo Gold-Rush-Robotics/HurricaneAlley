@@ -89,6 +89,8 @@ double PIDImpl::calculate( double setpoint, double pv )
     // Save error to previous error
     _pre_error = error;
 
+    std::cout << "kP:" << _Kp << " | error" << error << std::endl;
+
     return output;
 }
 

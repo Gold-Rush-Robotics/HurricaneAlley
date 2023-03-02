@@ -4,6 +4,7 @@
 #include "bcm2835.h"
 #include "pca9685.h"
 #include "../Utilities/pose.h"
+#include "../Utilities/pid.h"
 
 class Drivetrain{
     public:
@@ -20,4 +21,6 @@ class Drivetrain{
         std::shared_ptr<EncoderHandler> encoderHandler;
         void driveM(double fl, double fr, double bl, double br);
         Pose position;
+        PID translatePID;
+        PID rotatePID;
 };

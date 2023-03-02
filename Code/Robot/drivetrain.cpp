@@ -15,6 +15,8 @@ Drivetrain::Drivetrain(std::shared_ptr<PCA9685> pca, std::shared_ptr<EncoderHand
     fr->reverse();
     encoderHandler->resetPositions();
     position.update(0,0,0);
+    translatePID = PID(0.1, 1.0, -1.0, 1.0, 0.0, 0.0);
+    rotatePID = PID(0.1, 1.0, -1.0, 1.0, 0.0, 0.0);
 }
 
 void Drivetrain::drivePow(double forward, double strafe, double turn){
@@ -134,4 +136,26 @@ void Drivetrain::encoderLogic(){
 
 void Drivetrain::printPosition(){
     std::cout << position.x << " - " << position.y << " - " << position.theta << std::endl;
+}
+
+bool Drivetrain::driveToPoint(Pose p, double distanceTolerance, double headingTolerance){
+    bool inDistance = std::abs(position.getDistance(p)) <= distanceTolerance;
+    bool inHeading = std::abs(position.getHeadingOffset(p)) <= headingTolerance;
+    double xComp = 0;
+    double yComp = 0;
+    double hComp = 0;
+    if(!inDistance){
+        double correction = translatePID.calculate(0, position.getDistance(p));
+        double heading = position.getDirection(p);
+        xComp += correction * std::sin(heading);
+        yComp += correction * std::cos(heading);
+    }
+
+    if(!inHeading){
+        double correction = rotatePID.calculate(0, position.getHeadingOffset(p));
+        hComp += correction;
+    }
+
+    drivePow(xComp, yComp, hComp);
+    return inDistance && inHeading;
 }

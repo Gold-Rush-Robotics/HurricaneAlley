@@ -14,4 +14,6 @@ class EncoderHandler{
         void doNothing();
     private:
         
-};#endif
+};
+
+#endif

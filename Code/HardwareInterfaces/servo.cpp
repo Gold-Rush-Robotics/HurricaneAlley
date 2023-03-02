@@ -18,7 +18,7 @@ Servo::Servo(int pin, std::shared_ptr<PCA9685> pca){
 int Servo::setPosition(double degree, double max){
     double power = ((double) PCA9685_VALUE_MAX - 1.0) * (degree/max);
     pca9685->Write(CHANNEL(pin), VALUE(degree));
-    
+    return 0;
 }
 /*!
     this sets the speed for a CR servo
@@ -29,4 +29,5 @@ int Servo::setPosition(double degree, double max){
 int Servo::setSpeed(double speed){
     double power = (PCA9685_VALUE_MAX - 1) * (speed);
     pca9685->Write(CHANNEL(pin), VALUE(power));
+    return 0;
 }

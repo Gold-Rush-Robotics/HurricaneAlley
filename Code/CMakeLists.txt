@@ -13,7 +13,8 @@ set(HARDWARE HardwareInterfaces/motor.cpp HardwareInterfaces/servo.cpp HardwareI
 set(ROBOT Robot/drivetrain.cpp Robot/robot.cpp Robot/mechanisms/revolver.cpp)
 set(UTILITIES Utilities/utilFunc.cpp Utilities/I2C.cpp Utilities/pose.cpp Utilities/pid.cpp)
 set(TELEOP Opmodes/Teleop.cpp Opmodes/Runner.cpp)
-set(AUTO Opmodes/Auto.cpp Opmodes/Runner.cpp)
+set(ACTIONS Actions/GoldRushAction.cpp Actions/DriveToPointAction.cpp)
+set(AUTO Opmodes/Auto.cpp Opmodes/Runner.cpp ${ACTIONS})
 set(SIMPLE Opmodes/SimpleDrive.cpp)
 
 set(SOURCES ${HARDWARE} ${ROBOT} ${UTILITIES})

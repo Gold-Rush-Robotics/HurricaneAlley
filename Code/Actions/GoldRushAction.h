@@ -1,8 +1,10 @@
+#include "../Robot/robot.h"
+
 class GoldRushAction{
     public:
         void setNext(GoldRushAction *action);
         void setLast(GoldRushAction *action);
-        virtual GoldRushAction* run();
-    private:
+        GoldRushAction* run(Robot robot);
+    protected:
         GoldRushAction *nextAction;
 };

@@ -17,6 +17,6 @@ void GoldRushAction::setNext(GoldRushAction *action){
     }
 }
 
-GoldRushAction* GoldRushAction::run(){
+GoldRushAction* GoldRushAction::run(Robot robot){
     return nextAction;
 }

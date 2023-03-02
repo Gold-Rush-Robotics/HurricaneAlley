@@ -13,7 +13,8 @@ class Auto : Runner
     {
 
         while(currentAction != nullptr){
-            currentAction = currentAction->run();
+            robot.drivetrain->encoderLogic();
+            currentAction = currentAction->run(robot);
         }
         return 0;
     }

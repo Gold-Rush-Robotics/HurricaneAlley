@@ -96,10 +96,6 @@ void Drivetrain::encoderLogic(){
 
         Eigen::Vector3d v(dXC, dXh, fi);
 
-        std::cout << dH << " " << posH << " " << oldH << std::endl;
-
-        std::cout << dXh << " " << dH << " " << (fi/CM_PER_TICK * ODO_B) << " " << (dH + (fi/CM_PER_TICK * ODO_B)) << std::endl;
-
         // https://gm0.org/en/latest/docs/software/concepts/odometry.html
         // this is just for rotating it by the heading at the begining 
         Eigen::Matrix3d m1 {
@@ -138,7 +134,7 @@ void Drivetrain::printPosition(){
     std::cout << position.x << " - " << position.y << " - " << position.theta << std::endl;
 }
 
-bool Drivetrain::driveToPoint(Pose p, double distanceTolerance, double headingTolerance){
+bool Drivetrain::driveToPoint(Pose* p, double distanceTolerance, double headingTolerance){
     bool inDistance = std::abs(position.getDistance(p)) <= distanceTolerance;
     bool inHeading = std::abs(position.getHeadingOffset(p)) <= headingTolerance;
     double xComp = 0;

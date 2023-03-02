@@ -116,15 +116,12 @@ bool EncoderHandler::resetPositions()
 */
 int32_t *EncoderHandler::getValues()
 {
-    std::cout << "inside encoder " << std::endl;
     int32_t counts[8];
     int16_t vels[8];
     if (!octoquad_read_all_positions(counts))
         std::cout << "error reading" << std::endl;
     if (!octoquad_read_all_velocities(vels))
         std::cout << "error reading" << std::endl;
-
-    printf("C: %d %d %d \n", counts[0], counts[1], counts[2]);
 
     static int32_t value[16];
     for (int i = 0; i < 8; i++)
@@ -147,9 +144,7 @@ int32_t EncoderHandler::getPos(int encoder)
         exit(1);
     }
     int32_t values[1] = {0};
-    std::cout << "inside encoder 1" << std::endl;
     octoquad_read_single_position(encoder, values);
-    std::cout << "inside encoder 2" << std::endl;
     return values[0];
 }
 

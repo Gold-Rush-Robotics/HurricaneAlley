@@ -35,16 +35,16 @@ void Pose::normalizeHeading(){
 }
 
 
-double Pose::getDirection(Pose p){
-    double xLength = p.x - x;
-    double yLength = p.y - y;
+double Pose::getDirection(Pose* p){
+    double xLength = p->x - x;
+    double yLength = p->y - y;
     return std::atan(yLength/xLength);
 }
 
-double Pose::getDistance(Pose p){
-    return std::sqrt(std::pow(p.x-x, 2) + std::pow(p.y-y, 2));
+double Pose::getDistance(Pose* p){
+    return std::sqrt(std::pow(p->x-x, 2) + std::pow(p->y-y, 2));
 }
 
-double Pose::getHeadingOffset(Pose p){
-    return p.theta - theta;
+double Pose::getHeadingOffset(Pose* p){
+    return p->theta - theta;
 }

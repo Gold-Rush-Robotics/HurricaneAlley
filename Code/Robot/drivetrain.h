@@ -14,7 +14,7 @@ class Drivetrain{
         void stop();
         void encoderLogic();
         void printPosition();
-        bool driveToPoint(Pose p, double distanceTolerance, double headingTolerance);
+        bool driveToPoint(Pose* p, double distanceTolerance, double headingTolerance);
     private:
         std::shared_ptr<Motor> fl, fr, bl, br;
         std::shared_ptr<PCA9685> pca9685;

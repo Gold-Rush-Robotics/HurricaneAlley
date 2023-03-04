@@ -8,7 +8,7 @@ Revolver::Revolver(std::shared_ptr<PCA9685> pca, std::shared_ptr<EncoderHandler>
 
     //TODO: Update Pins
     motor_revolver = std::make_shared<Motor>(27, 7, pca);
-    agitator = std::make_shared<Motor>(5, 9, pca); // 17 6 is for real agitator current values are duck
+    agitator = std::make_shared<Motor>(17, 6, pca); // 17 6 is for real agitator current values are duck
     
     loader = std::make_shared<Servo>(10, pca); // This Pin needs to be updated
     opener = std::make_shared<Servo>(5, pca);
@@ -23,7 +23,7 @@ Revolver::Revolver(std::shared_ptr<PCA9685> pca, std::shared_ptr<EncoderHandler>
 // Look at the name
 void Revolver::turn_on_agitator()
 {
-    Revolver::agitator->setPower(1); // .5
+    Revolver::agitator->setPower(.5); // .5
 }
 
 // Look at the name
@@ -57,7 +57,6 @@ void Revolver::toggle_drop_servo()
     }
     else
     {
-        std::cout << "hello" << std::endl;
         dropper->setPosition(3750, 300);
         dropper_up = true;
     }
@@ -69,7 +68,7 @@ void Revolver::toggle_open_servo()
 {
     if (is_open)
     {
-        opener->setPosition(1800, 300);
+        opener->setPosition(2500, 300);
         is_open = false;
     }
     else
@@ -119,7 +118,7 @@ void Revolver::retract_loader()
 }
 
 void Revolver::insert_loader(){
-    loader->setPosition(2600, 270);
+    loader->setPosition(3800, 270);
 }
 
 bool Revolver::get_finger_in_revolver()

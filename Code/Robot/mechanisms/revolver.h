@@ -5,6 +5,8 @@
 #include "../../Utilities/utilFunc.h"
 #include "pca9685.h"
 
+#ifndef RevolverH
+#define RevolverH
 
 class Revolver{
     public:
@@ -25,9 +27,10 @@ class Revolver{
             WHITE
         };
 
-        int store_marshmallow(MARSHMALLOWS color);
+        bool store_marshmallow(MARSHMALLOWS color);
         int load_marshmallow(MARSHMALLOWS color);
-        void rotate_revolver(double pos);
+        bool rotate_revolver(double pos);
+        void rotate_speed(double speed);
         void retract_loader();
         void insert_loader();
 
@@ -51,4 +54,8 @@ class Revolver{
         bool dropper_up;
         bool is_open;
         bool finger_in_revolver;
+
+        PID* revolverPID;
 };
+
+#endif

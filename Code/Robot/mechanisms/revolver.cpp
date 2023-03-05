@@ -18,6 +18,8 @@ Revolver::Revolver(std::shared_ptr<PCA9685> pca, std::shared_ptr<EncoderHandler>
     is_open = false;
     dropper_up = false;
     finger_in_revolver = false;
+
+    revolverPID = new PID(0.1, 1.0, -1.0, 0.5, 0.0, 0.0);
 }
 
 // Look at the name
@@ -32,18 +34,19 @@ void Revolver::turn_off_agitator()
     Revolver::agitator->setPower(0.0);
 }
 
-/*  Rotates the revolver to one of the chambers (int pos)
-    TODO Edit how the rotation logic works
+/*  Rotates the revolver to encoder value (int pos)
     @param int pos (location in encoder ticks of where it needs to go)
 */
-void Revolver::rotate_revolver(double pos)
+bool Revolver::rotate_revolver(double pos)
 { 
-    //TODO Find Suitable Power to run the motor at and which direction it should turn
-    //double power = (encoder_ticks - chambers[pos] < 0) ? 1.0 : -1.0;
+    double speed = revolverPID.calculate(pos, enc->getPos(3));
 
-    //make it work
+    motor_revolver->setPower(speed);
+    return 1;
+}
 
-    motor_revolver->setPower(pos);
+void Revolver::rotate_speed(double speed){
+    motor_revolver->setPower(speed);
 }
 
 // Toggles the servo in control of dropping/storing the can
@@ -85,14 +88,12 @@ void Revolver::toggle_open_servo()
 }
 
 
-int Revolver::store_marshmallow(MARSHMALLOWS color)
+bool Revolver::store_marshmallow(MARSHMALLOWS color)
 {
     int goal_chamber = get_color_pos(EMPTY);
     if (goal_chamber == -1)
         return -1;
-    
-    rotate_revolver(chambers[goal_chamber] + agitator_mod);
-    return 1;
+    return rotate_revolver(chambers[goal_chamber] + agitator_mod);
 }
 
 int Revolver::get_color_pos(MARSHMALLOWS color)

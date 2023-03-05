@@ -1,4 +1,5 @@
 #include "Runner.h"
+#include "../Robot/mechanisms/revolver.h"
 
 #include <linux/joystick.h>
 #include "ps5Controller.cpp"
@@ -59,11 +60,11 @@ class Teleop : Runner
                 }
                 else if (ctr.c)
                 {
-                    robot.revolver->rotate_revolver(1);
+                    robot.revolver->rotate_speed(1);
                 } else if (ctr.lBump){
-                    robot.revolver->rotate_revolver(-1);
+                    robot.revolver->rotate_speed(-1);
                 } else {
-                    robot.revolver->rotate_revolver(0);
+                    robot.revolver->rotate_speed(0);
                 }
                 if (ctr.rBump) {
                     robot.revolver->insert_loader();
@@ -80,15 +81,27 @@ class Teleop : Runner
             robot.stop();
         }
 
+        void runAutoActions(){
+            Robot* robotPtr = &robot;
+            while(currentAction != nullptr){
+                        currentAction->printName();
+                        robot.drivetrain->encoderLogic();
+                        currentAction = currentAction->run(robotPtr);
+            }
+        }
+
         void marshmallowControls(js_event event, ps5Controller ctr, int js){
             std::cout << "Marshmallow Controls Mode:" << std::endl;
             double multiplier = .7;
-            while (read_event(js, &event) == 0)
+            while (1)
             {
                 ctr.eventHandler(&event);
 
                 if(ctr.x){
-                    //add a white marshmallow
+                    //white marshmellow
+                    //currentAction = ;
+                    runAutoActions();
+
                 }
                 if(ctr.s){
                     //add a green marshmallow

@@ -15,17 +15,14 @@ set(UTILITIES Utilities/utilFunc.cpp Utilities/I2C.cpp Utilities/pose.cpp Utilit
 set(TELEOP Opmodes/Teleop.cpp Opmodes/Runner.cpp)
 set(ACTIONS Actions/GoldRushAction.cpp Actions/DriveToPointAction.cpp)
 set(AUTO Opmodes/Auto.cpp Opmodes/Runner.cpp ${ACTIONS})
-set(SIMPLE Opmodes/SimpleDrive.cpp)
 
 set(SOURCES ${HARDWARE} ${ROBOT} ${UTILITIES})
 
 add_executable(GoldRushTele ${SOURCES} ${TELEOP})
 add_executable(GoldRushAuto ${SOURCES} ${AUTO})
-add_executable(GoldRushDrive ${SOURCES} ${SIMPLE})
 
 target_link_libraries(GoldRushTele -L"../../rpidmx512/lib-pca9685/lib_linux/" -lpigpio -lrt -lpca9685 -lbcm2835 -lpthread)
 target_link_libraries(GoldRushAuto -L"../../rpidmx512/lib-pca9685/lib_linux/" -lpigpio -lrt -lpca9685 -lbcm2835 -lpthread)
-target_link_libraries(GoldRushDrive -L"../../rpidmx512/lib-pca9685/lib_linux/" -lpigpio -lrt -lpca9685 -lbcm2835 -lpthread)
 
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})

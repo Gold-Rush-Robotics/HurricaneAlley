@@ -18,7 +18,7 @@ set(AUTO Opmodes/Auto.cpp Opmodes/Runner.cpp ${ACTIONS})
 
 set(SOURCES ${HARDWARE} ${ROBOT} ${UTILITIES})
 
-add_executable(GoldRushTele ${SOURCES} ${TELEOP})
+add_executable(GoldRushTele ${SOURCES} ${TELEOP} ${ACTIONS})
 add_executable(GoldRushAuto ${SOURCES} ${AUTO})
 
 target_link_libraries(GoldRushTele -L"../../rpidmx512/lib-pca9685/lib_linux/" -lpigpio -lrt -lpca9685 -lbcm2835 -lpthread)

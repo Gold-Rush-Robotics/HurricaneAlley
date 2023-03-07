@@ -7,7 +7,7 @@ std::string colors[] = {"EMPTY", "RED", "GREEN", "WHITE"};
 
 StoreMarshmellow::StoreMarshmellow(Revolver::MARSHMALLOWS color){
         StoreMarshmellow::color = color;
-        name = "Load Marshmelllow (" + colors[color] + ")";
+        name = "Store Marshmelllow (" + colors[color] + ")";
         GoldRushAction::setNext(new DelayAction(1.3))->setNext(new TurnOffAgitator());
     }
 

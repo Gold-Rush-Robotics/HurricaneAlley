@@ -109,7 +109,11 @@ bool Revolver::store_marshmallow(MARSHMALLOWS color)
     int goal_chamber = get_color_pos(EMPTY);
     if (goal_chamber == -1)
         return -1;
-    return rotate_revolver(chambers[goal_chamber] + agitator_mod);
+    if(rotate_revolver(chambers[goal_chamber] + agitator_mod)){
+        revolver[goal_chamber] = color;
+        return true;
+    }
+    return false;
 }
 
 int Revolver::get_color_pos(MARSHMALLOWS color)

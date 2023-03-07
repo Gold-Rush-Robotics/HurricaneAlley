@@ -3,6 +3,8 @@
 #include "../../HardwareInterfaces/motor.h"
 #include "../../HardwareInterfaces/encoder.h"
 #include "../../Utilities/utilFunc.h"
+#include "../../Utilities/pid.h"
+
 #include "pca9685.h"
 
 #ifndef RevolverH

@@ -39,7 +39,7 @@ void Revolver::turn_off_agitator()
 */
 bool Revolver::rotate_revolver(double pos)
 { 
-    double speed = revolverPID.calculate(pos, enc->getPos(3));
+    double speed = revolverPID->calculate(pos, enc->getPos(3));
 
     motor_revolver->setPower(speed);
     return 1;

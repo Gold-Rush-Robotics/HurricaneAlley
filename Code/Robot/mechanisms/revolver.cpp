@@ -2,6 +2,9 @@
 #include <memory>
 #include <iostream>
 
+int REV_TOLERANCE = 10;
+int stable = 0;
+
 Revolver::Revolver(std::shared_ptr<PCA9685> pca, std::shared_ptr<EncoderHandler> h)
 {
     enc = h;
@@ -19,7 +22,7 @@ Revolver::Revolver(std::shared_ptr<PCA9685> pca, std::shared_ptr<EncoderHandler>
     dropper_up = false;
     finger_in_revolver = false;
 
-    revolverPID = new PID(0.1, 1.0, -1.0, 0.5, 0.0, 0.0);
+    revolverPID = new PID(0.1, 1.0, -1.0, 0.01, 0.0, 0.0);
 }
 
 // Look at the name
@@ -39,10 +42,23 @@ void Revolver::turn_off_agitator()
 */
 bool Revolver::rotate_revolver(double pos)
 { 
-    double speed = revolverPID->calculate(pos, enc->getPos(3));
 
-    motor_revolver->setPower(speed);
-    return 1;
+    int current = enc->getPos(3);
+    std::cout << "Goal: " << pos << " | Current: " << current << std::endl;
+    double speed = revolverPID->calculate(pos, current);
+
+    
+    if(std::abs(current-pos) <= REV_TOLERANCE){
+        motor_revolver->setPower(0);
+        stable++;
+        if(stable >=10){
+            return true;
+        }
+    } else {
+        stable = 0;
+        motor_revolver->setPower(speed);
+    }
+    return false;
 }
 
 void Revolver::rotate_speed(double speed){

@@ -90,12 +90,13 @@ class Teleop : Runner
                         robot.drivetrain->encoderLogic();
                         currentAction = currentAction->run(robotPtr);
             }
+            std::cout << "Re-entering Teleop Mode" << std::endl;
         }
 
         void marshmallowControls(js_event event, ps5Controller ctr, int js){
             std::cout << "Marshmallow Controls Mode:" << std::endl;
             double multiplier = .7;
-            while (1)
+            while (read_event(js, &event) == 0)
             {
                 ctr.eventHandler(&event);
 
@@ -104,6 +105,7 @@ class Teleop : Runner
                     
                     currentAction = new StoreMarshmellow(Revolver::MARSHMALLOWS::WHITE);
                     runAutoActions();
+                    
 
                 }
                 if(ctr.s){

@@ -1,12 +1,13 @@
 #include "StoreMarshmellow.h"
+#include <string>
 
+std::string colors[] = {"EMPTY", "RED", "GREEN", "WHITE"};
 
 StoreMarshmellow::StoreMarshmellow(Revolver::MARSHMALLOWS color){
         StoreMarshmellow::color = color;
-        name = "Load Marshmelllow (" + std::to_string(color) + ")";
+        name = "Load Marshmelllow (" + colors[color] + ")";
     }
 
 GoldRushAction* StoreMarshmellow::run(Robot* robot){
-        bool test = robot->revolver->store_marshmallow(color);
-        return test ? nextAction : this;
+        return robot->revolver->store_marshmallow(color) ? nextAction : this;
     }

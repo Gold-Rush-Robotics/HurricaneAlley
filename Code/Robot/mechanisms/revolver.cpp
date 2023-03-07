@@ -2,7 +2,7 @@
 #include <memory>
 #include <iostream>
 
-int REV_TOLERANCE = 10;
+int REV_TOLERANCE = 5;
 int stable = 0;
 
 Revolver::Revolver(std::shared_ptr<PCA9685> pca, std::shared_ptr<EncoderHandler> h)

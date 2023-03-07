@@ -5,6 +5,8 @@
 #include "ps5Controller.cpp"
 #include <time.h>
 
+#include "../Actions/StoreMarshmellow.h"
+
 class Teleop : Runner
 {
     public:
@@ -99,7 +101,8 @@ class Teleop : Runner
 
                 if(ctr.x){
                     //white marshmellow
-                    //currentAction = ;
+                    
+                    currentAction = new StoreMarshmellow(Revolver::MARSHMALLOWS::WHITE);
                     runAutoActions();
 
                 }

@@ -44,13 +44,13 @@ class Revolver{
         
         MARSHMALLOWS revolver[5] = {EMPTY, EMPTY, EMPTY, EMPTY, EMPTY};
         MARSHMALLOWS can[3] = {EMPTY, EMPTY, EMPTY};
-        int32_t chambers[5] = {0, 1, 2, 3, 4};    //Encoder values for each chamber position basing it off of the loader for the pringle can
+        int32_t chambers[5] = {1792, 2534, 3254, 320, 1024};    //Encoder values for each chamber position basing it off of the loader for the pringle can
         
         
         int get_color_pos(MARSHMALLOWS color);
 
         int32_t encoder_ticks;
-        int agitator_mod;
+        int agitator_mod = -1792;
         int check_can;
 
         bool dropper_up;

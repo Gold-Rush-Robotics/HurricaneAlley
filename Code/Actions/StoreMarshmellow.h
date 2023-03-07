@@ -5,7 +5,7 @@
 #ifndef STOREMARSHMALLOWH
 #define STOREMARSHMALLOWH
 
-class StoreMarshmellow : GoldRushAction {
+class StoreMarshmellow : public GoldRushAction {
     public:
         StoreMarshmellow(Revolver::Marshmallow color);
         GoldRushAction* run(Robot* robot);

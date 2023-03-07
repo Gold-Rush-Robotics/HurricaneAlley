@@ -6,7 +6,7 @@
 
 class GoldRushAction{
     public:
-        void setNext(GoldRushAction *action);
+        GoldRushAction* setNext(GoldRushAction *action);
         void setLast(GoldRushAction *action);
         void printName();
         virtual GoldRushAction* run(Robot* robot);

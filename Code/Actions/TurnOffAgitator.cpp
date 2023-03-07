@@ -1,7 +1,7 @@
 #include "TurnOffAgitator.h"
 
 TurnOffAgitator::TurnOffAgitator(){
-    name = "turn off agitator"
+    name = "turn off agitator";
 }
 
 GoldRushAction* TurnOffAgitator::run(Robot* robot){

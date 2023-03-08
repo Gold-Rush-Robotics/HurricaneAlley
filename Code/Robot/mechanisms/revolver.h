@@ -30,7 +30,7 @@ class Revolver{
         };
 
         bool store_marshmallow(MARSHMALLOWS color);
-        int load_marshmallow(MARSHMALLOWS color);
+        bool load_marshmallow(MARSHMALLOWS color);
         bool rotate_revolver(double pos);
         void rotate_speed(double speed);
         void retract_loader();

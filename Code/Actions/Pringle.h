@@ -1,12 +1,12 @@
 #include "GoldRushAction.h"
 #include "../Robot/mechanisms/revolver.h"
 
-#ifndef LOADMARSHMELLOWH
-#define LOADMARSHMELLOWH
+#ifndef PRINGLEH
+#define PRINGLEH
 
-class InsertToPringle : public GoldRushAction {
+class Pringle : public GoldRushAction {
     public:
-        InsertToPringle(double seconds);
+        Pringle(double seconds);
         GoldRushAction* run(Robot* robot);
     private:
         int state;

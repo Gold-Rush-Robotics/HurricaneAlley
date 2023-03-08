@@ -1,14 +1,14 @@
-#include "InsertToPringle.h"
+#include "Pringle.h"
 #include "../Robot/mechanisms/revolver.h"
 #include "DelayAction.h"
 
-InsertToPringle::InsertToPringle(double seconds){
+Pringle::Pringle(double seconds){
     name = "Insert to Pringle";
     state = 0;
-    InsertToPringle::delay1 = new DelayAction(seconds);
-    InsertToPringle::delay2 = new DelayAction(seconds);
+    Pringle::delay1 = new DelayAction(seconds);
+    Pringle::delay2 = new DelayAction(seconds);
 }
-GoldRushAction* InsertToPringle::run(Robot* robot){
+GoldRushAction* Pringle::run(Robot* robot){
     switch(state){
         case 0:
             robot->revolver->insert_loader();

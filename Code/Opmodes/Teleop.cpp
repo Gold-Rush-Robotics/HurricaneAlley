@@ -6,6 +6,8 @@
 #include <time.h>
 
 #include "../Actions/StoreMarshmellow.h"
+#include "../Actions/StackAction.h"
+
 
 class Teleop : Runner
 {
@@ -56,11 +58,14 @@ class Teleop : Runner
                 {
                     robot.revolver->toggle_drop_servo();
                 }
-                else if (ctr.s)
+                if (ctr.s)
                 {
-                    robot.revolver->toggle_open_servo();
+                    robot.revolver->pringle_servo(Revolver::PRINGLE_STATES::OPEN);
+                } else {
+                    robot.revolver->pringle_servo(Revolver::PRINGLE_STATES::ACCEPTING);
                 }
-                else if (ctr.c)
+
+                if (ctr.c)
                 {
                     robot.revolver->rotate_speed(1);
                 } else if (ctr.lBump){
@@ -119,11 +124,13 @@ class Teleop : Runner
                 }
 
                 if(ctr.t){
-                    //build a three stack
+                    currentAction = new StackAction(StackAction::StackHeight::THREE);
+                    runAutoActions();
                 }
 
                 if(ctr.rBump){
-                    //build a two stack
+                    currentAction = new StackAction(StackAction::StackHeight::TWO);
+                    runAutoActions();
                 }
             }
         }

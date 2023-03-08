@@ -12,22 +12,30 @@
 
 class Revolver{
     public:
-        Revolver(std::shared_ptr<PCA9685> pca, std::shared_ptr<EncoderHandler> h);
-        
-        void turn_on_agitator();
-        void turn_off_agitator();
-        
-        void toggle_drop_servo();
-        void toggle_open_servo();
-
-        bool get_finger_in_revolver();
-
         enum MARSHMALLOWS { 
             EMPTY,
             RED, 
             GREEN, 
             WHITE
         };
+
+        enum PRINGLE_STATES {
+            CLOSED,
+            ACCEPTING,
+            OPEN
+        };
+
+        Revolver(std::shared_ptr<PCA9685> pca, std::shared_ptr<EncoderHandler> h);
+        
+        void turn_on_agitator();
+        void turn_off_agitator();
+        
+        void toggle_drop_servo();
+        void pringle_servo(PRINGLE_STATES state);
+
+        bool get_finger_in_revolver();
+
+        
 
         bool store_marshmallow(MARSHMALLOWS color);
         bool load_marshmallow(MARSHMALLOWS color);

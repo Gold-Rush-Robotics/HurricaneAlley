@@ -83,23 +83,18 @@ void Revolver::toggle_drop_servo()
 
 // Toggles the servo in control of opening/closing the can
 // Resets can and check_can if it opens
-void Revolver::toggle_open_servo()
+void Revolver::pringle_servo(PRINGLE_STATES state)
 {
-    if (is_open)
-    {
-        opener->setPosition(2500, 300);
-        is_open = false;
-    }
-    else
-    {
-        std::cout << "1" << std::endl;
-        opener->setPosition(1400, 300); // 1470 pusher closed
-        is_open = true;
-        /* for (int i = 0; i < 3; i++)
-        {
-            can[i] = EMPTY;
-        }
-        check_can = 3; */
+    switch(state){
+        case PRINGLE_STATES::CLOSED:
+            opener->setPosition(1900, 300);
+            break;
+        case PRINGLE_STATES::ACCEPTING:
+            opener->setPosition(2075, 300);
+            break;
+        case PRINGLE_STATES::OPEN:
+            opener->setPosition(2500, 300);
+            break;
     }
 }
 
@@ -151,9 +146,9 @@ bool Revolver::load_marshmallow(MARSHMALLOWS color)
     int chamber = get_color_pos(color);
     // The color wasn't loaded in the revolver
     if (chamber == -1)
-        return -1;
+        return false;
 
-    if(rotate_revolver(chamber)){
+    if(rotate_revolver(chambers[chamber])){
         revolver[chamber] = MARSHMALLOWS::EMPTY;
         return true;
     }

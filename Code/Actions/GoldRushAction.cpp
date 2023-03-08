@@ -1,10 +1,11 @@
 #include "GoldRushAction.h"
 
-void GoldRushAction::setLast(GoldRushAction *action){
+GoldRushAction* GoldRushAction::setLast(GoldRushAction *action){
     if(nextAction == nullptr){
         nextAction = action;
+        return action;
     } else {
-        nextAction->setNext(action);
+        return nextAction->setNext(action);
     }
 }
 

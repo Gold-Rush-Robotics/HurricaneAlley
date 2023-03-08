@@ -154,7 +154,7 @@ bool Revolver::load_marshmallow(MARSHMALLOWS color)
         return -1;
 
     if(rotate_revolver(chamber)){
-        revolver[goal_chamber] = MARSHMALLOWS::EMPTY;
+        revolver[chamber] = MARSHMALLOWS::EMPTY;
         return true;
     }
 

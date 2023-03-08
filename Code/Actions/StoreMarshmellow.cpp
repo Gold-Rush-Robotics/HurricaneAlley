@@ -3,10 +3,9 @@
 #include "TurnOffAgitator.h"
 #include <string>
 
-std::string colors[] = {"EMPTY", "RED", "GREEN", "WHITE"};
-
 StoreMarshmellow::StoreMarshmellow(Revolver::MARSHMALLOWS color){
         StoreMarshmellow::color = color;
+        std::string colors[] = {"EMPTY", "RED", "GREEN", "WHITE"};
         name = "Store Marshmelllow (" + colors[color] + ")";
         GoldRushAction::setNext(new DelayAction(1.3))->setNext(new TurnOffAgitator());
     }

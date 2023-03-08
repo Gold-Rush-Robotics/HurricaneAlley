@@ -1,11 +1,9 @@
 #include "LoadMarshmellow.h"
 #include "../Robot/mechanisms/revolver.h"
 
-
-std::string colors[] = {"EMPTY", "RED", "GREEN", "WHITE"};
-
 LoadMarshmellow::LoadMarshmellow(Revolver::MARSHMALLOWS color){
         LoadMarshmellow::color = color;
+        std::string colors[] = {"EMPTY", "RED", "GREEN", "WHITE"};
         name = "Load Marshmelllow (" + colors[color] + ")";
     }
 

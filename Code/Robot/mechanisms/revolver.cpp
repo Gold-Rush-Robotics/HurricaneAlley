@@ -135,7 +135,6 @@ int Revolver::get_color_pos(MARSHMALLOWS color)
 void Revolver::retract_loader()
 {
     loader->setPosition(800, 270);
-    finger_in_revolver = false;
 }
 
 void Revolver::insert_loader(){
@@ -147,28 +146,19 @@ bool Revolver::get_finger_in_revolver()
     return finger_in_revolver;
 }
 
-int Revolver::load_marshmallow(MARSHMALLOWS color)
+bool Revolver::load_marshmallow(MARSHMALLOWS color)
 {
     int chamber = get_color_pos(color);
     // The color wasn't loaded in the revolver
     if (chamber == -1)
         return -1;
-    
-    rotate_revolver(chamber);
-    loader->setPosition(270, 270); // Again need to adjust servo values
-    finger_in_revolver = true;
-    revolver[chamber] = EMPTY;
 
-
-    //TODO find a better way to do this part (probably w/ check_can)
-    int count = 0; 
-    while (can[count] != EMPTY)
-    {
-        count++;
+    if(rotate_revolver(chamber)){
+        revolver[goal_chamber] = MARSHMALLOWS::EMPTY;
+        return true;
     }
-    can[count] = color;
 
-    return count;
+    return false;
 }
 
 // Three tall Statue: base level – white, second level – green, third level – red

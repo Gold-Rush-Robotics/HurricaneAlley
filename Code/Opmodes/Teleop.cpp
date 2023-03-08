@@ -7,6 +7,7 @@
 
 #include "../Actions/StoreMarshmellow.h"
 #include "../Actions/StackAction.h"
+#include "../Actions/placeAction.h"
 
 
 class Teleop : Runner
@@ -56,7 +57,9 @@ class Teleop : Runner
                 }
                 if (ctr.t)
                 {
-                    robot.revolver->toggle_drop_servo();
+                    robot.revolver->drop_servo(true);
+                } else {
+                    robot.revolver->drop_servo(false);
                 }
                 if (ctr.s)
                 {
@@ -130,6 +133,10 @@ class Teleop : Runner
 
                 if(ctr.rBump){
                     currentAction = new StackAction(StackAction::StackHeight::TWO);
+                    runAutoActions();
+                }
+                if(ctr.lBump){
+                    currentAction = new PlaceAction();
                     runAutoActions();
                 }
             }

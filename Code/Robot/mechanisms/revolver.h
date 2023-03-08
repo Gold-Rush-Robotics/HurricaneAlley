@@ -30,7 +30,7 @@ class Revolver{
         void turn_on_agitator();
         void turn_off_agitator();
         
-        void toggle_drop_servo();
+        void drop_servo(bool down);
         void pringle_servo(PRINGLE_STATES state);
 
         bool get_finger_in_revolver();

@@ -15,7 +15,8 @@ set(UTILITIES Utilities/utilFunc.cpp Utilities/I2C.cpp Utilities/pose.cpp Utilit
 set(TELEOP Opmodes/Teleop.cpp Opmodes/Runner.cpp)
 set(ACTIONS Actions/GoldRushAction.cpp Actions/DriveToPointAction.cpp 
             Actions/StoreMarshmellow.cpp Actions/DelayAction.cpp Actions/TurnOffAgitator.cpp
-            Actions/StackAction.cpp Actions/LoadMarshmellow.cpp Actions/Pringle.cpp)
+            Actions/StackAction.cpp Actions/LoadMarshmellow.cpp Actions/Pringle.cpp
+            Actions/placeAction.cpp)
 set(AUTO Opmodes/Auto.cpp Opmodes/Runner.cpp ${ACTIONS})
 
 set(SOURCES ${HARDWARE} ${ROBOT} ${UTILITIES})

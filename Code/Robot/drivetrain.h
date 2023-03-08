@@ -15,12 +15,13 @@ class Drivetrain{
         void encoderLogic();
         void printPosition();
         bool driveToPoint(Pose* p, double distanceTolerance, double headingTolerance);
+        Pose position;
     private:
         std::shared_ptr<Motor> fl, fr, bl, br;
         std::shared_ptr<PCA9685> pca9685;
         std::shared_ptr<EncoderHandler> encoderHandler;
         void driveM(double fl, double fr, double bl, double br);
-        Pose position;
+        
         PID* translatePID;
         PID* rotatePID;
 };

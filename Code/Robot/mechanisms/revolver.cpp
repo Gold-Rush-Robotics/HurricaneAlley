@@ -66,18 +66,16 @@ void Revolver::rotate_speed(double speed){
 }
 
 // Toggles the servo in control of dropping/storing the can
-void Revolver::toggle_drop_servo()
+void Revolver::drop_servo(bool down)
 {
     
-    if (dropper_up)
+    if (down)
     {
         dropper->setPosition(1800, 300);
-        dropper_up = false;
     }
     else
     {
         dropper->setPosition(3750, 300);
-        dropper_up = true;
     }
 }
 

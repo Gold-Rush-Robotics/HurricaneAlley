@@ -13,7 +13,7 @@ Revolver::Revolver(std::shared_ptr<PCA9685> pca, std::shared_ptr<EncoderHandler>
     motor_revolver = std::make_shared<Motor>(27, 7, pca);
     agitator = std::make_shared<Motor>(17, 6, pca); // 17 6 is for real agitator current values are duck
     
-    loader = std::make_shared<Servo>(10, pca); // This Pin needs to be updated
+    loader = std::make_shared<Servo>(10, pca);
     opener = std::make_shared<Servo>(5, pca);
     dropper = std::make_shared<Servo>(4, pca);
 

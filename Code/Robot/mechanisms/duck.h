@@ -23,6 +23,8 @@ class Duck{
         void turn_off_agitator();
         bool home_agitator();
 
+        uint8_t stored_ducks;
+
     private:
         std::shared_ptr<Servo> gripper, elbow, shoulder, waist;
         std::shared_ptr<Motor> agitator;

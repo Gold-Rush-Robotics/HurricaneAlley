@@ -13,6 +13,8 @@ Duck::Duck(std::shared_ptr<PCA9685> pca){
     agitator = std::make_shared<Motor>(17, 6, pca); // Need to update these pins (same as duck now)
 
     hall_effect = new DigitalSensor(-1, true);
+
+    stored_ducks = 0;
 }
 
 void Duck::grip_duck()

@@ -29,40 +29,6 @@ void Duck::release_duck()
     gripper->setPosition(1800, 300);
 }
 
-void Duck::move_elbow(int pos)
-{
-    elbow->setPosition(pos, 300);
-}
-
-void Duck::move_shoulder(int pos)
-{
-    shoulder->setPosition(pos, 300);
-}
-
-void Duck::turn_to_agitator()
-{
-    // Need to update shoulder positions
-    waist->setPosition(1800, 300);
-}
-
-void Duck::turn_to_space_1()
-{
-    // Need to update shoulder positions
-    waist->setPosition(1800, 300);
-}
-
-void Duck::turn_to_space_2()
-{
-    // Need to update shoulder positions
-    waist->setPosition(1800, 300);
-}
-
-void Duck::turn_to_stack()
-{
-    // Need to update shoulder positions
-    waist->setPosition(1800, 300);
-}
-
 // Look at the name
 void Duck::turn_on_agitator()
 {
@@ -87,4 +53,64 @@ bool Duck::home_agitator()
         Duck::agitator->setPower(0.1);
     }
     return false;
+}
+
+void Duck::elbow_servo(ELBOW_POSITIONS state)
+{
+    switch(state)
+    {
+        case ELBOW_POSITIONS::AGITATOR:
+            elbow->setPosition(-1, 300);    // Need to tune values
+            break;
+        case ELBOW_POSITIONS::STORE_1:
+            elbow->setPosition(-1, 300);
+            break;
+        case ELBOW_POSITIONS::STORE_2:
+            elbow->setPosition(-1, 300);
+            break;
+        case ELBOW_POSITIONS::STACK:
+            elbow->setPosition(-1, 300);
+            break;
+        case ELBOW_POSITIONS::RAISED:
+            elbow->setPosition(-1, 300);
+            break;
+    }
+}
+
+void Duck::shoulder_servo(SHOULDER_POSITIONS state)
+{
+    switch(state)
+    {
+        case SHOULDER_POSITIONS::AGITATOR:
+            shoulder->setPosition(-1, 300);    // Need to tune values
+            break;
+        case SHOULDER_POSITIONS::STORE_1:
+            shoulder->setPosition(-1, 300);
+            break;
+        case SHOULDER_POSITIONS::STORE_2:
+            shoulder->setPosition(-1, 300);
+            break;
+        case SHOULDER_POSITIONS::STACK:
+            shoulder->setPosition(-1, 300);
+            break;
+    }
+}
+
+void Duck::waist_servo(WAIST_POSITIONS state)
+{
+    switch(state)
+    {
+        case WAIST_POSITIONS::AGITATOR:
+            waist->setPosition(-1, 300);    // Need to tune values
+            break;
+        case WAIST_POSITIONS::STORE_1:
+            waist->setPosition(-1, 300);
+            break;
+        case WAIST_POSITIONS::STORE_2:
+            waist->setPosition(-1, 300);
+            break;
+        case WAIST_POSITIONS::STACK:
+            waist->setPosition(-1, 300);
+            break;
+    }
 }

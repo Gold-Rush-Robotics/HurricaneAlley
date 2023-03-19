@@ -35,8 +35,6 @@ class Revolver{
 
         bool get_finger_in_revolver();
 
-        
-
         bool store_marshmallow(MARSHMALLOWS color);
         bool load_marshmallow(MARSHMALLOWS color);
         bool rotate_revolver(double pos);

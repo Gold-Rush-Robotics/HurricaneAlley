@@ -16,6 +16,4 @@ class StoreDuck : public GoldRushAction {
         GoldRushAction* delay2;
         GoldRushAction* delay3;
         GoldRushAction* delay4;
-
-
 };

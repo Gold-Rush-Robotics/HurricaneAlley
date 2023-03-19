@@ -15,7 +15,7 @@ GoldRushAction* GoToStore2::run(Robot* robot){
     {
         case 0:
             // Move the Shoulder
-            robot->duck->move_shoulder(1800); // Need to update this
+            robot->duck->shoulder_servo(Duck::SHOULDER_POSITIONS::STORE_2);
             state++;
             break;
         case 1:
@@ -26,7 +26,7 @@ GoldRushAction* GoToStore2::run(Robot* robot){
             break;
         case 2:
             // Turn to the storage position
-            robot->duck->turn_to_space_1();
+            robot->duck->waist_servo(Duck::WAIST_POSITIONS::STORE_2);
             state++;
             break;
         case 3:
@@ -36,7 +36,7 @@ GoldRushAction* GoToStore2::run(Robot* robot){
             break;
         case 4:
             // Move the Elbow
-            robot->duck->move_elbow(1800); // Need to update this
+            robot->duck->elbow_servo(Duck::ELBOW_POSITIONS::STORE_2);
             state++;
             break;
         case 5:

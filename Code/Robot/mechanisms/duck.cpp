@@ -6,9 +6,9 @@ Duck::Duck(std::shared_ptr<PCA9685> pca){
 
     // Need to update pins for servos
     gripper = std::make_shared<Servo>(-1, pca);
-    elbow = std::make_shared<Servo>(-1, pca);
-    shoulder = std::make_shared<Servo>(-1, pca);
-    waist = std::make_shared<Servo>(-1, pca);
+    j3 = std::make_shared<Servo>(-1, pca);
+    j2 = std::make_shared<Servo>(-1, pca);
+    j1 = std::make_shared<Servo>(-1, pca);
 
     agitator = std::make_shared<Motor>(17, 6, pca); // Need to update these pins (same as duck now)
 
@@ -55,62 +55,62 @@ bool Duck::home_agitator()
     return false;
 }
 
-void Duck::elbow_servo(ELBOW_POSITIONS state)
+void Duck::j3_servo(J3_POSITIONS state)
 {
     switch(state)
     {
-        case ELBOW_POSITIONS::AGITATOR:
-            elbow->setPosition(-1, 300);    // Need to tune values
+        case J3_POSITIONS::AGITATOR:
+            j3->setPosition(-1, 300);    // Need to tune values
             break;
-        case ELBOW_POSITIONS::STORE_1:
-            elbow->setPosition(-1, 300);
+        case J3_POSITIONS::STORE_1:
+            j3->setPosition(-1, 300);
             break;
-        case ELBOW_POSITIONS::STORE_2:
-            elbow->setPosition(-1, 300);
+        case J3_POSITIONS::STORE_2:
+            j3->setPosition(-1, 300);
             break;
-        case ELBOW_POSITIONS::STACK:
-            elbow->setPosition(-1, 300);
+        case J3_POSITIONS::STACK:
+            j3->setPosition(-1, 300);
             break;
-        case ELBOW_POSITIONS::RAISED:
-            elbow->setPosition(-1, 300);
+        case J3_POSITIONS::RAISED:
+            j3->setPosition(-1, 300);
             break;
     }
 }
 
-void Duck::shoulder_servo(SHOULDER_POSITIONS state)
+void Duck::j2_servo(J2_POSITIONS state)
 {
     switch(state)
     {
-        case SHOULDER_POSITIONS::AGITATOR:
-            shoulder->setPosition(-1, 300);    // Need to tune values
+        case J2_POSITIONS::AGITATOR:
+            j2->setPosition(-1, 300);    // Need to tune values
             break;
-        case SHOULDER_POSITIONS::STORE_1:
-            shoulder->setPosition(-1, 300);
+        case J2_POSITIONS::STORE_1:
+            j2->setPosition(-1, 300);
             break;
-        case SHOULDER_POSITIONS::STORE_2:
-            shoulder->setPosition(-1, 300);
+        case J2_POSITIONS::STORE_2:
+            j2->setPosition(-1, 300);
             break;
-        case SHOULDER_POSITIONS::STACK:
-            shoulder->setPosition(-1, 300);
+        case J2_POSITIONS::STACK:
+            j2->setPosition(-1, 300);
             break;
     }
 }
 
-void Duck::waist_servo(WAIST_POSITIONS state)
+void Duck::j1_servo(J1_POSITIONS state)
 {
     switch(state)
     {
-        case WAIST_POSITIONS::AGITATOR:
-            waist->setPosition(-1, 300);    // Need to tune values
+        case J1_POSITIONS::AGITATOR:
+            j1->setPosition(-1, 300);    // Need to tune values
             break;
-        case WAIST_POSITIONS::STORE_1:
-            waist->setPosition(-1, 300);
+        case J1_POSITIONS::STORE_1:
+            j1->setPosition(-1, 300);
             break;
-        case WAIST_POSITIONS::STORE_2:
-            waist->setPosition(-1, 300);
+        case J1_POSITIONS::STORE_2:
+            j1->setPosition(-1, 300);
             break;
-        case WAIST_POSITIONS::STACK:
-            waist->setPosition(-1, 300);
+        case J1_POSITIONS::STACK:
+            j1->setPosition(-1, 300);
             break;
     }
 }

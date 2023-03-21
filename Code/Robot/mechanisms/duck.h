@@ -8,7 +8,7 @@ class Duck{
     public:
         Duck(std::shared_ptr<PCA9685> pca);
 
-        enum ELBOW_POSITIONS{
+        enum J3_POSITIONS{
             AGITATOR,
             STORE_1,
             STORE_2,
@@ -16,14 +16,14 @@ class Duck{
             RAISED
         };
 
-        enum SHOULDER_POSITIONS{
+        enum J2_POSITIONS{
             AGITATOR,
             STORE_1,
             STORE_2,
             STACK
         };
 
-        enum WAIST_POSITIONS{
+        enum J1_POSITIONS{
             AGITATOR,
             STORE_1,
             STORE_2,
@@ -39,12 +39,12 @@ class Duck{
 
         uint8_t stored_ducks;
 
-        void elbow_servo(ELBOW_POSITIONS state);
-        void shoulder_servo(SHOULDER_POSITIONS state);
-        void waist_servo(WAIST_POSITIONS state);
+        void j3_servo(J3_POSITIONS state);
+        void j2_servo(J2_POSITIONS state);
+        void j1_servo(J1_POSITIONS state);
 
     private:
-        std::shared_ptr<Servo> gripper, elbow, shoulder, waist;
+        std::shared_ptr<Servo> gripper, j1, j2, j3;
         std::shared_ptr<Motor> agitator;
         DigitalSensor* hall_effect;
 }

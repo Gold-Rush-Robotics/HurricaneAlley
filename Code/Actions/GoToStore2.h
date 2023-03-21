@@ -1,6 +1,9 @@
 #include "GoldRushAction.h"
 #include "../Robot/mechanisms/duck.h"
 
+#ifndef GOTOSTORE2H
+#define GOTOSTORE2H
+
 class GoToStore2 : public GoldRushAction {
     public:
         GoToStore2(double seconds);
@@ -11,3 +14,5 @@ class GoToStore2 : public GoldRushAction {
         GoldRushAction* delay2;
         GoldRushAction* delay3;
 };
+
+#endif

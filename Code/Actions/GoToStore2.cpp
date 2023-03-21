@@ -14,19 +14,19 @@ GoldRushAction* GoToStore2::run(Robot* robot){
     switch(state)
     {
         case 0:
-            // Move the Shoulder
-            robot->duck->shoulder_servo(Duck::SHOULDER_POSITIONS::STORE_2);
+            // Move the j2
+            robot->duck->j2_servo(Duck::J2_POSITIONS::STORE_2);
             state++;
             break;
         case 1:
-            // Delay for Shoulder to get there
+            // Delay for j2 to get there
             name = "Store 2 - Delay 1";
             if (delay1->run(robot) == nullptr)
                 state++;
             break;
         case 2:
             // Turn to the storage position
-            robot->duck->waist_servo(Duck::WAIST_POSITIONS::STORE_2);
+            robot->duck->j1_servo(Duck::J1_POSITIONS::STORE_2);
             state++;
             break;
         case 3:
@@ -35,12 +35,12 @@ GoldRushAction* GoToStore2::run(Robot* robot){
                 state++;
             break;
         case 4:
-            // Move the Elbow
-            robot->duck->elbow_servo(Duck::ELBOW_POSITIONS::STORE_2);
+            // Move the j3
+            robot->duck->j3_servo(Duck::J3_POSITIONS::STORE_2);
             state++;
             break;
         case 5:
-            // Delay for Elbow
+            // Delay for j3
             name = "Store 2 - Delay 3";
             if (delay3->run(robot) == nullptr)
                 state++;

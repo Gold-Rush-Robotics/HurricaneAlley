@@ -1,6 +1,9 @@
 #include "GoldRushAction.h"
 #include "../Robot/mechanisms/duck.h"
 
+#ifndef GOTOAGITATORH
+#define GOTOAGITATORH
+
 class GoToAgitator : public GoldRushAction {
     public:
         GoToAgitator(double seconds);
@@ -11,3 +14,5 @@ class GoToAgitator : public GoldRushAction {
         GoldRushAction* delay2;
         GoldRushAction* delay3;
 };
+
+#endif

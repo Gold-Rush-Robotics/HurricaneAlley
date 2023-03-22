@@ -8,7 +8,20 @@ class Duck{
     public:
         Duck(std::shared_ptr<PCA9685> pca);
 
+        // "Elbow"
+        // Makes arm travel along z-axis
         enum J3_POSITIONS{
+            AGITATOR,
+            STORE_1,
+            STORE_2,
+            STACK_2,
+            STACK_3,
+            RAISED
+        };
+
+        // "Shoulder"
+        // Makes arm travel along a vertical arc
+        enum J2_POSITIONS{
             AGITATOR,
             STORE_1,
             STORE_2,
@@ -16,13 +29,8 @@ class Duck{
             RAISED
         };
 
-        enum J2_POSITIONS{
-            AGITATOR,
-            STORE_1,
-            STORE_2,
-            STACK
-        };
-
+        // "Waist"
+        // Rotates the whole arm along z axis
         enum J1_POSITIONS{
             AGITATOR,
             STORE_1,

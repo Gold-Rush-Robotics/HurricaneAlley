@@ -2,9 +2,10 @@
 #include "../Robot/mechanisms/duck.h"
 #include "DelayAction.h"
 
-GoToStack::GoToStack(double seconds){
+GoToStack::GoToStack(double seconds, int height){
     name = "Not at Stack";
     state = 0;
+    this->height = height;
     delay1 = new DelayAction(seconds);
     delay2 = new DelayAction(seconds);
     delay3 = new DelayAction(seconds);
@@ -36,7 +37,10 @@ GoldRushAction* GoToStack::run(Robot* robot){
             break;
         case 4:
             // Move the j3
-            robot->duck->j3_servo(Duck::J3_POSITIONS::STACK);
+            if (height == 3)
+                robot->duck->j3_servo(Duck::J3_POSITIONS::STACK_3);
+            else if (height == 2)
+                robot->duck->j3_servo(Duck::J3_POSITIONS::STACK_2);
             state++;
             break;
         case 5:

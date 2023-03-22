@@ -1,15 +1,21 @@
 #include "placeAction.h"
 #include "../Utilities/pose.h"
 #include "DelayAction.h"
+#include "../Robot/mechanisms/duck.h"
 
 Pose robotCur;
 
-PlaceAction::PlaceAction(){
-    name = "Place Stack";
+PlaceAction::PlaceAction(StackAction::StackHeight height){
+    name = "Place on " + height + " Stack";
+    size = height;
     state = 0;
     delay1 = new DelayAction(2);
     delay2 = new DelayAction(1);
     delay3 = new DelayAction(1);
+    ag = new GoToAgitator(1);
+    go_to_stack = new GoToStack(1);
+    go_to_store_1 = new GoToStore1(1);
+    go_to_store_2 = new GoToStore2(1);
 }
 GoldRushAction* PlaceAction::run(Robot* robot){
     switch(state){
@@ -34,16 +40,65 @@ GoldRushAction* PlaceAction::run(Robot* robot){
             }
             break;
         case 4:
+            // Move to correct storage location
+            switch (robot->duck->stored_ducks)
+            {
+                case 3:
+                    // Move arm to agitator
+                    if (ag->run(robot) == nullptr)
+                        state++;
+                    break;
+                case 2:
+                    // Move to Store 2
+                    if (go_to_store_2->run(robot) == nullptr)
+                        state++;
+                    break;
+                case 1:
+                    // Move to Store 1
+                    if (go_to_store_1->run(robot) == nullptr)
+                        state++;
+                    break;
+                case 0:
+                    // No Stored Ducks Error
+                    break;
+            }
+            break;
+        case 5:
+            // Move to Stack
+            if (go_to_stack->run(robot, size) == nullptr)
+                state++;
+            break;
+        case 6:
+            // Release Duck
+            robot->duck->release_duck();
+            state++;
+            break;
+        case 7:
+            // Delay for Releasing Duck
+            if (delay1->run(robot) == nullptr)
+                state++;
+            break;
+        case 8:
+            // Raise Arm
+            robot->duck->j2_servo(Duck::J2_POSITIONS::RAISED);
+            state++;
+            break;
+        case 9:
+            // Delay for Raising
+            if (delay1->run(robot) == nullptr)
+                state++;
+            break;
+        case 10:
             if(robot->drivetrain->driveToPoint(new Pose(robotCur.x+10, robotCur.y, robotCur.theta), 1, 0.01)){
                 state++;
             }
             break;
-        case 5:
+        case 11:
             robot->revolver->pringle_servo(Revolver::PRINGLE_STATES::CLOSED);
             robot->revolver->drop_servo(false);
             state++;
             break;
-        case 6:
+        case 12:
             if(delay3->run(robot) == nullptr){
                 return nextAction;
             }

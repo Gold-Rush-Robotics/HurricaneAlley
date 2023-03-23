@@ -55,61 +55,61 @@ bool Duck::home_agitator()
     return false;
 }
 
-void Duck::j3_servo(J3_POSITIONS state)
+void Duck::j3_servo(JOINT_POSITIONS state)
 {
     switch(state)
     {
-        case J3_POSITIONS::AGITATOR:
+        case JOINT_POSITIONS::AGITATOR:
             j3->setPosition(-1, 300);    // Need to tune values
             break;
-        case J3_POSITIONS::STORE_1:
+        case JOINT_POSITIONS::STORE_1:
             j3->setPosition(-1, 300);
             break;
-        case J3_POSITIONS::STORE_2:
+        case JOINT_POSITIONS::STORE_2:
             j3->setPosition(-1, 300);
             break;
-        case J3_POSITIONS::STACK:
+        case JOINT_POSITIONS::STACK:
             j3->setPosition(-1, 300);
             break;
-        case J3_POSITIONS::RAISED:
+        case JOINT_POSITIONS::RAISED:
             j3->setPosition(-1, 300);
             break;
     }
 }
 
-void Duck::j2_servo(J2_POSITIONS state)
+void Duck::j2_servo(JOINT_POSITIONS state)
 {
     switch(state)
     {
-        case J2_POSITIONS::AGITATOR:
+        case JOINT_POSITIONS::AGITATOR:
             j2->setPosition(-1, 300);    // Need to tune values
             break;
-        case J2_POSITIONS::STORE_1:
+        case JOINT_POSITIONS::STORE_1:
             j2->setPosition(-1, 300);
             break;
-        case J2_POSITIONS::STORE_2:
+        case JOINT_POSITIONS::STORE_2:
             j2->setPosition(-1, 300);
             break;
-        case J2_POSITIONS::STACK:
+        case JOINT_POSITIONS::STACK:
             j2->setPosition(-1, 300);
             break;
     }
 }
 
-void Duck::j1_servo(J1_POSITIONS state)
+void Duck::j1_servo(JOINT_POSITIONS state)
 {
     switch(state)
     {
-        case J1_POSITIONS::AGITATOR:
+        case JOINT_POSITIONS::AGITATOR:
             j1->setPosition(-1, 300);    // Need to tune values
             break;
-        case J1_POSITIONS::STORE_1:
+        case JOINT_POSITIONS::STORE_1:
             j1->setPosition(-1, 300);
             break;
-        case J1_POSITIONS::STORE_2:
+        case JOINT_POSITIONS::STORE_2:
             j1->setPosition(-1, 300);
             break;
-        case J1_POSITIONS::STACK:
+        case JOINT_POSITIONS::STACK:
             j1->setPosition(-1, 300);
             break;
     }

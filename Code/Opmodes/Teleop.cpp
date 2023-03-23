@@ -104,6 +104,7 @@ class Teleop : Runner
         void marshmallowControls(js_event event, ps5Controller ctr, int js){
             std::cout << "Marshmallow Controls Mode:" << std::endl;
             double multiplier = .7;
+            StackAction::StackHeight currentStack = StackAction::StackHeight::THREE;
             while (read_event(js, &event) == 0)
             {
                 ctr.eventHandler(&event);
@@ -128,15 +129,17 @@ class Teleop : Runner
 
                 if(ctr.t){
                     currentAction = new StackAction(StackAction::StackHeight::THREE);
+                    currentStack = StackAction::StackHeight::THREE;
                     runAutoActions();
                 }
 
                 if(ctr.rBump){
                     currentAction = new StackAction(StackAction::StackHeight::TWO);
+                    currentStack = StackAction::StackHeight::TWO;
                     runAutoActions();
                 }
                 if(ctr.lBump){
-                    currentAction = new PlaceAction();
+                    currentAction = new PlaceAction(currentStack);
                     runAutoActions();
                 }
             }

@@ -18,6 +18,7 @@ PlaceAction::PlaceAction(StackAction::StackHeight height){
     go_to_store_2 = new GoToStore2(1);
 }
 GoldRushAction* PlaceAction::run(Robot* robot){
+    std::cout<< state << std::endl;
     switch(state){
         case 0:
             robot->revolver->pringle_servo(Revolver::PRINGLE_STATES::CLOSED);
@@ -45,22 +46,27 @@ GoldRushAction* PlaceAction::run(Robot* robot){
             {
                 case 3:
                     // Move arm to agitator
+                    ag->printName();
+                    
                     if (ag->run(robot) == nullptr)
                         state++;
                     break;
                 case 2:
                     // Move to Store 2
+                    go_to_store_2->printName();
                     if (go_to_store_2->run(robot) == nullptr)
                         state++;
                     break;
                 case 1:
                     // Move to Store 1
+                    go_to_store_1->printName();
                     if (go_to_store_1->run(robot) == nullptr)
                         state++;
                     break;
                 case 0:
+                    std::cout << "No stored ducks" << std::endl;
                     // No Stored Ducks Error
-                    break;
+                    return nextAction;
             }
             break;
         case 5:

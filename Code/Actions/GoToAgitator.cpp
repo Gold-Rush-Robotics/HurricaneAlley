@@ -11,6 +11,7 @@ GoToAgitator::GoToAgitator(double seconds){
 }
 
 GoldRushAction* GoToAgitator::run(Robot* robot){
+    std::cout << "Agitator: " << state << std::endl;
     switch(state)
     {
         case 0:
@@ -43,7 +44,7 @@ GoldRushAction* GoToAgitator::run(Robot* robot){
             // Delay for j3
             name = "Agitator - Delay 3";
             if (delay3->run(robot) == nullptr)
-                state++;
+                return nextAction;
             break;
     }
     return this;

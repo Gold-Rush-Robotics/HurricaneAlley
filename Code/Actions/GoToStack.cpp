@@ -47,7 +47,7 @@ GoldRushAction* GoToStack::run(Robot* robot){
             // Delay for j3
             name = "Stack 1 - Delay 3";
             if (delay3->run(robot) == nullptr)
-                state++;
+                return nextAction;
             break;
     }
     return this;

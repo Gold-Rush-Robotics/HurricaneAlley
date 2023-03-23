@@ -29,7 +29,7 @@ class Duck{
         void turn_off_agitator();
         bool home_agitator();
 
-        uint8_t stored_ducks;
+        uint8_t stored_ducks = 0;
 
         void j3_servo(JOINT_POSITIONS state);
         void j2_servo(JOINT_POSITIONS state);

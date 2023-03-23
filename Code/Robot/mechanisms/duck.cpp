@@ -14,7 +14,7 @@ Duck::Duck(std::shared_ptr<PCA9685> pca){
 
     hall_effect = new DigitalSensor(-1, true);
 
-    stored_ducks = 0;
+    stored_ducks = 3;   // For Testing remove later
 }
 
 void Duck::grip_duck()

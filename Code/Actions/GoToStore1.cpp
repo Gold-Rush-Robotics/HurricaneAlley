@@ -43,7 +43,7 @@ GoldRushAction* GoToStore1::run(Robot* robot){
             // Delay for j3
             name = "Store 1 - Delay 3";
             if (delay3->run(robot) == nullptr)
-                state++;
+                return nextAction;
             break;
     }
     return this;

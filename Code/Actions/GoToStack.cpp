@@ -16,7 +16,7 @@ GoldRushAction* GoToStack::run(Robot* robot){
     {
         case 0:
             // Move the j2
-            robot->duck->j2_servo(Duck::J2_POSITIONS::STACK);
+            robot->duck->j2_servo(Duck::JOINT_POSITIONS::STACK);
             state++;
             break;
         case 1:
@@ -27,7 +27,7 @@ GoldRushAction* GoToStack::run(Robot* robot){
             break;
         case 2:
             // Turn to the storage position
-            robot->duck->j1_servo(Duck::J1_POSITIONS::STACK);
+            robot->duck->j1_servo(Duck::JOINT_POSITIONS::STACK);
             state++;
             break;
         case 3:
@@ -38,9 +38,9 @@ GoldRushAction* GoToStack::run(Robot* robot){
         case 4:
             // Move the j3
             if (height == 3)
-                robot->duck->j3_servo(Duck::J3_POSITIONS::STACK_3);
+                robot->duck->j3_servo(Duck::JOINT_POSITIONS::STACK_3);
             else if (height == 2)
-                robot->duck->j3_servo(Duck::J3_POSITIONS::STACK_2);
+                robot->duck->j3_servo(Duck::JOINT_POSITIONS::STACK_2);
             state++;
             break;
         case 5:

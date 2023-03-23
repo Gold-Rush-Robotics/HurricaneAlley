@@ -6,14 +6,14 @@
 Pose robotCur;
 
 PlaceAction::PlaceAction(StackAction::StackHeight height){
-    name = "Place on " + height + " Stack";
+    name = "Place on " + std::to_string(height) + " Stack";
     size = height;
     state = 0;
     delay1 = new DelayAction(2);
     delay2 = new DelayAction(1);
     delay3 = new DelayAction(1);
     ag = new GoToAgitator(1);
-    go_to_stack = new GoToStack(1);
+    go_to_stack = new GoToStack(1.0, size);
     go_to_store_1 = new GoToStore1(1);
     go_to_store_2 = new GoToStore2(1);
 }
@@ -65,7 +65,7 @@ GoldRushAction* PlaceAction::run(Robot* robot){
             break;
         case 5:
             // Move to Stack
-            if (go_to_stack->run(robot, size) == nullptr)
+            if (go_to_stack->run(robot) == nullptr)
                 state++;
             break;
         case 6:
@@ -80,7 +80,7 @@ GoldRushAction* PlaceAction::run(Robot* robot){
             break;
         case 8:
             // Raise Arm
-            robot->duck->j2_servo(Duck::J2_POSITIONS::RAISED);
+            robot->duck->j2_servo(Duck::JOINT_POSITIONS::RAISED);
             state++;
             break;
         case 9:

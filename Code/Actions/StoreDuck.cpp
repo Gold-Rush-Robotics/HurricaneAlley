@@ -3,7 +3,7 @@
 #include "DelayAction.h"
 
 StoreDuck::StoreDuck(double seconds){
-    name = "Storing Duck " + (Duck::stored_ducks + 1);
+    name = "Storing Duck";
     state = 0;
     delay1 = new DelayAction(seconds);
     delay2 = new DelayAction(seconds);
@@ -47,7 +47,7 @@ bool StoreDuck::Store1(Robot* robot){
             break;
         case 2:
             // Move j3 Up
-            robot->duck->j3_servo(Duck::J3_POSITIONS::RAISED);
+            robot->duck->j3_servo(Duck::JOINT_POSITIONS::RAISED);
             state++;
             break;
         case 3:
@@ -87,7 +87,7 @@ bool StoreDuck::Store2(Robot* robot){
             break;
         case 2:
             // Move j3 Up
-            robot->duck->j3_servo(Duck::J3_POSITIONS::RAISED);
+            robot->duck->j3_servo(Duck::JOINT_POSITIONS::RAISED);
             state++;
             break;
         case 3:

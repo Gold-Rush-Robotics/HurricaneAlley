@@ -15,7 +15,7 @@ GoldRushAction* GoToStore1::run(Robot* robot){
     {
         case 0:
             // Move the j2
-            robot->duck->j2_servo(Duck::J2_POSITIONS::STORE_1);
+            robot->duck->j2_servo(Duck::JOINT_POSITIONS::STORE_1);
             state++;
             break;
         case 1:
@@ -26,7 +26,7 @@ GoldRushAction* GoToStore1::run(Robot* robot){
             break;
         case 2:
             // Turn to the storage position
-            robot->duck->j1_servo(Duck::J1_POSITIONS::STORE_1);
+            robot->duck->j1_servo(Duck::JOINT_POSITIONS::STORE_1);
             state++;
             break;
         case 3:
@@ -36,7 +36,7 @@ GoldRushAction* GoToStore1::run(Robot* robot){
             break;
         case 4:
             // Move the j3
-            robot->duck->j3_servo(Duck::J3_POSITIONS::STORE_1);
+            robot->duck->j3_servo(Duck::JOINT_POSITIONS::STORE_1);
             state++;
             break;
         case 5:

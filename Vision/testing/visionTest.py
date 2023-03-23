@@ -25,7 +25,7 @@ pu = np.array([174,255,255],np.uint8)
 
 
 
-video = cv2.VideoCapture(0)
+video = cv2.VideoCapture(1)
 
 prev_frame_time = 0
 new_frame_time = 0

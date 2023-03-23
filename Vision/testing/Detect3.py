@@ -65,16 +65,91 @@ for circle in circles[0]:
     cv2.circle(img_circle, (x, y), r, (0, 0, 255), 2)
     cv2.circle(mask, (x, y), r, 255, -1)
 
+# get average color with mask 
+
+
+mean,stddev = cv2.meanStdDev(frame, mask=mask)[:3]
+print("average circle color:", )
+
+ru = np.array([min(mean[0]+ stddev[0], 255),min(mean[1]+ stddev[1], 255), min(mean[2]+ stddev[2], 255)],np.uint8)
+rl = np.array([max(mean[0]- stddev[0],0),max(mean[1]- stddev[1],0),max(mean[2]- stddev[2],0)],np.uint8)
+print("redL",rl)
+print("redU",ru)
+
+''''' For Red and Pink
 # get average color with mask  
-ave_color = cv2.mean(img, mask=mask)[:3]
+ave_color = cv2.meanStd(frame, mask=mask)[:3]
 print("average circle color:", ave_color)
 
-# save results
+ru = np.array([min(ave_color[0]+ 10, 255),min(ave_color[1]+ 10, 255), min(ave_color[2]+ 10, 255)],np.uint8)
+rl = np.array([max(ave_color[0]- 10,0),max(ave_color[1]- 10,0),max(ave_color[2]- 10,0)],np.uint8)
+'''''
+
+prev_frame_time = 0
+new_frame_time = 0
+
 cv2.imwrite('green_circle_circle.jpg', img_circle)
 cv2.imwrite('green_circle_mask.jpg', mask)
-
 # show images
 cv2.imshow('circle', img_circle)
 cv2.imshow('mask', mask)
-cv2.waitKey(0)
+
+
+while True:
+    success, img = cam.read()
+
+
+    if not success:
+        break
+ 
+    # Our operations on the frame come here
+    gray = img
+ 
+    # resizing the frame size according to our need
+    gray = cv2.resize(gray, (500, 300))
+ 
+    # font which we will be using to display FPS
+    font = cv2.FONT_HERSHEY_SIMPLEX
+    # time when we finish processing for this frame
+    new_frame_time = time.time()
+ 
+    # Calculating the fps
+ 
+    # fps will be number of frame processed in given time frame
+    # since their will be most of time error of 0.001 second
+    # we will be subtracting it to get more accurate result
+    fps = 1/(new_frame_time-prev_frame_time)
+    prev_frame_time = new_frame_time
+ 
+    # converting the fps into integer
+    fps = int(fps)
+ 
+    # converting the fps to string so that we can display it on frame
+    # by using putText function
+    fps = str(fps)
+ 
+    # putting the FPS count on the frame
+    cv2.putText(gray, fps, (7, 70), font, 3, (100, 255, 0), 3, cv2.LINE_AA)
+ 
+    # displaying the frame with fps
+    cv2.imshow('frame', gray)
+
+    rmask = cv2.inRange(img,rl,ru)
+    rcontours, rhier = cv2.findContours(rmask,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_NONE)
+
+    # red
+    if len(rcontours) != 0:
+        for contour in rcontours:
+            if cv2.contourArea(contour) > 100:
+                x,y,w,h = cv2.boundingRect(contour)
+                
+                cv2.rectangle(img, (x,y),(x + w, y+ h ),(0,0,255,),3)
+
+    
+    cv2.imshow("webcam", img)
+
+    cv2.waitKey(1)
+
+# save results
+
 cv2.destroyAllWindows()

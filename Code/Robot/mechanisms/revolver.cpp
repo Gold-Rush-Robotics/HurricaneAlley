@@ -22,6 +22,8 @@ Revolver::Revolver(std::shared_ptr<PCA9685> pca, std::shared_ptr<EncoderHandler>
     dropper_up = false;
     finger_in_revolver = false;
 
+    // Add colorsensor to constructor
+
     revolverPID = new PID(0.1, 1.0, -1.0, 0.01, 0.0, 0.0);
 }
 
@@ -97,13 +99,13 @@ void Revolver::pringle_servo(PRINGLE_STATES state)
 }
 
 
-bool Revolver::store_marshmallow(MARSHMALLOWS color)
+bool Revolver::store_marshmallow()
 {
     int goal_chamber = get_color_pos(EMPTY);
     if (goal_chamber == -1)
         return -1;
     if(rotate_revolver(chambers[goal_chamber] + agitator_mod)){
-        revolver[goal_chamber] = color;
+        revolver[goal_chamber] = get_color();
         return true;
     }
     return false;
@@ -152,6 +154,11 @@ bool Revolver::load_marshmallow(MARSHMALLOWS color)
     }
 
     return false;
+}
+
+MARSHMALLOWS Revolver::get_color()
+{
+    // return colorsensor->get_color();
 }
 
 // Three tall Statue: base level – white, second level – green, third level – red

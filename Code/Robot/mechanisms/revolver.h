@@ -2,6 +2,7 @@
 #include "../../HardwareInterfaces/servo.h"
 #include "../../HardwareInterfaces/motor.h"
 #include "../../HardwareInterfaces/encoder.h"
+#include "../../HardwareInterfaces/colorsensor.h"
 #include "../../Utilities/utilFunc.h"
 #include "../../Utilities/pid.h"
 
@@ -16,7 +17,9 @@ class Revolver{
             EMPTY,
             RED, 
             GREEN, 
-            WHITE
+            WHITE,
+            RED_CHIPS,
+            GREEN_CHIPS
         };
 
         enum PRINGLE_STATES {
@@ -35,20 +38,22 @@ class Revolver{
 
         bool get_finger_in_revolver();
 
-        bool store_marshmallow(MARSHMALLOWS color);
+        bool store_marshmallow();
         bool load_marshmallow(MARSHMALLOWS color);
         bool rotate_revolver(double pos);
         void rotate_speed(double speed);
         void retract_loader();
         void insert_loader();
-
+        MARSHMALLOWS get_color();
     
     private:
         std::shared_ptr<EncoderHandler> enc;
         std::shared_ptr<Servo> loader, opener, dropper;
         std::shared_ptr<Motor> agitator, motor_revolver;
         
-        MARSHMALLOWS revolver[5] = {EMPTY, EMPTY, EMPTY, EMPTY, EMPTY};
+        // For now setting initial positions of food chips in here
+        // Could probably do it with teleop at the start if we wanted
+        MARSHMALLOWS revolver[5] = {RED_CHIPS, GREEN_CHIPS, EMPTY, EMPTY, EMPTY};
         MARSHMALLOWS can[3] = {EMPTY, EMPTY, EMPTY};
         int32_t chambers[5] = {1792, 2534, 3254, 320, 1024};    //Encoder values for each chamber position basing it off of the loader for the pringle can
         

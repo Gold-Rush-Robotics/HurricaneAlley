@@ -4,7 +4,7 @@ import time
 import argparse
 
 
-cam = cv2.VideoCapture(1)
+cam = cv2.VideoCapture(0)
 return_value,img = cam.read()
 
 
@@ -47,9 +47,10 @@ gray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
 img2 = cv2.medianBlur(gray,5)
 #for marshmellows
 cimg = cv2.cvtColor(img2,cv2.COLOR_GRAY2BGR)
-circles = cv2.HoughCircles(img2, cv2.HOUGH_GRADIENT, 1,120,param1=100,param2=45,minRadius=30,maxRadius=60)
+
+#circles = cv2.HoughCircles(img2, cv2.HOUGH_GRADIENT, 1,120,param1=100,param2=45,minRadius=30,maxRadius=60)
 #For ducks
-#circles = cv2.HoughCircles(img2, cv2.HOUGH_GRADIENT, 1,150,param1=100,param2=23,minRadius=40,maxRadius=60)
+circles = cv2.HoughCircles(img2, cv2.HOUGH_GRADIENT, 1,150,param1=100,param2=23,minRadius=40,maxRadius=60)
 
 
 # draw circles
@@ -67,12 +68,16 @@ for circle in circles[0]:
 
 # get average color with mask 
 
+hsvFrame = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+mean,stddev = cv2.meanStdDev(hsvFrame, mask=mask)[:3]
 
-mean,stddev = cv2.meanStdDev(frame, mask=mask)[:3]
-print("average circle color:", )
+print("average circle color:",mean[0])
+print("average circle color:",mean[1])
+print("average circle color:",mean[2])
 
-ru = np.array([min(mean[0]+ stddev[0], 255),min(mean[1]+ stddev[1], 255), min(mean[2]+ stddev[2], 255)],np.uint8)
-rl = np.array([max(mean[0]- stddev[0],0),max(mean[1]- stddev[1],0),max(mean[2]- stddev[2],0)],np.uint8)
+
+ru = np.array([min(mean[0]+ 2*stddev[0], 180),min(mean[1]+ 2*stddev[1], 255), min(mean[2]+ 2*stddev[2], 255)],np.uint8)
+rl = np.array([max(mean[0]- 2*stddev[0],0),max(mean[1]- 2*stddev[1],0),max(mean[2]- 2*stddev[2],0)],np.uint8)
 print("redL",rl)
 print("redU",ru)
 
@@ -80,7 +85,6 @@ print("redU",ru)
 # get average color with mask  
 ave_color = cv2.meanStd(frame, mask=mask)[:3]
 print("average circle color:", ave_color)
-
 ru = np.array([min(ave_color[0]+ 10, 255),min(ave_color[1]+ 10, 255), min(ave_color[2]+ 10, 255)],np.uint8)
 rl = np.array([max(ave_color[0]- 10,0),max(ave_color[1]- 10,0),max(ave_color[2]- 10,0)],np.uint8)
 '''''
@@ -133,14 +137,14 @@ while True:
  
     # displaying the frame with fps
     cv2.imshow('frame', gray)
-
-    rmask = cv2.inRange(img,rl,ru)
+    image = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+    rmask = cv2.inRange(image,rl,ru)
     rcontours, rhier = cv2.findContours(rmask,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_NONE)
 
     # red
     if len(rcontours) != 0:
         for contour in rcontours:
-            if cv2.contourArea(contour) > 100:
+            if cv2.contourArea(contour) > 50:
                 x,y,w,h = cv2.boundingRect(contour)
                 
                 cv2.rectangle(img, (x,y),(x + w, y+ h ),(0,0,255,),3)

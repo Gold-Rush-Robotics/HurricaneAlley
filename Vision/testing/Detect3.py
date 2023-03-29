@@ -47,9 +47,9 @@ gray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
 img2 = cv2.medianBlur(gray,5)
 #for marshmellows
 cimg = cv2.cvtColor(img2,cv2.COLOR_GRAY2BGR)
-#circles = cv2.HoughCircles(img2, cv2.HOUGH_GRADIENT, 1,120,param1=100,param2=45,minRadius=30,maxRadius=60)
+circles = cv2.HoughCircles(img2, cv2.HOUGH_GRADIENT, 1,120,param1=100,param2=45,minRadius=30,maxRadius=60)
 #For ducks
-circles = cv2.HoughCircles(img2, cv2.HOUGH_GRADIENT, 1,150,param1=100,param2=23,minRadius=40,maxRadius=60)
+#circles = cv2.HoughCircles(img2, cv2.HOUGH_GRADIENT, 1,150,param1=100,param2=23,minRadius=40,maxRadius=60)
 
 
 # draw circles

@@ -112,18 +112,18 @@ class Teleop : Runner
                 if(ctr.x){
                     //white marshmellow
                     
-                    currentAction = new StoreMarshmellow(Revolver::MARSHMALLOWS::WHITE);
+                    currentAction = new StoreMarshmellow(MARSHMALLOWS::WHITE);
                     runAutoActions();
                     
                 }
                 if(ctr.s){
                     //add a green marshmallow
-                    currentAction = new StoreMarshmellow(Revolver::MARSHMALLOWS::GREEN);
+                    currentAction = new StoreMarshmellow(MARSHMALLOWS::GREEN);
                     runAutoActions();
                 }
                 if(ctr.c){
                     //add a red marshmallow
-                    currentAction = new StoreMarshmellow(Revolver::MARSHMALLOWS::RED);
+                    currentAction = new StoreMarshmellow(MARSHMALLOWS::RED);
                     runAutoActions();
                 }
 

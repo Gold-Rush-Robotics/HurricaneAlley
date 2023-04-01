@@ -23,6 +23,7 @@ Revolver::Revolver(std::shared_ptr<PCA9685> pca, std::shared_ptr<EncoderHandler>
     finger_in_revolver = false;
 
     // Add colorsensor to constructor
+    colorsensor = new ColorSensor();
 
     revolverPID = new PID(0.1, 1.0, -1.0, 0.01, 0.0, 0.0);
 }
@@ -158,7 +159,7 @@ bool Revolver::load_marshmallow(MARSHMALLOWS color)
 
 MARSHMALLOWS Revolver::get_color()
 {
-    // return colorsensor->get_color();
+    return colorsensor->get_color();
 }
 
 // Three tall Statue: base level – white, second level – green, third level – red

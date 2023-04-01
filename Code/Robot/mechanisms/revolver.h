@@ -13,15 +13,7 @@
 
 class Revolver{
     public:
-        enum MARSHMALLOWS { 
-            EMPTY,
-            RED, 
-            GREEN, 
-            WHITE,
-            RED_CHIPS,
-            GREEN_CHIPS
-        };
-
+        
         enum PRINGLE_STATES {
             CLOSED,
             ACCEPTING,
@@ -69,6 +61,8 @@ class Revolver{
         bool finger_in_revolver;
 
         PID* revolverPID;
+
+        ColorSensor* colorsensor;
 };
 
 #endif

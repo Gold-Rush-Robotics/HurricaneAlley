@@ -6,10 +6,10 @@
 
 class StoreMarshmellow : public GoldRushAction {
     public:
-        StoreMarshmellow(Revolver::MARSHMALLOWS color);
+        StoreMarshmellow(MARSHMALLOWS color);
         GoldRushAction* run(Robot* robot);
     private:
-        Revolver::MARSHMALLOWS color;
+        MARSHMALLOWS color;
 
 };
 

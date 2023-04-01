@@ -4,12 +4,12 @@
 StackAction::StackAction(StackHeight height){
     name = "Stack " + std::to_string(height) + " high";
     if(height == 3){
-        this->setLast(new LoadMarshmellow(Revolver::MARSHMALLOWS::RED))
-            ->setLast(new LoadMarshmellow(Revolver::MARSHMALLOWS::GREEN))
-            ->setLast(new LoadMarshmellow(Revolver::MARSHMALLOWS::WHITE));
+        this->setLast(new LoadMarshmellow(MARSHMALLOWS::RED))
+            ->setLast(new LoadMarshmellow(MARSHMALLOWS::GREEN))
+            ->setLast(new LoadMarshmellow(MARSHMALLOWS::WHITE));
     } else {
-        this->setLast(new LoadMarshmellow(Revolver::MARSHMALLOWS::GREEN))
-            ->setLast(new LoadMarshmellow(Revolver::MARSHMALLOWS::WHITE));
+        this->setLast(new LoadMarshmellow(MARSHMALLOWS::GREEN))
+            ->setLast(new LoadMarshmellow(MARSHMALLOWS::WHITE));
     }
     
 }

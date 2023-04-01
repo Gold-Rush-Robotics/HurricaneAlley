@@ -10,7 +10,7 @@ include_directories(./Utilities/ ../../rpidmx512/lib-pca9685/include/ ../OldCode
 include_directories(../eigen/)
 
 set(HARDWARE HardwareInterfaces/motor.cpp HardwareInterfaces/servo.cpp HardwareInterfaces/octoquad.cpp HardwareInterfaces/encoder.cpp
-    HardwareInterfaces/digitalsensor.cpp)
+    HardwareInterfaces/digitalsensor.cpp HardwareInterfaces/colorsensor.cpp)
 set(ROBOT Robot/drivetrain.cpp Robot/robot.cpp Robot/mechanisms/revolver.cpp Robot/mechanisms/duck.cpp)
 set(UTILITIES Utilities/utilFunc.cpp Utilities/I2C.cpp Utilities/pose.cpp Utilities/pid.cpp)
 set(TELEOP Opmodes/Teleop.cpp Opmodes/Runner.cpp)

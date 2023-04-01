@@ -1,8 +1,8 @@
 #include <stdint.h>
 #include <memory>
-#include "../Robot/mechanisms/revolver.h"
+
 #include "../Utilities/I2C.h"
-// #include "../Utilities/utilFunc.h"
+#include "../Utilities/utilFunc.h"
 
 #ifndef COLORSENSORH
 #define COLORSENSORH
@@ -23,9 +23,9 @@ class ColorSensor{
         void getRawDataOneShot(uint16_t *r, uint16_t *g, uint16_t *b, uint16_t *c);
         void getRGB(float *r, float *g, float *b);
         
-        uint16_t red_marshmallow[3];
-        uint16_t green_marshmallow[3];
-        uint16_t white_marshmallow[3];
+        uint16_t red_marshmallow [3];
+        uint16_t green_marshmallow [3];
+        uint16_t white_marshmallow [3];
         uint16_t red_threshold;
 
         bool is_red(float *r, float *g, float *b, double tolerance);

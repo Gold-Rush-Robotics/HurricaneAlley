@@ -11,17 +11,25 @@
 
 ColorSensor::ColorSensor() {
     addr = 0x32;
-    red_marshmallow = {255, 0, 0};
-    green_marshmallow = {0, 255, 0};
-    white_marshmallow = {255, 255, 255};
+    red_marshmallow[0] = 255;
+    red_marshmallow[1] = 0;
+    red_marshmallow[2] = 0;
+
+    green_marshmallow[0] = 0;
+    green_marshmallow[1] = 255;
+    green_marshmallow[2] = 0;
+
+    white_marshmallow[0] = 255;
+    white_marshmallow[1] = 255;
+    white_marshmallow[2] = 255;
     red_threshold = 128;
 }
 
 void ColorSensor::write8(uint8_t reg, uint8_t value) {
 //   uint8_t buffer[2] = {(uint8_t)(TCS34725_COMMAND_BIT | reg), value};
 //   i2c_dev->write(buffer, 2);
-    uint8_t *source = value;
-    if(!I2C::writeRegisters(addr, reg, &source, 1))
+    uint8_t *source = &value;
+    if(!I2C::writeRegisters(addr, reg, source, 1))
         std::cout << "Failed to Write 8 -- colorsensor.cpp" << std::endl; 
 }
 
@@ -35,8 +43,8 @@ uint8_t ColorSensor::read8(uint8_t reg) {
 //   i2c_dev->write_then_read(buffer, 1, buffer, 1);
 //   return buffer[0];
     uint8_t *dst;
-    if(I2C::readRegisters(addr, reg, 1, &dst))
-        return dst;
+    if(I2C::readRegisters(addr, reg, 1, dst))
+        return *dst;
     else
         return 0x00;
 }
@@ -51,8 +59,8 @@ uint16_t ColorSensor::read16(uint8_t reg) {
 //   i2c_dev->write_then_read(buffer, 1, buffer, 2);
 //   return (uint16_t(buffer[1]) << 8) | (uint16_t(buffer[0]) & 0xFF);
     uint8_t *dst;
-    if(I2C::readRegisters(addr, reg, 2, &dst))
-        return dst;
+    if(I2C::readRegisters(addr, reg, 2, dst))
+        return *dst;
     else
         return 0x0000;
 }
@@ -160,12 +168,13 @@ MARSHMALLOWS ColorSensor::get_color()
     double tolerance = 0.05;
 
     if (is_red(&red, &green, &blue, tolerance))
-        return RED;
+        return MARSHMALLOWS::RED;
     else if (is_green(&red, &green, &blue, tolerance))
-        return GREEN;
+        return MARSHMALLOWS::GREEN;
     else if (is_white(&red, &green, &blue, tolerance))
-        return WHITE;
+        return MARSHMALLOWS::WHITE;
     
+    return MARSHMALLOWS::EMPTY;
 }
 
 bool ColorSensor::is_start_light()
@@ -181,42 +190,39 @@ bool ColorSensor::is_start_light()
 
 bool ColorSensor::is_red(float *r, float *g, float *b, double tolerance)
 {
-    if ( essentiallyEqual(r, red_marshmallow[0], tolerance) )
+    if ( essentiallyEqual(*r, red_marshmallow[0], tolerance) )
     {
-        if ( essentiallyEqual(g, red_marshmallow[1], tolerance) ) 
+        if ( essentiallyEqual(*g, red_marshmallow[1], tolerance) ) 
         {
-            if ( essentiallyEqual(b, red_marshmallow[2], tolerance) )
+            if ( essentiallyEqual(*b, red_marshmallow[2], tolerance) )
                 return true;
         }
     }
-    else
-        return false;
+    return false;
 }
 
 bool ColorSensor::is_green(float *r, float *g, float *b, double tolerance)
 {
-    if ( essentiallyEqual(r, green_marshmallow[0], tolerance) )
+    if ( essentiallyEqual(*r, green_marshmallow[0], tolerance) )
     {
-        if ( essentiallyEqual(g, green_marshmallow[1], tolerance) ) 
+        if ( essentiallyEqual(*g, green_marshmallow[1], tolerance) ) 
         {
-            if ( essentiallyEqual(b, green_marshmallow[2], tolerance) )
+            if ( essentiallyEqual(*b, green_marshmallow[2], tolerance) )
                 return true;
         }
     }
-    else
-        return false;
+    return false;
 }
 
 bool ColorSensor::is_white(float *r, float *g, float *b, double tolerance)
 {
-    if ( essentiallyEqual(r, white_marshmallow[0], tolerance) )
+    if ( essentiallyEqual(*r, white_marshmallow[0], tolerance) )
     {
-        if ( essentiallyEqual(g, white_marshmallow[1], tolerance) ) 
+        if ( essentiallyEqual(*g, white_marshmallow[1], tolerance) ) 
         {
-            if ( essentiallyEqual(b, white_marshmallow[2], tolerance) )
+            if ( essentiallyEqual(*b, white_marshmallow[2], tolerance) )
                 return true;
         }
     }
-    else
-        return false;
+    return false;
 }

@@ -95,11 +95,13 @@ GoldRushAction* PlaceAction::run(Robot* robot){
                 state++;
             break;
         case 10:
+            // Back up
             if(robot->drivetrain->driveToPoint(new Pose(robotCur.x+10, robotCur.y, robotCur.theta), 1, 0.01)){
                 state++;
             }
             break;
         case 11:
+            // Raise Pringle
             robot->revolver->pringle_servo(Revolver::PRINGLE_STATES::CLOSED);
             robot->revolver->drop_servo(false);
             state++;

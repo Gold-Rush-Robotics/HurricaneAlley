@@ -5,7 +5,7 @@ import argparse
 
 
 cam = cv2.VideoCapture(1)
-cam.set(cv2.CAP_PROP_EXPOSURE,-4.0) #-6.5
+cam.set(cv2.CAP_PROP_EXPOSURE,-6.5) #-6.5
 return_value,img = cam.read()
 
 # let's assume the number of images gotten is 0
@@ -45,10 +45,10 @@ gray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
 img2 = cv2.medianBlur(gray,5)
 cimg = cv2.cvtColor(img2,cv2.COLOR_GRAY2BGR)
 # under not working
-#circles = cv2.HoughCircles(img2, cv2.HOUGH_GRADIENT, 1,120,param1=100,param2=45,minRadius=30,maxRadius=60)
+circles = cv2.HoughCircles(img2, cv2.HOUGH_GRADIENT, 1,120,param1=100,param2=30,minRadius=30,maxRadius=80)
 #For circles prev param 2 was 23
 #circles = cv2.HoughCircles(img2, cv2.HOUGH_GRADIENT, 1,150,param1=100,param2=24,minRadius=40,maxRadius=60)
-circles = cv2.HoughCircles(img2, cv2.HOUGH_GRADIENT, 1,200,param1=100,param2=23,minRadius=30,maxRadius=50)
+#circles = cv2.HoughCircles(img2, cv2.HOUGH_GRADIENT, 1,200,param1=100,param2=23,minRadius=30,maxRadius=50)
                                                                     #200,param1=100,param2=19,minRadius=30,maxRadius=50               
 # draw circles
 img_circle = img.copy()
@@ -81,6 +81,8 @@ cv2.imshow('mask', mask)
 # 3 for white 2 for red and green i think pink and yellow is three
 #ru = np.array([min(mean[0]+ stddev[0], 180),min(mean[1]+ stddev[1], 255), min(mean[2]+ stddev[2], 255)],np.uint8)
 #rl = np.array([max(mean[0]- stddev[0],0),max(mean[1]- stddev[1],0),max(mean[2]- stddev[2],0)],np.uint8)
+#ru = np.array([int(min(mean[0]+ 1.5*stddev[0], 180)),int(min(mean[1]+ 1.5*stddev[1], 255)),int(min(mean[2]+ 1.5*stddev[2], 255))],np.uint8)
+#rl = np.array([int(max(mean[0]- 1.5*stddev[0],0)),int(max(mean[1]- 1.5*stddev[1],0)),int(max(mean[2]- 1.5*stddev[2],0))],np.uint8)
 #ru = np.array([min(mean[0]+ 2*stddev[0], 180),min(mean[1]+ 2*stddev[1], 255), min(mean[2]+ 2*stddev[2], 255)],np.uint8)
 #rl = np.array([max(mean[0]- 2*stddev[0],0),max(mean[1]- 2*stddev[1],0),max(mean[2]- 2*stddev[2],0)],np.uint8)
 #ru = np.array([min(mean[0]+ 3*stddev[0], 180),min(mean[1]+ 3*stddev[1], 255), min(mean[2]+ 3*stddev[2], 255)],np.uint8)
@@ -145,6 +147,7 @@ while True:
     # displaying the frame with fps
     cv2.imshow('frame', gray)
     image = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+
     rmask = cv2.inRange(image,rl,ru)
     rcontours, rhier = cv2.findContours(rmask,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_NONE)
 
@@ -157,7 +160,7 @@ while True:
     
     if len(rcontours) != 0: 
         for contour in rcontours:
-            if cv2.contourArea(contour) > 350 :
+            if cv2.contourArea(contour) > 450:
                 x,y,w,h = cv2.boundingRect(contour)
                     
                 cv2.rectangle(img, (x,y),(x + w, y+ h ),(0,0,255,),3)

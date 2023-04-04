@@ -5,6 +5,7 @@ import argparse
 
 
 cam = cv2.VideoCapture(1)
+cam.set(cv2.CAP_PROP_EXPOSURE,-4.0) #-6.5
 return_value,img = cam.read()
 
 # let's assume the number of images gotten is 0
@@ -71,11 +72,22 @@ print("average circle color:",mean[0])
 print("average circle color:",mean[1])
 print("average circle color:",mean[2])
 
+cv2.imwrite('green_circle_circle.jpg', img_circle)
+cv2.imwrite('green_circle_mask.jpg', mask)
+# show images
+cv2.imshow('circle', img_circle)
+cv2.imshow('mask', mask)
+
 # 3 for white 2 for red and green i think pink and yellow is three
+#ru = np.array([min(mean[0]+ stddev[0], 180),min(mean[1]+ stddev[1], 255), min(mean[2]+ stddev[2], 255)],np.uint8)
+#rl = np.array([max(mean[0]- stddev[0],0),max(mean[1]- stddev[1],0),max(mean[2]- stddev[2],0)],np.uint8)
 #ru = np.array([min(mean[0]+ 2*stddev[0], 180),min(mean[1]+ 2*stddev[1], 255), min(mean[2]+ 2*stddev[2], 255)],np.uint8)
 #rl = np.array([max(mean[0]- 2*stddev[0],0),max(mean[1]- 2*stddev[1],0),max(mean[2]- 2*stddev[2],0)],np.uint8)
-ru = np.array([min(mean[0]+ 3*stddev[0], 180),min(mean[1]+ 3*stddev[1], 255), min(mean[2]+ 3*stddev[2], 255)],np.uint8)
-rl = np.array([max(mean[0]- 3*stddev[0],0),max(mean[1]- 3*stddev[1],0),max(mean[2]- 3*stddev[2],0)],np.uint8)
+#ru = np.array([min(mean[0]+ 3*stddev[0], 180),min(mean[1]+ 3*stddev[1], 255), min(mean[2]+ 3*stddev[2], 255)],np.uint8)
+#rl = np.array([max(mean[0]- 3*stddev[0],0),max(mean[1]- 3*stddev[1],0),max(mean[2]- 3*stddev[2],0)],np.uint8)
+ru = np.array([min(mean[0]+ stddev[0]*4, 180),min(mean[1]+ stddev[1]*4, 255), min(mean[2]+ stddev[2]*4, 255)],np.uint8)
+rl = np.array([max(mean[0]- stddev[0]*4,0),max(mean[1]- stddev[1]*4,0),max(mean[2]- stddev[2]*4,0)],np.uint8)
+
 
 print("redL",rl)
 print("redU",ru)
@@ -91,11 +103,7 @@ rl = np.array([max(ave_color[0]- 10,0),max(ave_color[1]- 10,0),max(ave_color[2]-
 prev_frame_time = 0
 new_frame_time = 0
 
-cv2.imwrite('green_circle_circle.jpg', img_circle)
-cv2.imwrite('green_circle_mask.jpg', mask)
-# show images
-cv2.imshow('circle', img_circle)
-cv2.imshow('mask', mask)
+
 
 
 while True:
@@ -146,13 +154,13 @@ while True:
     # yellow - 400
     #pink- 500
     # red - 50
-    if(img_counter == 0):
-        if len(rcontours) != 0: 
-            for contour in rcontours:
-                if cv2.contourArea(contour) > 50:
-                    x,y,w,h = cv2.boundingRect(contour)
+    
+    if len(rcontours) != 0: 
+        for contour in rcontours:
+            if cv2.contourArea(contour) > 350 :
+                x,y,w,h = cv2.boundingRect(contour)
                     
-                    cv2.rectangle(img, (x,y),(x + w, y+ h ),(0,0,255,),3)
+                cv2.rectangle(img, (x,y),(x + w, y+ h ),(0,0,255,),3)
 
     
     cv2.imshow("webcam", img)

@@ -5,14 +5,14 @@ import argparse
 
 
 cam = cv2.VideoCapture(1)
-cam.set(cv2.CAP_PROP_EXPOSURE,-4.0) #-6.5
+cam.set(cv2.CAP_PROP_EXPOSURE,-6.0) #-6.5
 return_value,img = cam.read()
 
 # let's assume the number of images gotten is 0
 img_counter = 0
 
 # while loop
-while img_counter < 3:
+while img_counter < 4:
     # intializing the frame, ret
     ret, frame = cam.read()
     # if statement
@@ -43,16 +43,18 @@ imgArr = ["image[0].png","image[1].png","image[2].png","image[3].png","image[4].
 
 
 img_counter = 0
-while img_counter < 3:
+while img_counter < 4:
     img = cv2.imread(imgArr[img_counter])
     gray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
     img2 = cv2.medianBlur(gray,5)
     cimg = cv2.cvtColor(img2,cv2.COLOR_GRAY2BGR)
     
-    if(img_counter != 3 or 4):
+    if((img_counter != 3) and (img_counter != 4)):
         circles = cv2.HoughCircles(img2, cv2.HOUGH_GRADIENT, 1,120,param1=100,param2=45,minRadius=30,maxRadius=60)
+        print(f'here{img_counter}')
     else:
-        circles = cv2.HoughCircles(img2, cv2.HOUGH_GRADIENT, 1,200,param1=100,param2=23,minRadius=30,maxRadius=50)     
+        circles = cv2.HoughCircles(img2, cv2.HOUGH_GRADIENT, 1,200,param1=100,param2=24,minRadius=30,maxRadius=50)   
+        print(f'2here{img_counter}')  
 
     img_circle = img.copy()
     mask = np.zeros_like(gray)
@@ -77,14 +79,14 @@ while img_counter < 3:
         gu = np.array([min(mean[0]+ 4*stddev[0], 180),min(mean[1]+ 4*stddev[1], 255), min(mean[2]+ 4*stddev[2], 255)],np.uint8)
         gl = np.array([max(mean[0]- 4*stddev[0],0),max(mean[1]- 4*stddev[1],0),max(mean[2]- 4*stddev[2],0)],np.uint8)
     if(img_counter == 2):
-        ru = np.array([min(mean[0]+ 4*stddev[0], 180),min(mean[1]+ 4*stddev[1], 255), min(mean[2]+ 4*stddev[2], 255)],np.uint8)
-        rl = np.array([max(mean[0]- 4*stddev[0],0),max(mean[1]- 4*stddev[1],0),max(mean[2]- 4*stddev[2],0)],np.uint8)
+        ru = np.array([int(min(mean[0]+ 2*stddev[0], 180)),int(min(mean[1]+ 2*stddev[1], 255)),int(min(mean[2]+ 2*stddev[2], 255))],np.uint8)
+        rl = np.array([int(max(mean[0]- 2*stddev[0],0)),int(max(mean[1]- 2*stddev[1],0)),int(max(mean[2]- 2*stddev[2],0))],np.uint8)
     if(img_counter == 3):
-        yu = np.array([min(mean[0]+ 4*stddev[0], 180),min(mean[1]+ 4*stddev[1], 255), min(mean[2]+ 4*stddev[2], 255)],np.uint8)
-        yl = np.array([max(mean[0]- 4*stddev[0],0),max(mean[1]- 4*stddev[1],0),max(mean[2]- 4*stddev[2],0)],np.uint8)
+        yu = np.array([min(mean[0]+ 2*stddev[0], 180),min(mean[1]+ 2*stddev[1], 255), min(mean[2]+ 2*stddev[2], 255)],np.uint8)
+        yl = np.array([max(mean[0]- 2*stddev[0],0),max(mean[1]- 2*stddev[1],0),max(mean[2]- 2*stddev[2],0)],np.uint8)
     if(img_counter == 4):
-        pu = np.array([min(mean[0]+ 4*stddev[0], 180),min(mean[1]+ 4*stddev[1], 255), min(mean[2]+ 4*stddev[2], 255)],np.uint8)
-        pl = np.array([max(mean[0]- 4*stddev[0],0),max(mean[1]- 4*stddev[1],0),max(mean[2]- 4*stddev[2],0)],np.uint8)
+        pu = np.array([min(mean[0]+ 2*stddev[0], 180),min(mean[1]+ 2*stddev[1], 255), min(mean[2]+ 2*stddev[2], 255)],np.uint8)
+        pl = np.array([max(mean[0]- 2*stddev[0],0),max(mean[1]- 2*stddev[1],0),max(mean[2]- 2*stddev[2],0)],np.uint8)
     img_counter+=1
     
 prev_frame_time = 0
@@ -133,13 +135,13 @@ while True:
     wmask = cv2.inRange(image,wl,wu)
     gmask = cv2.inRange(image,gl,gu)
     rmask = cv2.inRange(image,rl,ru)
-    #ymask = cv2.inRange(image,yl,yu)
+    ymask = cv2.inRange(image,yl,yu)
     #pmask = cv2.inRange(image,pl,pu)
 
     wcontours, whier = cv2.findContours(wmask,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_NONE)
     gcontours, ghier = cv2.findContours(gmask,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_NONE)
     rcontours, rhier = cv2.findContours(rmask,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_NONE)
-    #ycontours, yhier = cv2.findContours(ymask,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_NONE)
+    ycontours, yhier = cv2.findContours(ymask,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_NONE)
     #pcontours, phier = cv2.findContours(pmask,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_NONE)
     
     
@@ -151,38 +153,38 @@ while True:
     
     if len(wcontours) != 0: 
             for contour in wcontours:
-                if cv2.contourArea(contour) > 350:
+                if cv2.contourArea(contour) > 300:
                     x,y,w,h = cv2.boundingRect(contour)
                     
                     cv2.rectangle(img, (x,y),(x + w, y+ h ),(255,255,255,),3)
     
     if len(gcontours) != 0: 
             for contour in gcontours:
-                if cv2.contourArea(contour) > 350:
+                if cv2.contourArea(contour) > 300:
                     x,y,w,h = cv2.boundingRect(contour)
                     
                     cv2.rectangle(img, (x,y),(x + w, y+ h ),(0,255,0,),3)
     
     if len(rcontours) != 0: 
             for contour in rcontours:
-                if cv2.contourArea(contour) > 350:
+                if cv2.contourArea(contour) > 300:
                     x,y,w,h = cv2.boundingRect(contour)
                     
                     cv2.rectangle(img, (x,y),(x + w, y+ h ),(0,0,255,),3)
 
-#    if len(ycontours) != 0: 
-#            for contour in ycontours:
-#                if cv2.contourArea(contour) > 350:
-#                    x,y,w,h = cv2.boundingRect(contour)
-#                    
-#                    cv2.rectangle(img, (x,y),(x + w, y+ h ),(0,255,255,),3)
+    if len(ycontours) != 0: 
+            for contour in ycontours:
+                if cv2.contourArea(contour) > 450:
+                    x,y,w,h = cv2.boundingRect(contour)
+                    
+                    cv2.rectangle(img, (x,y),(x + w, y+ h ),(0,255,255,),3)
     
-#    if len(pcontours) != 0: 
-#            for contour in pcontours:
-#                if cv2.contourArea(contour) > 350:
-#                    x,y,w,h = cv2.boundingRect(contour)
-#                    
-#                    cv2.rectangle(img, (x,y),(x + w, y+ h ),(204,153,255,),3)
+    #if len(pcontours) != 0: 
+    #        for contour in pcontours:
+    #            if cv2.contourArea(contour) > 450:
+    #                x,y,w,h = cv2.boundingRect(contour)
+    #                
+    #                cv2.rectangle(img, (x,y),(x + w, y+ h ),(204,153,255,),3)
 
     
     cv2.imshow("webcam", img)

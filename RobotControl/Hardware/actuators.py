@@ -2,7 +2,10 @@ from adafruit_pca9685 import PCA9685
 from adafruit_motor import servo
 from microcontroller import Pin
 import digitalio
-import numpy as np
+from board import SCL, SDA
+import board
+import busio
+
 
 from utils import clampRange
 
@@ -38,6 +41,16 @@ class PWMMotor(Actuator):
     def run(self, power: int) -> None:
         power = clampRange(-1.0, 1.0, power)
         self.pca.channels[self.pwmPIN] = abs(power) * PWM_MAX
-        self.dirPIN.value = (np.sign(power) < 0) and not self.reversed
+        self.dirPIN.value = (power < 0) and not self.reversed
         
-        
+
+if __name__ == "__main__":
+    i2c = busio.I2C(SCL, SDA)
+    pca = PCA9685(i2c)
+    motor = PWMMotor(0, board.GPIO0, pca)
+    input("speed")
+    motor.run(1)
+    input("input to stop")
+    motor.run(0)
+    print("stopped")
+

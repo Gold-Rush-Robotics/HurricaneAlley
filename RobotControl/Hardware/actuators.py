@@ -5,9 +5,11 @@ import digitalio
 from board import SCL, SDA
 import board
 import busio
+from roboclaw import Roboclaw
 
 
-from utils import clampRange
+
+from utils import clampRange, reMap
 
 PWM_MAX = 0xFFFF
 
@@ -42,6 +44,18 @@ class PWMMotor(Actuator):
         power = clampRange(-1.0, 1.0, power)
         self.pca.channels[self.pwmPIN] = abs(power) * PWM_MAX
         self.dirPIN.value = (power < 0) and not self.reversed
+
+class Servo(Actuator):
+    pwmPin: int = 0
+    rangeMax: int = 0
+    rangeMin: int = 360
+    def __init__(self, pca: PCA9685, pwm:int, rangeMin: int, rangeMax: int) -> None:
+        super().__init__(pca)
+        self.pwmPin = pwm
+        self.rangeMax = rangeMax
+        self.rangeMin = rangeMin
+    def run(self, position: int) -> None:
+        self.pca.channels[self.pwmPin] = reMap(position, self.rangeMin, self.rangeMax, PWM_MAX, 0)
         
 
 if __name__ == "__main__":

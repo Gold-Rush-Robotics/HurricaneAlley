@@ -7,9 +7,6 @@ import board
 import busio
 
 from Vendors.roboclaw_python.roboclaw_3 import Roboclaw
-
-
-
 from utils import clampRange, reMap
 
 PWM_MAX = 0xFFFF - 1

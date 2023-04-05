@@ -27,7 +27,6 @@ class Actuator:
     def coast() -> None:
         pass
     
-
 class PWMMotor(Actuator):
     pwmPIN = 0
     dirPIN: digitalio.DigitalInOut = 0
@@ -41,7 +40,10 @@ class PWMMotor(Actuator):
     def reverse(self, reverse:bool) -> None:
         self.reversed = reverse
 
-    def run(self, power: int) -> None:
+    def run(self, power: float) -> None:
+        '''
+        power -1.0 - 1.0
+        '''
         power = clampRange(-1.0, 1.0, power)
         self.pca.channels[self.pwmPIN] = abs(power) * PWM_MAX
         self.dirPIN.value = (power < 0) and not self.reversed

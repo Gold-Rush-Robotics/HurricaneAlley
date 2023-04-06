@@ -5,3 +5,43 @@ def reMap(OldValue:float, OldMin:float, OldMax:float, NewMax:float, NewMin:float
     OldRange = (OldMax - OldMin)  
     NewRange = (NewMax - NewMin)  
     return (((OldValue - OldMin) * NewRange) / OldRange) + NewMin
+
+class PID:
+    KP:float
+    KI:float
+    KD:float
+    maximum: float
+    minimum: float
+    _integral: float = 0
+    _previousError: float = 0
+    dt: float = 0.01
+    def __init__(self, kp: float, ki: float, kd: float, maximum:float, minimum:float) -> None:
+        self.KP = kp
+        self.KI = ki
+        self.KD = kd
+        self.maximum = maximum
+        self.minimum = minimum
+    def calculate(self, goal:float, current:float) -> float:
+        error = current - goal
+
+        #proportional
+        Pout = self.KP * error
+
+        #integral
+        self._integral += error * self.dt
+        Iout = self.KI * self._integral
+
+        #derivative
+        derivative = (error - self._previousError) / self.dt
+        Dout = self.KD * derivative
+
+        output = Pout + Iout + Dout
+
+        output = clampRange(self.minimum, self.maximum, output)
+
+        self._previousError = error
+
+        return output
+
+
+    

@@ -7,9 +7,10 @@ def nothing(x):
     pass
 
 # Initializing the webcam feed.
-cap = cv2.VideoCapture(0)
+cap = cv2.VideoCapture(1)
 cap.set(3,1280)
 cap.set(4,720)
+
 
 # Create a window named trackbars.
 cv2.namedWindow("Trackbars")
@@ -18,10 +19,10 @@ cv2.namedWindow("Trackbars")
 # H,S and V channels. The Arguments are like this: Name of trackbar, 
 # window name, range,callback function. For Hue the range is 0-179 and
 # for S,V its 0-255.
-cv2.createTrackbar("L - H", "Trackbars", 0, 179, nothing)
+cv2.createTrackbar("L - H", "Trackbars", 0, 255, nothing)
 cv2.createTrackbar("L - S", "Trackbars", 0, 255, nothing)
 cv2.createTrackbar("L - V", "Trackbars", 0, 255, nothing)
-cv2.createTrackbar("U - H", "Trackbars", 179, 179, nothing)
+cv2.createTrackbar("U - H", "Trackbars", 255, 255, nothing)
 cv2.createTrackbar("U - S", "Trackbars", 255, 255, nothing)
 cv2.createTrackbar("U - V", "Trackbars", 255, 255, nothing)
  
@@ -35,7 +36,7 @@ while True:
     frame = cv2.flip( frame, 1 ) 
     
     # Convert the BGR image to HSV image.
-    hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+    
     
     # Get the new values of the trackbar in real time as the user changes 
     # them
@@ -53,7 +54,7 @@ while True:
     
     # Filter the image and get the binary mask, where white represents 
     # your target color
-    mask = cv2.inRange(hsv, lower_range, upper_range)
+    mask = cv2.inRange(frame, lower_range, upper_range)
  
     # You can also visualize the real part of the target color (Optional)
     res = cv2.bitwise_and(frame, frame, mask=mask)

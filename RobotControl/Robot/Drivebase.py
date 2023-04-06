@@ -1,7 +1,7 @@
 from Hardware.actuators import GRRRoboClaw
 from Hardware.encoders import Encoder
 from adafruit_pca9685 import PCA9685
-from utils import PID, clampRange
+from utils import PID, clampRange, normalizeAngle
 import numpy as np
 import math
 
@@ -80,8 +80,8 @@ class Drivetrain:
         v = np.array([dXC, dXh, fi])
 
         m1 = np.matrix([
-            [math.cos(self.position[2]), -math.sin(self.position[2]), 0],
-            [math.sin(self.position[2]),  math.cos(self.position[2]), 0],
+            [np.cos(self.position[2]), -np.sin(self.position[2]), 0],
+            [np.sin(self.position[2]),  np.cos(self.position[2]), 0],
             [0, 0, 1]])
 
         sineTerm = 0
@@ -91,8 +91,8 @@ class Drivetrain:
             sineTerm = 1.0 - ( fi * fi ) / 6.0
             cosTerm = fi / 2.0
         else:
-            sineTerm = math.sin(fi)/fi
-            cosTerm = (1-math.cos(fi))/fi
+            sineTerm = np.sin(fi)/fi
+            cosTerm = (1-np.cos(fi))/fi
 
         m2 = np.matrix([
             [sineTerm, -cosTerm, 0],
@@ -107,4 +107,37 @@ class Drivetrain:
         self.position[2] += v2[2]
 
         return self.position
+    def driveToPoint(self, pose:np.array, distTol:float, angTol:float) -> bool:
+        '''
+        distTol in cm
+        angTol in radians
+        '''
+        ax, ay, atheta = self.position
+        bx, by, btheta = pose
+        distDif = np.linalg.norm(np.array([bx, by])-np.array([ax, ay]))
+        headingDif = normalizeAngle(btheta-atheta)
+
+        xComp = 0
+        yComp = 0
+        tComp = 0
+
+        inDist = distDif <= distTol
+        inAng = headingDif <= angTol
+
+        if(not inDist):
+            correction = self.translatePid.calculate(0, distDif)
+            unit_vector_1 = np.array([ax, ay]) / np.linalg.norm(np.array([ax, ay]))
+            unit_vector_2 = np.array([bx, by]) / np.linalg.norm(np.array([bx, by]))
+            angle = np.arccos(np.dot(unit_vector_1, unit_vector_2))
+            xComp -= correction * np.cos(angle)
+            yComp += correction * np.sin(angle)
+
+        if(not inAng):
+            correction = self.roatatePid.calculate(0, headingDif)
+            tComp -= correction
+
+        self.drivePow(xComp, yComp, tComp)
+        return (inDist and inAng)
+
+
     

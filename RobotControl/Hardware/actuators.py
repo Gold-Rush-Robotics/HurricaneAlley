@@ -12,7 +12,7 @@ from utils import clampRange, reMap
 PWM_MAX = 0xFFFF - 1
 
 class Actuator:
-    pca: PCA9685 = None
+    pca: PCA9685
 
     def __init__(self, pca: PCA9685) -> None:
         self.pca = pca
@@ -27,12 +27,13 @@ class Actuator:
     def coast() -> None:
         pass
     
-class PWMMotor(Actuator):
+class PWMMotor:
     pwmPIN = 0
-    dirPIN: digitalio.DigitalInOut = 0
+    dirPIN: digitalio.DigitalInOut
     reversed: bool = False
+    pca: PCA9685
     def __init__(self, pwm: int, dir: Pin, pca:PCA9685) -> None:
-        super.__init__(pca)
+        self.pca = pca
         self.pwmPIN = pwm
         self.dirPIN = digitalio.DigitalInOut(dir)
         self.dirPIN.switch_to_output(True)
@@ -57,7 +58,7 @@ class Servo(Actuator):
         self.pwmPin = pwm
         self.rangeMax = rangeMax
         self.rangeMin = rangeMin
-    def run(self, position: int) -> None:
+    def run(self, position: float) -> None:
         self.pca.channels[self.pwmPin] = reMap(position, self.rangeMin, self.rangeMax, PWM_MAX, 0)
 
 class GRRRoboClaw(Actuator):
@@ -72,7 +73,7 @@ class GRRRoboClaw(Actuator):
     def reverse(self, reverse:bool) -> None:
         self.reversed = reverse
 
-    def run(self, power: int) -> None:
+    def run(self, power: float) -> None:
         power = clampRange(-1, 1, power)
         power = reMap(power, -1, 1, 127, -127)
         if(self.m1):

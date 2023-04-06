@@ -160,8 +160,8 @@ def readChipID():
 spi = spidev.SpiDev(SPI_BUS, SPI_CS)
 
 class Encoder:
-    counts: list[int]
-    vels: list[int]
+    counts: "list[int]"
+    vels: "list[int]"
     def __init__(self) -> None:
         # Setup slave select pin
         digitalio.DigitalInOut(Pin(SS_PIN)).switch_to_output(True)
@@ -200,7 +200,14 @@ class Encoder:
     def update(self) -> None:
         updateEncoderDataSticky(self.counts, self.vels)
     
-    def getCounts(self) -> list[int]:
+    def getCounts(self) -> "list[int]":
         return self.counts
-    def getVelo(self) -> list[int]:
+    def getVelo(self) -> "list[int]":
         return self.vels
+
+
+if __name__ == "__main__":
+    octo = Encoder()
+    while True:
+        octo.update()
+        print(octo.getCounts())

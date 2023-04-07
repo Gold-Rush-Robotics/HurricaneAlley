@@ -4,7 +4,7 @@ from adafruit_pca9685 import PCA9685
 import numpy as np
 import math
 
-DM_SEPARATOR_MARSHMALLOW = 0
+DM_SEPARATOR_MARSHMALLOW = 0 
 DM_SEPARATOR_DUCK = 0
 
 AB_SEPARATOR_AGITATOR = 0
@@ -14,6 +14,7 @@ COW_CATCHER_LOWERED = 0
 COW_CATCHER_RAISED = 0
 
 class Intake:
+    
     intake_motor : GRRRoboClaw
     ab_separator_servo : Servo
     dm_separator_servo : Servo

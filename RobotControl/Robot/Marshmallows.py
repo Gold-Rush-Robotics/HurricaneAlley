@@ -27,7 +27,7 @@ class MarshmallowColors(Enum):
         else:
             return MarshmallowColors.EMPTY
 
-class PringleStates:
+class PringleStates(Enum):
     OPEN = 0
     TIGHT = 0
     CLOSED = 0
@@ -43,6 +43,8 @@ PRINGLE_OPEN = 0
 PRINGLE_CLOSED = 0
 
 AGITATOR_SPEED = 0.5
+
+REVOLVER_ENCODER_PORT = 3
 
 # Tick Positions of Marshmallow Chambers in Relation to Pringle
 ENCODER_POS = [1792, 2534, 3254, 320, 1024]
@@ -135,7 +137,7 @@ class Marshmallows:
             bool: true when it is finished
         """
         index = self.stored_in_revolver.index(color)
-        curr_count = self.revolver_enc.getCounts()
+        curr_count = self.revolver_enc.getCounts()[REVOLVER_ENCODER_PORT]
         self.revolver.run( self.revolver_PID.calculate(ENCODER_POS[index] + AGITATOR_MOD, curr_count) )
         if np.isclose(ENCODER_POS[index] + AGITATOR_MOD if to_agitator else 0, curr_count):
             self.revolver.run(0)

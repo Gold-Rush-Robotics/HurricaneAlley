@@ -13,6 +13,11 @@ AB_SEPARATOR_BAG = 0
 COW_CATCHER_LOWERED = 0
 COW_CATCHER_RAISED = 0
 
+INTAKE_MARSH_SPEED = 0.66
+INTAKE_DUCK_BAG_SPEED = 1
+INTAKE_DUCK_AG_SPEED = 0.83
+
+
 class Intake:
     
     intake_motor : GRRRoboClaw
@@ -27,16 +32,19 @@ class Intake:
         self.cow_catcher_servo  = Servo(pca, 0, 0, 180)
 
     def intake_marshmallow(self) -> None:
-        self.intake_motor.run(0.66)
         self.dm_separator_servo.run(DM_SEPARATOR_MARSHMALLOW)
+        self.intake_motor.run(INTAKE_MARSH_SPEED)
+    
+    def stopIntaking(self) -> None:
+        self.intake_motor.run(0.0)
         
     def intake_duck_agitator(self) -> None:
-        self.intake_motor.run(0.83)
+        self.intake_motor.run(INTAKE_DUCK_AG_SPEED)
         self.dm_separator_servo.run(DM_SEPARATOR_DUCK)
         self.ab_separator_servo.run(AB_SEPARATOR_AGITATOR)
 
     def intake_duck_bag(self) -> None:
-        self.intake_motor.run(1)
+        self.intake_motor.run(INTAKE_DUCK_BAG_SPEED)
         self.dm_separator_servo.run(DM_SEPARATOR_DUCK)
         self.ab_separator_servo.run(AB_SEPARATOR_BAG)
 

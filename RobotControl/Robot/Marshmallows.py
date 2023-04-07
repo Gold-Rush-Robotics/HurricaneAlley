@@ -27,6 +27,12 @@ class MarshmallowColors(Enum):
         else:
             return MarshmallowColors.EMPTY
 
+class PringleStates:
+    OPEN = 0
+    TIGHT = 0
+    CLOSED = 0
+    
+
 LOADER_UP = 0
 LOADER_DOWN = 0
 
@@ -119,6 +125,15 @@ class Marshmallows:
         
     
     def rotate_revolver(self, color: MarshmallowColors, to_agitator: bool) -> bool:
+        """Rotates revolver
+
+        Args:
+            color (MarshmallowColors): Which color it should rotate to
+            to_agitator (bool): if it should rotate to the agitator
+
+        Returns:
+            bool: true when it is finished
+        """
         index = self.stored_in_revolver.index(color)
         curr_count = self.revolver_enc.getCounts()
         self.revolver.run( self.revolver_PID.calculate(ENCODER_POS[index] + AGITATOR_MOD, curr_count) )
@@ -128,25 +143,32 @@ class Marshmallows:
             return True
         return False
     
-    def insertToPringle(self, color: MarshmallowColors) -> None:
-        """puts the selected color into the pringle can
+    def set_loader(self, load: bool) -> None:
+        """Toggles the Loader Servo
 
         Args:
-            color (MarshmallowColors): which color to load
+            load (bool): when true moves servo up
         """
-        pass
-
-    def pringleOpen(self, open:bool) -> None:
-        """open the pringle can
+        if load:
+            self.loader.run(LOADER_UP)
+            self.stored_in_revolver[self.curr_chamber] = MarshmallowColors.EMPTY
+        else:
+            self.loader.run(LOADER_DOWN)
+            
+    def set_pringle(self, degree: PringleStates) -> None:
+        """Controls pringle servo
 
         Args:
-            open (bool): open or close
+            degree (PringleStates): which state the pringle servo should be in
         """
-        pass
+        self.pringle_can.run(degree)
+                
     
-    def lowerPringle(self, lower:bool) -> None:
-        pass
-
+    def place_pringle(self, lower:bool) -> None:
+        if lower:
+            self.placer.run(PLACER_DOWN)
+        else:
+            self.placer.run(PLACER_UP)
 
 #Three tall Statue: base level – white, second level – green, third level – red
 #Two Tall Statue: base level – white, second level – green

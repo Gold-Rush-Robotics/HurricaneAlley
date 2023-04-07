@@ -1,8 +1,10 @@
 from __future__ import annotations
 from enum import Enum
 from Hardware.actuators import Servo, PWMMotor
+from Hardware.encoders import Encoder
 from adafruit_pca9685 import PCA9685
 import adafruit_tcs34725 as ColorSensor
+from utils import PID
 import numpy as np
 import board
 
@@ -34,30 +36,66 @@ PLACER_DOWN = 0
 PRINGLE_OPEN = 0
 PRINGLE_CLOSED = 0
 
+AGITATOR_SPEED = 0.5
+
+# Tick Positions of Marshmallow Chambers in Relation to Pringle
+ENCODER_POS = [1792, 2534, 3254, 320, 1024]
+
+# Mod to add to ENCODER_POS to go to Agitator
+AGITATOR_MOD = -1792
+
 class Marshmallows:
     
     loader : Servo
     placer : Servo
     pringle_can : Servo
     
-    revolver : PWMMotor
+    revolver_enc : Encoder
     
-    color_sensor : ColorSensor
+    revolver : PWMMotor
+    agitator : PWMMotor
+    
+    revolver_PID : PID
+    
+    color_sensor : ColorSensor.TCS34725
+    
+    stored_in_revolver : list[MarshmallowColors, MarshmallowColors, MarshmallowColors, MarshmallowColors, MarshmallowColors]
+    state : int 
+    curr_chamber : int
     
     def __init__(self, pca: PCA9685, i2c: type[board.I2C]) -> None:
         self.loader = Servo(pca, 0, 0, 180)
         self.placer = Servo(pca, 0, 0, 180)
         self.pringle_can  = Servo(pca, 0, 0, 180)
-        self.color_sensor = ColorSensor(i2c, 0x29)
         
+        self.revolver_enc = Encoder()
+        self.revolver = PWMMotor(0, 0, pca)
+        self.agitator = PWMMotor(0, 0, pca)
+        
+        self.revolver_PID = PID(0.01, 0, 0, 1.0, -1.0)
+        
+        self.color_sensor = ColorSensor.TCS34725(i2c, 0x29)
+        self.stored_in_revolver = [ MarshmallowColors.GREENFOOD, 
+                                    MarshmallowColors.REDFOOD, 
+                                    MarshmallowColors.EMPTY,
+                                    MarshmallowColors.EMPTY,
+                                    MarshmallowColors.EMPTY,]
+        self.state = 0
 
-    def agitate(self) -> bool:
+    def agitate(self, marsh_color : MarshmallowColors) -> bool:
         """Agitates the marshmallows until they settle
 
+        Args:
+            MarshmallowColors: color read from storeMarsh
         Returns:
             bool: returns true if the marshmallow has settled
         """
-        pass
+        if marsh_color is MarshmallowColors.EMPTY:
+            self.agitator.run(AGITATOR_SPEED)
+            return False
+        else:
+            self.agitator.run(0)
+            return True
 
     def storeMarsh(self) -> bool:
         """Prep to recieve and agitate
@@ -65,6 +103,30 @@ class Marshmallows:
         Returns:
             bool: true when the marshmallow has settled
         """
+        color = self.color_sensor.color_rgb_bytes()
+        marsh_color : MarshmallowColors = MarshmallowColors.getMarshFromRGB(color)
+        match(self.state):
+            case 0:
+                # Rotate to Empty Chamber
+                if self.rotate_revolver(MarshmallowColors.EMPTY, True):
+                    self.state = 1
+            case 1:
+                # Dump Marshmallow in the Chamber
+                if self.agitate(marsh_color):
+                    self.stored_in_revolver[self.curr_chamber] = marsh_color
+                    self.state = 0
+            
+        
+    
+    def rotate_revolver(self, color: MarshmallowColors, to_agitator: bool) -> bool:
+        index = self.stored_in_revolver.index(color)
+        curr_count = self.revolver_enc.getCounts()
+        self.revolver.run( self.revolver_PID.calculate(ENCODER_POS[index] + AGITATOR_MOD, curr_count) )
+        if np.isclose(ENCODER_POS[index] + AGITATOR_MOD if to_agitator else 0, curr_count):
+            self.revolver.run(0)
+            self.curr_chamber = index
+            return True
+        return False
     
     def insertToPringle(self, color: MarshmallowColors) -> None:
         """puts the selected color into the pringle can

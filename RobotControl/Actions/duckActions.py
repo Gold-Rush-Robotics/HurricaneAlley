@@ -1,7 +1,7 @@
 from GoldRushAction import GoldRushAction
 from Robot.Robot import Robot
 
-class StartupActions(GoldRushAction):
+class DuckAction(GoldRushAction):
     def __init__(self, description: str = ...) -> None:
         super().__init__(description)
     

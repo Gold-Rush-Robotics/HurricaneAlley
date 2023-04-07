@@ -1,4 +1,5 @@
 from __future__ import annotations
+from Robot.Robot import Robot
 
 class GoldRushAction:
     description: str
@@ -15,5 +16,6 @@ class GoldRushAction:
         else:
             self.nextAction = lastAction
             return self.nextAction
-    
+    def run(self, robot : Robot) -> GoldRushAction:
+        return self.nextAction
     

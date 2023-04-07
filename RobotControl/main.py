@@ -10,3 +10,4 @@ if __name__ == "__main__":
     while(actionTree):
         runEachLoop(robot)
         actionTree = actionTree.run(robot)
+        print(actionTree.description)

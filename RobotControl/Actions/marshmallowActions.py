@@ -176,6 +176,7 @@ class LoadStack(GoldRushAction):
                     if self.index < len(stack)-1:
                         self.index += 1
                         self.state = 0
+                        robot.marshmallow.inPringle = len(stack)
                     else:
                         return self.nextAction
         

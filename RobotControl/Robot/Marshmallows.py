@@ -151,7 +151,7 @@ class Marshmallows:
         """Toggles the Loader Servo
 
         Args:
-            load (bool): when true moves servo up
+            load (bool): when true moves servo down
         """
         if load:
             self.loader.run(LOADER_UP)

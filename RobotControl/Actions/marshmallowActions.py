@@ -100,7 +100,9 @@ class LoadStack(GoldRushAction):
         self.delay_pringle = DelayAction(PRINGLE_DELAY)
         self.delay_loader = DelayAction(LOADER_DELAY)
         
-    def run(self, robot: Robot, stack: tuple[MarshmallowColors]) -> GoldRushAction:
+    def run(self, robot: Robot, stack: tuple[MarshmallowColors], flag:bool) -> GoldRushAction:
+        if(flag):
+            return self.nextAction
         match(self.state):
             case 0:
                 # Rotate color to Revolver

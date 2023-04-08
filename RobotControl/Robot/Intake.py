@@ -17,6 +17,7 @@ INTAKE_MARSH_SPEED = 0.66
 INTAKE_DUCK_BAG_SPEED = 1
 INTAKE_DUCK_AG_SPEED = 0.83
 
+OUTTAKE_SPEED = -1
 
 class Intake:
     
@@ -55,3 +56,6 @@ class Intake:
 
     def lower_cow_catcher(self) -> None:
         self.cow_catcher_servo.run(COW_CATCHER_LOWERED)
+        
+    def outtake(self) -> None:
+        self.intake_motor.run(OUTTAKE_SPEED)

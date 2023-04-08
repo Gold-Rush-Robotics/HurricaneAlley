@@ -5,6 +5,12 @@ from DelayAction import DelayAction
 PRINGLE_DELAY = 0.5
 LOADER_DELAY = 0.5
 
+#outtake
+#drive forward a foot or so
+# drive back a foot or so 
+# lower cow catcher
+# *begin sweep* 
+
 class MarshAction(GoldRushAction):
     def __init__(self, description: str = ...) -> None:
         super().__init__(description)

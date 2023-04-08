@@ -70,6 +70,7 @@ class Marshmallows:
     stored_in_revolver : list[MarshmallowColors, MarshmallowColors, MarshmallowColors, MarshmallowColors, MarshmallowColors]
     state : int 
     curr_chamber : int
+    inPringle: int = 0
     
     def __init__(self, pca: PCA9685, i2c: type[board.I2C]) -> None:
         self.loader = Servo(pca, 0, 0, 180)

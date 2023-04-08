@@ -21,6 +21,13 @@ class FoodAction(GoldRushAction):
          init intake
          drive to spot2
          visionnnn
+         go to the top-Right of food2 (45 degrees)
+         Load the right food chip
+         Place it
+         go to the bottom right of food1 (135 degrees)
+         load the next food chip
+         place it
+
          if(red):
             
          if(green):

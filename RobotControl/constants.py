@@ -1,3 +1,6 @@
+import math
+
+
 FIELD_X = 235
 FIELD_Y = 119
 START_X = 121.92
@@ -14,3 +17,5 @@ PLACE1 = (152.4, FIELD_Y - 15.24, 2)
 PLACE2 = (76.2, FIELD_Y - 15.24, 2)
 
 LIGHT_SWITCH = (FIELD_X, FIELD_Y/2)
+
+PI = math.pi

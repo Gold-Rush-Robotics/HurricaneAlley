@@ -10,6 +10,8 @@ class DuckArmLocations(Enum):
     STORE2 = 2
     PLACE2 = 3
     PLACE3 = 4
+    ARM_STORAGE = 5
+    INITIAL_STORAGE = 5
     
 DUCK_BAG_PREP = 0
 DUCK_BAG_DEPLOY = 0
@@ -23,6 +25,8 @@ STORE_1_POS = [0, 0, 0]
 STORE_2_POS = [0, 0, 0]
 PLACE_2_POS = [0, 0, 0]
 PLACE_3_POS = [0, 0, 0] 
+ARM_STORAGE_POS = [0, 0, 0] 
+INITIAL_STORAGE_POS = [0, 0, 0]
 
 GRAB_DUCK_POS = 0
 RELEASE_DUCK_POS = 0
@@ -191,6 +195,40 @@ class Duck:
                     case 3:
                         # Joint 3
                         self.j3.run(PLACE_3_POS[2])
+            case DuckArmLocations.ARM_STORAGE:
+                match(joint):
+                    case -1:
+                        # All Joints at Once
+                        for i in range(3):
+                            self.j1.run(ARM_STORAGE_POS[i])
+                            self.j2.run(ARM_STORAGE_POS[i])
+                            self.j3.run(ARM_STORAGE_POS[i])
+                    case 1:
+                        # Joint 1
+                        self.j1.run(ARM_STORAGE_POS[0])
+                    case 2:
+                        # Joint 2
+                        self.j2.run(ARM_STORAGE_POS[1])
+                    case 3:
+                        # Joint 3
+                        self.j3.run(ARM_STORAGE_POS[2])
+            case DuckArmLocations.INITIAL_STORAGE:
+                match(joint):
+                    case -1:
+                        # All Joints at Once
+                        for i in range(3):
+                            self.j1.run(INITIAL_STORAGE_POS[i])
+                            self.j2.run(INITIAL_STORAGE_POS[i])
+                            self.j3.run(INITIAL_STORAGE_POS[i])
+                    case 1:
+                        # Joint 1
+                        self.j1.run(INITIAL_STORAGE_POS[0])
+                    case 2:
+                        # Joint 2
+                        self.j2.run(INITIAL_STORAGE_POS[1])
+                    case 3:
+                        # Joint 3
+                        self.j3.run(INITIAL_STORAGE_POS[2])
             
 
     def grabDuck(self, grab : bool) -> None:

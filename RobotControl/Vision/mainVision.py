@@ -130,8 +130,8 @@ class VisionBuilder:
         self.pink.updateLower(ranges["pinkL"])
         self.pink.updateUpper(ranges["pinkU"])
 
-    def detectMarshmellows(self) -> list[tuple[int, int, float, MarshmallowColors]]:
-        '''given a frame, will return a list of detected marshmellows 
+    def detectMarshmallows(self) -> list[tuple[int, int, float, MarshmallowColors]]:
+        '''given a frame, will return a list of detected marshmallows 
 
         Type:
         * 0 - Green
@@ -180,7 +180,7 @@ if __name__ == "__main__":
     while True:
         ret, frame = vb.video.read()
         cv2.imshow("test",frame)
-        marsh = vb.detectMarshmellows()
+        marsh = vb.detectMarshmallows()
         print(marsh)
         if cv2.waitKey(1) == ord('q'):
             break

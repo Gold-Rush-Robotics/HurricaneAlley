@@ -13,7 +13,7 @@ from Vision.mainVision import VisionBuilder
 class Robot:
     drivetrain: Drivetrain
     duck: Duck
-    marhmallow:  Marshmallows
+    marshmallow:  Marshmallows
     intake: Intake
     vision: VisionBuilder
     def __init__(self) -> None:
@@ -21,7 +21,7 @@ class Robot:
         pca = PCA9685(i2c)
         self.drivetrain = Drivetrain(pca)
         self.duck = Duck(pca)
-        self.marhmallow = Marshmallows(pca, i2c)
+        self.marshmallow = Marshmallows(pca, i2c)
         self.intake = Intake(pca)
         self.vision = VisionBuilder()
         

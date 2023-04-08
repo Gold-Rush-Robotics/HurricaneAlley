@@ -27,4 +27,4 @@ CAMERA_X_CENTER = MAX_X / 2
 # Where Cow Catcher is 
 COW_CATCHER_Y = 600
 # Pixel per cm constant
-PIXEL_PER_CM = 20
+PIXEL_PER_CM = 1

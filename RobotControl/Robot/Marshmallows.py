@@ -123,7 +123,8 @@ class Marshmallows:
                 if self.agitate(marsh_color):
                     self.stored_in_revolver[self.curr_chamber] = marsh_color
                     self.state = 0
-            
+                    return True
+        return False
         
     
     def rotate_revolver(self, color: MarshmallowColors, to_agitator: bool) -> bool:

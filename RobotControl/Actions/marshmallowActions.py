@@ -4,6 +4,8 @@ from Robot.Robot import Robot
 from Robot.Marshmallows import MarshmallowColors, PringleStates
 from DelayAction import DelayAction
 import numpy as np
+from constants import *
+
 PRINGLE_DELAY = 0.5
 LOADER_DELAY = 0.5
 
@@ -31,7 +33,7 @@ class MarshAction(GoldRushAction):
             case 0:
                 # Outtake
                 robot.intake.outtake()
-                if self.outtake_delay.run(robot):
+                if not self.outtake_delay.run(robot):
                     self.state += 1
                     robot.intake.stopIntaking()
             case 1:
@@ -55,7 +57,7 @@ class MarshAction(GoldRushAction):
                 robot.intake.lower_cow_catcher()
                 robot.intake.intake_marshmallow()
                 # Delay
-                if self.cow_catcher_delay.run(robot):
+                if not self.cow_catcher_delay.run(robot):
                     self.state += 1
             case 4:
                 # Drive to Marshmallow
@@ -88,7 +90,22 @@ class MarshAction(GoldRushAction):
         Returns:
             bool: returns true when marshmallow no longer detected (was taken by intake)
         """
-        pass
+        marshmallows_detected = robot.vision.detectMarshmallows()
+        priority_marshmallows : list[tuple[tuple[int,int,float,MarshmallowColors], float]] = []
+        non_priority_marshmallows : list[tuple[tuple[int,int,float,MarshmallowColors], float]] = []
+        for marshmallow in marshmallows_detected:
+            distance_from_intake = np.linalg.norm(np.array([CAMERA_X_CENTER, MAX_Y]) - np.array([marshmallow[1], marshmallow[2]]))
+            if marshmallow[2] > COW_CATCHER_Y:
+                priority_marshmallows.append((marshmallow, distance_from_intake))
+            else:
+                non_priority_marshmallows.append((marshmallow, distance_from_intake))
+        
+        priority_marshmallows.sort(key=lambda x: x[1])
+        non_priority_marshmallows.sort(key=lambda x: x[1])
+
+        if priority_marshmallows:
+            pass
+
     
 class LoadStack(GoldRushAction):
     state : int = 0
@@ -111,22 +128,22 @@ class LoadStack(GoldRushAction):
             case 1:
                 # Open Pringle Slightly
                 robot.marshmallow.set_pringle(PringleStates.LOAD)
-                if(self.delay_pringle.run(robot)):
+                if not (self.delay_pringle.run(robot)):
                     self.state += 1
             case 2:
                 # Load into Pringle
                 robot.marshmallow.set_loader(True)
-                if(self.delay_loader.run(robot)):
+                if not (self.delay_loader.run(robot)):
                     self.state += 1
             case 3:
                 # Tighten Pringle
                 robot.marshmallow.set_pringle(PringleStates.TIGHT)
-                if(self.delay_pringle.run(robot)):
+                if not (self.delay_pringle.run(robot)):
                     self.state += 1
             case 4:
                 # Retract Loader
                 robot.marshmallow.set_loader(False)
-                if(self.delay_loader.run(robot)):
+                if not (self.delay_loader.run(robot)):
                     if self.index < len(stack)-1:
                         self.index += 1
                         self.state = 0

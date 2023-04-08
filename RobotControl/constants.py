@@ -19,3 +19,12 @@ PLACE2 = (76.2, FIELD_Y - 15.24, 2)
 LIGHT_SWITCH = (FIELD_X, FIELD_Y/2)
 
 PI = math.pi
+
+# Vision Constants
+MAX_X = 400
+MAX_Y = 800
+CAMERA_X_CENTER = MAX_X / 2
+# Where Cow Catcher is 
+COW_CATCHER_Y = 600
+# Pixel per cm constant
+PIXEL_PER_CM = 20

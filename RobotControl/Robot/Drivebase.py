@@ -2,6 +2,7 @@ from Hardware.actuators import GRRRoboClaw
 from Hardware.encoders import Encoder
 from adafruit_pca9685 import PCA9685
 from utils import PID, clampRange, normalizeAngle
+from constants import *
 import numpy as np
 import math
 
@@ -30,7 +31,7 @@ class Drivetrain:
     pca: PCA9685
     translatePid: PID = PID(1, 0, 0, 1.0, -1.0)
     roatatePid: PID = PID(1, 0, 0, 1.0, -1.0)
-    position: np.array = np.array([0, 0, 0])
+    position: np.array = np.array([START_X, START_Y, np.pi/2])
     encoderHandler: Encoder = Encoder()
     
     def __init__(self, pca: PCA9685) -> None:

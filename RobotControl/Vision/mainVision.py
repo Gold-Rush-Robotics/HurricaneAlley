@@ -2,6 +2,7 @@ import cv2
 import numpy as np
 import json
 from enum import Enum
+from Robot.Marshmallows import MarshmallowColors
 
 
 #Tunables to increase speed and decrease accuracy
@@ -102,11 +103,11 @@ class ColorType:
 
 class VisionBuilder:
     def __init__(self) -> None:
-        self.green = ColorType(ColorSpace.BGR)
-        self.white = ColorType(ColorSpace.BGR)
-        self.red = ColorType(ColorSpace.BGR)
-        self.yellow = ColorType(ColorSpace.BGR)
-        self.pink = ColorType(ColorSpace.BGR)
+        self.green = ColorType(ColorSpace.HSV)
+        self.white = ColorType(ColorSpace.HSV)
+        self.red = ColorType(ColorSpace.HSV)
+        self.yellow = ColorType(ColorSpace.HSV)
+        self.pink = ColorType(ColorSpace.HSV)
         self.video = cv2.VideoCapture(CAMERA_NUM)
         self.video.set(cv2.CAP_PROP_EXPOSURE,-6.5) #-6.5
 
@@ -129,7 +130,7 @@ class VisionBuilder:
         self.pink.updateLower(ranges["pinkL"])
         self.pink.updateUpper(ranges["pinkU"])
 
-    def detectMarshmellows(self) -> list[tuple[int, int, int, int]]:
+    def detectMarshmellows(self) -> list[tuple[int, int, float, MarshmallowColors]]:
         '''given a frame, will return a list of detected marshmellows 
 
         Type:
@@ -141,12 +142,12 @@ class VisionBuilder:
         '''
         ret, frame = self.video.read()
         objList = []
-        objList.extend([(b[0], b[1], b[2], 0) for b in self.green.blob(frame, ColorSpace.BGR)])
-        objList.extend([(b[0], b[1], b[2], 1) for b in self.white.blob(frame, ColorSpace.BGR)])
-        objList.extend([(b[0], b[1], b[2], 2) for b in self.red.blob(frame, ColorSpace.BGR)])
+        objList.extend([(b[0], b[1], b[2], MarshmallowColors.GREEN) for b in self.green.blob(frame, ColorSpace.BGR)])
+        objList.extend([(b[0], b[1], b[2], MarshmallowColors.WHITE) for b in self.white.blob(frame, ColorSpace.BGR)])
+        objList.extend([(b[0], b[1], b[2], MarshmallowColors.RED) for b in self.red.blob(frame, ColorSpace.BGR)])
         return objList
     
-    def detectDucks(self) -> list[tuple[int, int, int, int]]:
+    def detectDucks(self) -> list[tuple[int, int, float, int]]:
         '''given a frame, will return a list of detected Ducks 
 
         Type:

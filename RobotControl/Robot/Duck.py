@@ -42,6 +42,8 @@ class Duck:
     home_sensor : digitalio.DigitalInOut
     
     home : Pin  = 0
+
+    nextDuck: DuckArmLocations
     
     def __init__(self, pca: PCA9685) -> None:
         self.j1 = Servo(pca, 0, 0, 180)

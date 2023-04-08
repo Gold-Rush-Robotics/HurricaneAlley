@@ -12,6 +12,8 @@ LOADER_DELAY = 0.5
 OUTTAKE_DELAY = 1
 COW_CATCHER_DELAY = 0.5
 
+SWEEPS = [[0,0,0], [1, 1, 1]]
+
 class MarshAction(GoldRushAction):
     state : int = 0
     pos : np.array
@@ -20,6 +22,8 @@ class MarshAction(GoldRushAction):
     calculate_initial : bool = True
     stored_in_pringle : tuple
     stacker : LoadStack
+    sweepState : int = 0
+    previous_priority : int = 0
 
     def __init__(self, description: str = ...) -> None:
         super().__init__(description)
@@ -79,7 +83,12 @@ class MarshAction(GoldRushAction):
                     self.state = 4
                 # Add condition for if we run out of time for sweep
         
-        return super().run(robot)
+        return self
+
+    def sweep(self, robot: Robot) -> bool:
+        if(not self.drive_to_marsh(robot)):
+            if robot.drivetrain.driveToPoint(SWEEPS[self.sweepState], 3, 0.01):
+                self.sweepState += 1
     
     def drive_to_marsh(self, robot: Robot) -> bool:
         """Drives until marshmallow is taken into intake
@@ -103,9 +112,29 @@ class MarshAction(GoldRushAction):
         priority_marshmallows.sort(key=lambda x: x[1])
         non_priority_marshmallows.sort(key=lambda x: x[1])
 
-        if priority_marshmallows:
-            pass
+        self.pos = robot.drivetrain.position
 
+        if priority_marshmallows:
+            marsh_pos = (priority_marshmallows[0][0][0], priority_marshmallows[0][0][1])
+            heading = np.arctan2(marsh_pos[0], marsh_pos[1])
+            mod = np.array(marsh_pos[0], marsh_pos[1], heading)
+            point = self.pos + mod
+            robot.drivetrain.driveToPoint(point, 1, .01)
+        elif non_priority_marshmallows:
+            marsh_pos = (non_priority_marshmallows[0][0][0], non_priority_marshmallows[0][0][1])
+            heading = np.arctan2(marsh_pos[0], marsh_pos[1])
+            mod = np.array(marsh_pos[0], marsh_pos[1], heading)
+            point = self.pos + mod
+            robot.drivetrain.driveToPoint(point, 1, .01)
+        else:
+            self.sweep(robot)
+
+        if len(priority_marshmallows) < self.previous_priority:
+            self.previous_priority = len(priority_marshmallows)
+            return True
+
+        self.previous_priority = len(priority_marshmallows)
+        return False
     
 class LoadStack(GoldRushAction):
     state : int = 0
@@ -150,7 +179,7 @@ class LoadStack(GoldRushAction):
                     else:
                         return self.nextAction
         
-        return super().run(robot)
+        return self
     
 
 #Three tall Statue: base level – white, second level – green, third level – red

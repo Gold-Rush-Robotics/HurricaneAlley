@@ -4,12 +4,21 @@ import board
 import busio
 
 from Drivebase import Drivetrain
+from Duck import Duck
+from Marshmallows import Marshmallows
+from Intake import Intake
 
 
 class Robot:
     drivetrain: Drivetrain
+    duck: Duck
+    marhmallow:  Marshmallows
+    intake: Intake
     def __init__(self) -> None:
         i2c = busio.I2C(SCL, SDA)
         pca = PCA9685(i2c)
         self.drivetrain = Drivetrain(pca)
+        self.duck = Duck(pca)
+        self.marhmallow = Marshmallows(pca, i2c)
+        self.intake = Intake(pca)
         

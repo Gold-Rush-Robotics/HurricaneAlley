@@ -30,7 +30,7 @@ class MarshmallowColors(Enum):
 class PringleStates(Enum):
     OPEN = 0
     TIGHT = 0
-    CLOSED = 0
+    LOAD = 0
     
 
 LOADER_UP = 0

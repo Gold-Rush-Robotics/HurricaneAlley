@@ -2,15 +2,18 @@
 #include <memory>
 #include <iostream>
 
+int REV_TOLERANCE = 5;
+int stable = 0;
+
 Revolver::Revolver(std::shared_ptr<PCA9685> pca, std::shared_ptr<EncoderHandler> h)
 {
     enc = h;
 
     //TODO: Update Pins
     motor_revolver = std::make_shared<Motor>(27, 7, pca);
-    agitator = std::make_shared<Motor>(5, 9, pca); // 17 6 is for real agitator current values are duck
+    agitator = std::make_shared<Motor>(17, 6, pca); // 17 6 is for real agitator current values are duck
     
-    loader = std::make_shared<Servo>(10, pca); // This Pin needs to be updated
+    loader = std::make_shared<Servo>(10, pca);
     opener = std::make_shared<Servo>(5, pca);
     dropper = std::make_shared<Servo>(4, pca);
 
@@ -18,12 +21,17 @@ Revolver::Revolver(std::shared_ptr<PCA9685> pca, std::shared_ptr<EncoderHandler>
     is_open = false;
     dropper_up = false;
     finger_in_revolver = false;
+
+    // Add colorsensor to constructor
+    colorsensor = new ColorSensor();
+
+    revolverPID = new PID(0.1, 1.0, -1.0, 0.01, 0.0, 0.0);
 }
 
 // Look at the name
 void Revolver::turn_on_agitator()
 {
-    Revolver::agitator->setPower(1); // .5
+    Revolver::agitator->setPower(.5); // .5
 }
 
 // Look at the name
@@ -32,68 +40,76 @@ void Revolver::turn_off_agitator()
     Revolver::agitator->setPower(0.0);
 }
 
-/*  Rotates the revolver to one of the chambers (int pos)
-    TODO Edit how the rotation logic works
+/*  Rotates the revolver to encoder value (int pos)
     @param int pos (location in encoder ticks of where it needs to go)
 */
-void Revolver::rotate_revolver(double pos)
+bool Revolver::rotate_revolver(double pos)
 { 
-    //TODO Find Suitable Power to run the motor at and which direction it should turn
-    //double power = (encoder_ticks - chambers[pos] < 0) ? 1.0 : -1.0;
 
-    //make it work
+    int current = enc->getPos(3);
+    std::cout << "Goal: " << pos << " | Current: " << current << std::endl;
+    double speed = revolverPID->calculate(pos, current);
 
-    motor_revolver->setPower(pos);
+    
+    if(std::abs(current-pos) <= REV_TOLERANCE){
+        motor_revolver->setPower(0);
+        stable++;
+        if(stable >=10){
+            return true;
+        }
+    } else {
+        stable = 0;
+        motor_revolver->setPower(speed);
+    }
+    return false;
+}
+
+void Revolver::rotate_speed(double speed){
+    motor_revolver->setPower(speed);
 }
 
 // Toggles the servo in control of dropping/storing the can
-void Revolver::toggle_drop_servo()
+void Revolver::drop_servo(bool down)
 {
     
-    if (dropper_up)
+    if (down)
     {
         dropper->setPosition(1800, 300);
-        dropper_up = false;
     }
     else
     {
-        std::cout << "hello" << std::endl;
         dropper->setPosition(3750, 300);
-        dropper_up = true;
     }
 }
 
 // Toggles the servo in control of opening/closing the can
 // Resets can and check_can if it opens
-void Revolver::toggle_open_servo()
+void Revolver::pringle_servo(PRINGLE_STATES state)
 {
-    if (is_open)
-    {
-        opener->setPosition(1800, 300);
-        is_open = false;
-    }
-    else
-    {
-        std::cout << "1" << std::endl;
-        opener->setPosition(1400, 300); // 1470 pusher closed
-        is_open = true;
-        /* for (int i = 0; i < 3; i++)
-        {
-            can[i] = EMPTY;
-        }
-        check_can = 3; */
+    switch(state){
+        case PRINGLE_STATES::CLOSED:
+            opener->setPosition(1900, 300);
+            break;
+        case PRINGLE_STATES::ACCEPTING:
+            opener->setPosition(2075, 300);
+            break;
+        case PRINGLE_STATES::OPEN:
+            opener->setPosition(2500, 300);
+            break;
     }
 }
 
 
-int Revolver::store_marshmallow(MARSHMALLOWS color)
+bool Revolver::store_marshmallow()
 {
     int goal_chamber = get_color_pos(EMPTY);
     if (goal_chamber == -1)
         return -1;
-    
-    rotate_revolver(chambers[goal_chamber] + agitator_mod);
-    return 1;
+    if(rotate_revolver(chambers[goal_chamber] + agitator_mod)){
+        revolver[goal_chamber] = get_color();
+        return true;
+    }
+    return false;
 }
 
 int Revolver::get_color_pos(MARSHMALLOWS color)
@@ -115,11 +131,10 @@ int Revolver::get_color_pos(MARSHMALLOWS color)
 void Revolver::retract_loader()
 {
     loader->setPosition(800, 270);
-    finger_in_revolver = false;
 }
 
 void Revolver::insert_loader(){
-    loader->setPosition(2600, 270);
+    loader->setPosition(3800, 270);
 }
 
 bool Revolver::get_finger_in_revolver()
@@ -127,28 +142,24 @@ bool Revolver::get_finger_in_revolver()
     return finger_in_revolver;
 }
 
-int Revolver::load_marshmallow(MARSHMALLOWS color)
+bool Revolver::load_marshmallow(MARSHMALLOWS color)
 {
     int chamber = get_color_pos(color);
     // The color wasn't loaded in the revolver
     if (chamber == -1)
-        return -1;
-    
-    rotate_revolver(chamber);
-    loader->setPosition(270, 270); // Again need to adjust servo values
-    finger_in_revolver = true;
-    revolver[chamber] = EMPTY;
+        return false;
 
-
-    //TODO find a better way to do this part (probably w/ check_can)
-    int count = 0; 
-    while (can[count] != EMPTY)
-    {
-        count++;
+    if(rotate_revolver(chambers[chamber])){
+        revolver[chamber] = MARSHMALLOWS::EMPTY;
+        return true;
     }
-    can[count] = color;
 
-    return count;
+    return false;
+}
+
+MARSHMALLOWS Revolver::get_color()
+{
+    return colorsensor->get_color();
 }
 
 // Three tall Statue: base level – white, second level – green, third level – red

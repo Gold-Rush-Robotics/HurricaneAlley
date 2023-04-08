@@ -9,23 +9,26 @@ include_directories(./Utilities/ ../../rpidmx512/lib-pca9685/include/ ../OldCode
 
 include_directories(../eigen/)
 
-set(HARDWARE HardwareInterfaces/motor.cpp HardwareInterfaces/servo.cpp HardwareInterfaces/octoquad.cpp HardwareInterfaces/encoder.cpp)
-set(ROBOT Robot/drivetrain.cpp Robot/robot.cpp Robot/mechanisms/revolver.cpp)
+set(HARDWARE HardwareInterfaces/motor.cpp HardwareInterfaces/servo.cpp HardwareInterfaces/octoquad.cpp HardwareInterfaces/encoder.cpp
+    HardwareInterfaces/digitalsensor.cpp HardwareInterfaces/colorsensor.cpp)
+set(ROBOT Robot/drivetrain.cpp Robot/robot.cpp Robot/mechanisms/revolver.cpp Robot/mechanisms/duck.cpp)
 set(UTILITIES Utilities/utilFunc.cpp Utilities/I2C.cpp Utilities/pose.cpp Utilities/pid.cpp)
 set(TELEOP Opmodes/Teleop.cpp Opmodes/Runner.cpp)
-set(ACTIONS Actions/GoldRushAction.cpp Actions/DriveToPointAction.cpp)
+set(ACTIONS Actions/GoldRushAction.cpp Actions/DriveToPointAction.cpp 
+            Actions/StoreMarshmellow.cpp Actions/DelayAction.cpp Actions/TurnOffAgitator.cpp
+            Actions/StackAction.cpp Actions/LoadMarshmellow.cpp Actions/Pringle.cpp
+            Actions/placeAction.cpp Actions/GoToStore1.cpp Actions/GoToStore2.cpp Actions/GoToAgitator.cpp
+            Actions/GoToStack.cpp Actions/StoreDuck.cpp 
+    )
 set(AUTO Opmodes/Auto.cpp Opmodes/Runner.cpp ${ACTIONS})
-set(SIMPLE Opmodes/SimpleDrive.cpp)
 
 set(SOURCES ${HARDWARE} ${ROBOT} ${UTILITIES})
 
-add_executable(GoldRushTele ${SOURCES} ${TELEOP})
+add_executable(GoldRushTele ${SOURCES} ${TELEOP} ${ACTIONS})
 add_executable(GoldRushAuto ${SOURCES} ${AUTO})
-add_executable(GoldRushDrive ${SOURCES} ${SIMPLE})
 
 target_link_libraries(GoldRushTele -L"../../rpidmx512/lib-pca9685/lib_linux/" -lpigpio -lrt -lpca9685 -lbcm2835 -lpthread)
 target_link_libraries(GoldRushAuto -L"../../rpidmx512/lib-pca9685/lib_linux/" -lpigpio -lrt -lpca9685 -lbcm2835 -lpthread)
-target_link_libraries(GoldRushDrive -L"../../rpidmx512/lib-pca9685/lib_linux/" -lpigpio -lrt -lpca9685 -lbcm2835 -lpthread)
 
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})

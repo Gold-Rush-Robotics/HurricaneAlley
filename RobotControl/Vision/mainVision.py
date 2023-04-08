@@ -107,6 +107,9 @@ class VisionBuilder:
         self.red = ColorType(ColorSpace.BGR)
         self.yellow = ColorType(ColorSpace.BGR)
         self.pink = ColorType(ColorSpace.BGR)
+        self.video = cv2.VideoCapture(CAMERA_NUM)
+        self.video.set(cv2.CAP_PROP_EXPOSURE,-6.5) #-6.5
+
     def loadFromFile(self) -> None:
         ranges ={}
         with open("colorVals.json", "r") as f:
@@ -126,7 +129,7 @@ class VisionBuilder:
         self.pink.updateLower(ranges["pinkL"])
         self.pink.updateUpper(ranges["pinkU"])
 
-    def detectMarshmellows(self, frame: cv2.Mat) -> list[tuple[int, int, int, int]]:
+    def detectMarshmellows(self) -> list[tuple[int, int, int, int]]:
         '''given a frame, will return a list of detected marshmellows 
 
         Type:
@@ -136,13 +139,14 @@ class VisionBuilder:
 
         return: (type, center x, center y, area)
         '''
+        ret, frame = self.video.read()
         objList = []
         objList.extend([(b[0], b[1], b[2], 0) for b in self.green.blob(frame, ColorSpace.BGR)])
         objList.extend([(b[0], b[1], b[2], 1) for b in self.white.blob(frame, ColorSpace.BGR)])
         objList.extend([(b[0], b[1], b[2], 2) for b in self.red.blob(frame, ColorSpace.BGR)])
         return objList
     
-    def detectDucks(self, frame: cv2.Mat) -> list[tuple[int, int, int, int]]:
+    def detectDucks(self) -> list[tuple[int, int, int, int]]:
         '''given a frame, will return a list of detected Ducks 
 
         Type:
@@ -151,19 +155,31 @@ class VisionBuilder:
 
         return: (type, center x, center y, area)
         '''
+        ret, frame = self.video.read()
         objList = []
         objList.extend([(b[0], b[1], b[2], 3) for b in self.yellow.blob(frame, ColorSpace.BGR)])
         objList.extend([(b[0], b[1], b[2], 4) for b in self.pink.blob(frame, ColorSpace.BGR)])
         return objList
 
+    def detectRedFood(self) -> bool:
+        """will figure out what food area is under the camera
+
+        Returns:
+            bool: true if red
+        """
+        ret, frame = self.video.read()
+        r, g, b = cv2.mean(frame)
+        return r >= g
+        
+
+
 if __name__ == "__main__":
     vb = VisionBuilder()
     vb.loadFromFile()
-    video = cv2.VideoCapture(CAMERA_NUM)
     while True:
-        ret, frame = video.read()
+        ret, frame = vb.video.read()
         cv2.imshow("test",frame)
-        marsh = vb.detectMarshmellows(frame)
+        marsh = vb.detectMarshmellows()
         print(marsh)
         if cv2.waitKey(1) == ord('q'):
             break

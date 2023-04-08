@@ -14,6 +14,11 @@ DUCK_BAG_DELAY = 1
 
 SWEEPS = [[0,0,0], [1, 1, 1]]
 
+J1_DELAY = 1
+J2_DELAY = 1
+J3_DELAY = 1
+GRAB_DELAY = 1
+
 class DuckAction(GoldRushAction):
     state : int = 0
     pos : np.array
@@ -21,12 +26,14 @@ class DuckAction(GoldRushAction):
     cow_catcher_delay : DelayAction
     duck_agitator_delay : DelayAction
     duck_bag_delay : DelayAction
+    grab_delay : DelayAction
     at_duck_bag : bool = False
     stored_ducks : int = 0
     sweepState : int = 0
     previous_priority : int = 0
     totalDelay : DelayAction
     store_state : int = 0
+    duck_arm : DuckArm
 
     def __init__(self, description: str = ...) -> None:
         super().__init__(description)
@@ -34,7 +41,9 @@ class DuckAction(GoldRushAction):
         self.cow_catcher_delay = DelayAction(COW_CATCHER_DELAY)
         self.duck_agitator_delay = DelayAction(DUCK_AGITATOR_DELAY)
         self.duck_bag_delay = DelayAction(DUCK_BAG_DELAY)
+        self.grab_delay = DelayAction(GRAB_DELAY)
         self.totalDelay = DelayAction(30000)
+        self.duck_arm = DuckArm()
 
     def run(self, robot: Robot) -> GoldRushAction:
         match(self.state):
@@ -42,6 +51,7 @@ class DuckAction(GoldRushAction):
                 # Raise Cow Catcher Prep Intake for Duck
                 robot.intake.raise_cow_catcher()
                 robot.intake.intake_duck_agitator()
+                self.duck_arm.run(robot, DuckArmLocations.ARM_STORAGE)
                 # Delay
                 if not self.cow_catcher_delay.run(robot):
                     self.state += 1
@@ -51,46 +61,58 @@ class DuckAction(GoldRushAction):
                     self.state += 1
             case 2:
                 # Agitate the Duck that was taken
-                robot.duck.agitate(True)
-                if self.duck_agitator_delay.run(robot):
-                    robot.duck.agitate(False)
+                if not self.at_duck_bag:
+                    robot.duck.agitate(True)
+                    if self.duck_agitator_delay.run(robot):
+                        robot.duck.agitate(False)
+                        self.state += 1
+                else:
                     self.state += 1
             case 3:
                 # Store Duck
                 match(self.store_state):
                     case 0:
                         # Use Arm to put duck in Store 1
-                        robot.duck.duckArm(DuckArmLocations.AGITATOR, -1)
+                        self.duck_arm.run(robot, DuckArmLocations.AGITATOR)
                         robot.duck.grabDuck(True)
-                        self.stored_ducks += 1
-                        pass
+                        if self.grab_delay.run(robot):
+                            self.store_state += 1
                     case 1:
-                        # Use Arm to put duck in Store 2
+                        self.duck_arm.run(robot, DuckArmLocations.STORE1)
+                        robot.duck.grabDuck(False)
                         self.stored_ducks += 1
-                        pass
+                        self.store_state += 1
+                        self.duck_arm.run(robot, DuckArmLocations.ARM_STORAGE)
+                        self.state = 1
                     case 2:
-                        # Keep Duck in Agitator
-                        self.stored_ducks += 1
-                        pass
+                        # Use Arm to put duck in Store 2
+                        self.duck_arm.run(robot, DuckArmLocations.AGITATOR)
+                        robot.duck.grabDuck(True)
+                        if self.grab_delay.run(robot):
+                            self.store_state += 1
                     case 3:
-                        # Delay for 
-                        pass
+                        self.duck_arm.run(robot, DuckArmLocations.STORE2)
+                        robot.duck.grabDuck(False)
+                        self.stored_ducks += 1
+                        self.store_state += 1
+                        self.duck_arm.run(robot, DuckArmLocations.ARM_STORAGE)
+                        self.state = 1
                     case 4:
-                        pass
-                    case _:
-                        pass
-                if self.stored_ducks < 2:
-                    # Use Arm to Store Duck in Storage
-                    pass
-                elif self.stored_ducks == 3:
-                    # Save one more for 
-                    pass
-                else:
-                    # Start Storing in Duck Bag
-                    if not self.at_duck_bag:
+                        # Keep Duck in Agitator, switch to Bag
+                        self.stored_ducks += 1
                         robot.intake.intake_duck_bag()
-                    else:
-                        pass
+                        # Delay for Intake to switch to duck bag
+                        if self.duck_bag_delay.run(robot):
+                            self.store_state += 1
+                            self.state = 1
+                    case 5:
+                        # Keep Track of Ducks Stored in Bag
+                        if self.stored_ducks == 10:
+                            return self.nextAction
+                        else:
+                            self.stored_ducks += 1
+                            self.state = 1
+
         if not self.totalDelay.run(robot):
             return self.nextAction
         return self
@@ -147,3 +169,31 @@ class DuckAction(GoldRushAction):
 
         self.previous_priority = len(priority_ducks)
         return False
+    
+class DuckArm(GoldRushAction):
+    state : int = 0
+    delay1 : DelayAction
+    delay2 : DelayAction
+    delay3 : DelayAction
+
+    def __init__(self, description: str = ...) -> None:
+        super().__init__(description)
+        self.delay1 = DelayAction(J1_DELAY)
+        self.delay2 = DelayAction(J2_DELAY)
+        self.delay3 = DelayAction(J3_DELAY)
+    
+    def run(self, robot: Robot, position: DuckArmLocations) -> GoldRushAction:
+        match(self.state):
+            case 0:
+                robot.duck.duckArm(position, 3)
+                if self.delay3.run(robot):
+                    self.state += 1
+            case 1:
+                robot.duck.duckArm(position, 2)
+                if self.delay2.run(robot):
+                    self.state += 1
+            case 2:
+                robot.duck.duckArm(position, 1)
+                if self.delay1.run(robot):
+                    self.state += 1
+        return self

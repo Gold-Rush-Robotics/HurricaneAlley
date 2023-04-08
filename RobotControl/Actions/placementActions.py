@@ -9,3 +9,8 @@ class PlacementAction(GoldRushAction):
     def run(self, robot: Robot) -> GoldRushAction:
         
         return super().run(robot)
+
+
+class PlaceStack(GoldRushAction):
+    def run(self, robot: Robot, duck:bool) -> GoldRushAction:
+        return self

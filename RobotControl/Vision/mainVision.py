@@ -138,7 +138,7 @@ class VisionBuilder:
         * 1 - White
         * 2 - Red
 
-        return: (type, center x, center y, area)
+        return: (center x, center y, area, type)
         '''
         ret, frame = self.video.read()
         objList = []
@@ -154,7 +154,7 @@ class VisionBuilder:
         * 3 - Yellow
         * 4 - Pink
 
-        return: (type, center x, center y, area)
+        return: (center x, center y, area, type)
         '''
         ret, frame = self.video.read()
         objList = []

@@ -41,7 +41,9 @@ class Duck:
     
     home_sensor : digitalio.DigitalInOut
     
-    def __init__(self, pca: PCA9685, home: Pin) -> None:
+    home : Pin  = 0
+    
+    def __init__(self, pca: PCA9685) -> None:
         self.j1 = Servo(pca, 0, 0, 180)
         self.j2 = Servo(pca, 0, 0, 180)
         self.j3 = Servo(pca, 0, 0, 180)
@@ -50,7 +52,7 @@ class Duck:
         
         self.duck_agitator = GRRRoboClaw(pca, 0x00, True)
         
-        self.home_sensor = digitalio.DigitalInOut(home)
+        self.home_sensor = digitalio.DigitalInOut(self.home)
         self.home_sensor.direction = digitalio.Direction.INPUT
         self.home_sensor.pull = digitalio.Pull.UP
 

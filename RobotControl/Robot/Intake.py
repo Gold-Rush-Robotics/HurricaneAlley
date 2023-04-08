@@ -32,6 +32,8 @@ class Intake:
         self.cow_catcher_servo  = Servo(pca, 0, 0, 180)
 
     def intake_marshmallow(self) -> None:
+        """Sets intake motor and dm_servo to intake a marshmallow
+        """
         self.dm_separator_servo.run(DM_SEPARATOR_MARSHMALLOW)
         self.intake_motor.run(INTAKE_MARSH_SPEED)
     

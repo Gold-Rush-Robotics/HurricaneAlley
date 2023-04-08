@@ -15,7 +15,7 @@ class MarshAction(GoldRushAction):
         robot.intake.intake_marshmallow()
         robot.marhmallow.storeMarsh()
         if robot.marhmallow.stored_in_revolver.count(MarshmallowColors.EMPTY) == 0:
-            robot.marhmallow.
+            pass
         
         return super().run(robot)
     

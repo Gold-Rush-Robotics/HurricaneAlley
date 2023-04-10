@@ -57,8 +57,7 @@ class MarshAction(GoldRushAction):
                 if robot.drivetrain.driveToPoint(self.pos, 1, .01):
                     self.state += 1
             case 3:
-                # Lower Cow Catcher Prep Intake for Marshmallow
-                robot.intake.lower_cow_catcher()
+                # Prep Intake for Marshmallow
                 robot.intake.intake_marshmallow()
                 # Delay
                 if not self.cow_catcher_delay.run(robot):

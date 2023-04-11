@@ -1,18 +1,13 @@
 from Hardware.actuators import GRRRoboClaw, Servo, PWMMotor
 from adafruit_pca9685 import PCA9685
-
-DM_SEPARATOR_MARSHMALLOW = 0 
-DM_SEPARATOR_DUCK = 0
+from constants import *
 
 AB_SEPARATOR_AGITATOR = 0
 AB_SEPARATOR_BAG = 0
 
 COW_CATCHER_LOWERED = 0
-COW_CATCHER_RAISED = 0
-
-INTAKE_MARSH_SPEED = 0.66
-INTAKE_DUCK_BAG_SPEED = 1
-INTAKE_DUCK_AG_SPEED = 0.83
+COW_CATCHER_MID     = 0
+COW_CATCHER_RAISED  = 0
 
 OUTTAKE_SPEED = -1
 COW_CATCHER_SPEED = 1
@@ -33,10 +28,9 @@ class Intake:
         self.cow_catcher_servo  = Servo(pca, 0, 0, 180)
 
     def intake_marshmallow(self) -> None:
-        """Sets intake motor and dm_servo to intake a marshmallow
+        """Sets cow_catcher and dm_servo to intake a marshmallow
         """
         self.dm_separator_servo.run(DM_SEPARATOR_MARSHMALLOW)
-        self.intake_motor.run(INTAKE_MARSH_SPEED)
         self.lower_cow_catcher()
     
     def stopIntaking(self) -> None:
@@ -58,7 +52,7 @@ class Intake:
 
     def raise_cow_catcher(self) -> None:
         self.cow_catcher_motor.run(0.0)
-        self.cow_catcher_servo.run(COW_CATCHER_RAISED)
+        self.cow_catcher_servo.run(COW_CATCHER_MID)
 
     def lower_cow_catcher(self) -> None:
         self.cow_catcher_servo.run(COW_CATCHER_LOWERED)

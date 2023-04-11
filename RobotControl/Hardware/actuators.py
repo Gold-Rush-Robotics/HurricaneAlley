@@ -83,14 +83,10 @@ class GRRRoboClaw(Actuator):
         if(self.m1):
             if((power < 0) and not self.reversed):
                 self.roboclaw.BackwardM1(self.rcAddress, abs(power))
-                print(power)
-                print("Backwards?")
             else:
                 self.roboclaw.ForwardM1(self.rcAddress, abs(power))
-                print(power)
-                print("forwards")
         else:
-            if((power < 0) and not reversed):
+            if((power < 0) and not self.reversed):
                 self.roboclaw.BackwardM2(self.rcAddress, abs(power))
             else:
                 self.roboclaw.ForwardM2(self.rcAddress, abs(power))

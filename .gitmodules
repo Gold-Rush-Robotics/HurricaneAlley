@@ -1,3 +1,9 @@
 [submodule "eigen"]
 	path = eigen
 	url = https://gitlab.com/libeigen/eigen.git
+[submodule "RobotControl/Vendors/raspberry_pi_packet_serial"]
+	path = RobotControl/Vendors/raspberry_pi_packet_serial
+	url = https://github.com/basicmicro/raspberry_pi_packet_serial.git
+[submodule "RobotControl/Vendors/roboclaw_python_library"]
+	path = RobotControl/Vendors/roboclaw_python_library
+	url = https://github.com/basicmicro/roboclaw_python_library.git

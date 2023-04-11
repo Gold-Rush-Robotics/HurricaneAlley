@@ -1,7 +1,7 @@
 from __future__ import annotations
 from GoldRushAction import GoldRushAction
 from Robot.Robot import Robot
-from Robot.Marshmallows import MarshmallowColors, PringleStates
+from Robot.Marshmallows import MarshmallowColors, PringleStates, AGITATOR_SPEED
 from DelayAction import DelayAction
 import numpy as np
 from constants import *
@@ -9,7 +9,7 @@ from constants import *
 PRINGLE_DELAY = 0.5
 LOADER_DELAY = 0.5
 
-OUTTAKE_DELAY = 1
+RELEASE_DELAY = 2.0
 COW_CATCHER_DELAY = 0.5
 
 SWEEPS = [[0,0,0], [1, 1, 1]]
@@ -17,7 +17,7 @@ SWEEPS = [[0,0,0], [1, 1, 1]]
 class MarshAction(GoldRushAction):
     state : int = 0
     pos : np.array
-    outtake_delay : DelayAction
+    release_delay : DelayAction
     cow_catcher_delay : DelayAction
     calculate_initial : bool = True
     stored_in_pringle : tuple
@@ -27,7 +27,7 @@ class MarshAction(GoldRushAction):
 
     def __init__(self, description: str = ...) -> None:
         super().__init__(description)
-        self.outtake_delay = DelayAction(OUTTAKE_DELAY)
+        
         self.cow_catcher_delay = DelayAction(COW_CATCHER_DELAY)
         self.calculate_initial = True
         self.stacker = LoadStack()
@@ -35,11 +35,11 @@ class MarshAction(GoldRushAction):
     def run(self, robot: Robot) -> GoldRushAction:
         match(self.state):
             case 0:
-                # Outtake
-                robot.intake.outtake()
-                if not self.outtake_delay.run(robot):
+                # Release Intake 
+                robot.marshmallow.agitator.run(AGITATOR_SPEED)
+                if not self.release_delay.run(robot):
                     self.state += 1
-                    robot.intake.stopIntaking()
+                    robot.marshmallow.agitate(0.0)
             case 1:
                 # Move Forward
                 if self.calculate_initial:
@@ -61,6 +61,7 @@ class MarshAction(GoldRushAction):
                 robot.intake.intake_marshmallow()
                 # Delay
                 if not self.cow_catcher_delay.run(robot):
+                    robot.intake.intake_motor.run(INTAKE_MARSH_SPEED)
                     self.state += 1
             case 4:
                 # Drive to Marshmallow

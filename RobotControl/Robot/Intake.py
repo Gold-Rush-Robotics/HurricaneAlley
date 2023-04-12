@@ -25,9 +25,9 @@ class Intake:
         self.intake_motor.reverse(True)
         self.cow_catcher_motor = GRRRoboClaw(pca, 0x81, False)
         self.cow_catcher_motor.reverse(True)
-        self.agitator_bag_servo = Servo(pca, 0, 0, 180)
-        self.dm_separator_servo = Servo(pca, 0, 0, 180)
-        self.cow_catcher_servo  = Servo(pca, 0, 0, 180)
+        self.agitator_bag_servo = Servo(pca, 15, 0, 180)
+        self.dm_separator_servo = Servo(pca, 15, 0, 180)
+        self.cow_catcher_servo  = Servo(pca, 15, 0, 180)
 
     def intake_marshmallow(self) -> None:
         """Sets cow_catcher and dm_servo to intake a marshmallow

@@ -20,6 +20,15 @@ LIGHT_SWITCH = (FIELD_X, FIELD_Y/2)
 
 PI = math.pi
 
+# Intake Motor Speeds
+INTAKE_MARSH_SPEED = 0.66
+INTAKE_DUCK_BAG_SPEED = 1
+INTAKE_DUCK_AG_SPEED = 0.83
+
+# For Camera Release
+DM_SEPARATOR_MARSHMALLOW = 0 
+DM_SEPARATOR_DUCK = 0
+
 # Vision Constants
 MAX_X = 400
 MAX_Y = 800

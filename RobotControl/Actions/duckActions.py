@@ -48,8 +48,7 @@ class DuckAction(GoldRushAction):
     def run(self, robot: Robot) -> GoldRushAction:
         match(self.state):
             case 0:
-                # Raise Cow Catcher Prep Intake for Duck
-                robot.intake.raise_cow_catcher()
+                # Prep Intake for Duck
                 robot.intake.intake_duck_agitator()
                 self.duck_arm.run(robot, DuckArmLocations.ARM_STORAGE)
                 # Delay

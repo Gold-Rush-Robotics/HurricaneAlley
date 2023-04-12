@@ -35,10 +35,10 @@ class Drivetrain:
     encoderHandler: Encoder = Encoder()
     
     def __init__(self, pca: PCA9685) -> None:
-        fl = GRRRoboClaw(pca, 0x00, True)
-        fr = GRRRoboClaw(pca, 0x00, True)
-        bl = GRRRoboClaw(pca, 0x00, True)
-        br = GRRRoboClaw(pca, 0x00, True)
+        fl = GRRRoboClaw(pca, 0x81, False)
+        fr = GRRRoboClaw(pca, 0x82, True)
+        bl = GRRRoboClaw(pca, 0x81, True)
+        br = GRRRoboClaw(pca, 0x82, False)
     
     def drivePow(self, forward: float, strafe: float, rotate:float) -> None:
         powerFL = forward + strafe - rotate

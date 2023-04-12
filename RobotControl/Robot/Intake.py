@@ -1,4 +1,4 @@
-from Hardware.actuators import GRRRoboClaw, Servo, PWMMotor
+from Hardware.actuators import GRRRoboClaw, Servo
 from adafruit_pca9685 import PCA9685
 from constants import *
 
@@ -15,7 +15,7 @@ COW_CATCHER_SPEED = 1
 class Intake:
     
     intake_motor : GRRRoboClaw
-    cow_catcher_motor : PWMMotor
+    cow_catcher_motor : GRRRoboClaw
     ab_separator_servo : Servo
     dm_separator_servo : Servo
     cow_catcher_servo  : Servo
@@ -25,9 +25,9 @@ class Intake:
         self.intake_motor.reverse(True)
         self.cow_catcher_motor = GRRRoboClaw(pca, 0x81, False)
         self.cow_catcher_motor.reverse(True)
-        self.agitator_bag_servo = Servo(pca, 15, 0, 180)
-        self.dm_separator_servo = Servo(pca, 15, 0, 180)
-        self.cow_catcher_servo  = Servo(pca, 15, 0, 180)
+        self.agitator_bag_servo = Servo(pca, 1, 0, 180)
+        self.dm_separator_servo = Servo(pca, 3, 0, 180)
+        self.cow_catcher_servo  = Servo(pca, 2, 0, 180)
 
     def intake_marshmallow(self) -> None:
         """Sets cow_catcher and dm_servo to intake a marshmallow

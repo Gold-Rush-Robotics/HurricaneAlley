@@ -1,5 +1,5 @@
 from enum import Enum
-from Hardware.actuators import Servo, GRRRoboClaw
+from Hardware.actuators import Servo, PWMMotor
 from adafruit_pca9685 import PCA9685
 from microcontroller import Pin
 import digitalio
@@ -38,23 +38,23 @@ class Duck:
     
     duck_bag : Servo
     duck_gripper : Servo
-    duck_agitator : GRRRoboClaw
+    duck_agitator : PWMMotor
     
     duck_bag_deployed : bool = False
     duck_bag_prepped  : bool = False
     
     home_sensor : digitalio.DigitalInOut
     
-    home : Pin  = 0
+    home : Pin  = 0 # 18 on the pi hat
     
     def __init__(self, pca: PCA9685) -> None:
-        self.j1 = Servo(pca, 0, 0, 180)
-        self.j2 = Servo(pca, 0, 0, 180)
-        self.j3 = Servo(pca, 0, 0, 180)
-        self.duck_bag = Servo(pca, 0, 0, 180)
-        self.duck_gripper = Servo(pca, 0, 0, 180)
+        self.j1 = Servo(pca, 7, 0, 180)
+        self.j2 = Servo(pca, 8, 0, 180)
+        self.j3 = Servo(pca, 9, 0, 180)
+        self.duck_bag = Servo(pca, 4, 0, 180)
+        self.duck_gripper = Servo(pca, 10, 0, 180)
         
-        self.duck_agitator = GRRRoboClaw(pca, 0x00, True)
+        self.duck_agitator = PWMMotor(15, 0, pca)
         
         self.home_sensor = digitalio.DigitalInOut(self.home)
         self.home_sensor.direction = digitalio.Direction.INPUT

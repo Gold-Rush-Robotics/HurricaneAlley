@@ -73,12 +73,11 @@ class Marshmallows:
     
     def __init__(self, pca: PCA9685, i2c: type[board.I2C]) -> None:
         self.loader = Servo(pca, 0, 0, 180)
-        self.placer = Servo(pca, 0, 0, 180)
-        self.pringle_can  = Servo(pca, 0, 0, 180)
-        
+        self.placer = Servo(pca, 5, 0, 180)
+        self.pringle_can = Servo(pca, 6, 0, 180)
         self.revolver_enc = Encoder()
-        self.revolver = PWMMotor(0, 0, pca)
-        self.agitator = PWMMotor(0, 0, pca)
+        self.revolver = PWMMotor(14, 0, pca)
+        self.agitator = PWMMotor(13, 0, pca)
         
         self.revolver_PID = PID(0.01, 0, 0, 1.0, -1.0)
         
@@ -111,7 +110,7 @@ class Marshmallows:
         Returns:
             bool: true when the marshmallow has settled
         """
-        color = self.color_sensor.color_rgb_bytes()
+        color = self.color_sensor.color_rgb_bytes
         marsh_color : MarshmallowColors = MarshmallowColors.getMarshFromRGB(color)
         match(self.state):
             case 0:

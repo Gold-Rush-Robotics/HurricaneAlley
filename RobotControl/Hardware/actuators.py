@@ -6,7 +6,7 @@ from board import SCL, SDA
 import board
 import busio
 
-from Vendors.roboclaw_python.roboclaw_3 import Roboclaw
+from Vendors.roboclaw_python_library.roboclaw_python.roboclaw_3 import Roboclaw
 from utils import clampRange, reMap
 
 PWM_MAX = 0xFFFF - 1
@@ -75,17 +75,21 @@ class GRRRoboClaw(Actuator):
 
     def run(self, power: float) -> None:
         power = clampRange(-1, 1, power)
-        power = reMap(power, -1, 1, 127, -127)
+        print(power)
+        power = reMap(power, -1, 1, 126, -126)
+        print(power)
+        power = int(power)
+        print(power)
         if(self.m1):
-            if((power < 0) and not reversed):
-                self.roboclaw.BackwardM1(self.rcAddress, power)
+            if((power < 0) and not self.reversed):
+                self.roboclaw.BackwardM1(self.rcAddress, abs(power))
             else:
-                self.roboclaw.ForwardM1(self.rcAddress, power)
+                self.roboclaw.ForwardM1(self.rcAddress, abs(power))
         else:
-            if((power < 0) and not reversed):
-                self.roboclaw.BackwardM2(self.rcAddress, power)
+            if((power < 0) and not self.reversed):
+                self.roboclaw.BackwardM2(self.rcAddress, abs(power))
             else:
-                self.roboclaw.ForwardM2(self.rcAddress, power)
+                self.roboclaw.ForwardM2(self.rcAddress, abs(power))
         
 
 if __name__ == "__main__":

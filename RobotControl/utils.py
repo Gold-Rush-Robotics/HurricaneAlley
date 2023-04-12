@@ -1,7 +1,7 @@
 import numpy as np
 
 def clampRange(start: float, stop: float, num: float) -> float:
-    return max(start, min(stop, float))
+    return max(start, min(stop, num))
 
 def reMap(OldValue:float, OldMin:float, OldMax:float, NewMax:float, NewMin:float):
     OldRange = (OldMax - OldMin)  

@@ -3,11 +3,9 @@
 #                      IMPORTS
 #----------------------------------------------------------------
 
-import spidev
+import smbus
 import time
 import sys
-from microcontroller import Pin
-import digitalio
 
 #----------------------------------------------------------------
 #                      CONSTANTS
@@ -28,68 +26,22 @@ VEL_PAYLOAD_LEN = sizeof_vel*NUM_ENCODERS
 ENC_DATA_PAYLOAD_LEN = CNT_PAYLOAD_LEN + VEL_PAYLOAD_LEN
 FW_PAYLOAD_LEN = 3
 
-SECONDS_PER_US = 1 / 1000000
-
-SPI_BUS = 0 # We only have one bus
-SPI_CS = 1 # Not actually used bc we control manually using a GPIO
-SPI_MODE = 3
-SPI_BAUD = 1000000
-SS_PIN = 5
-
-OCTOQUAD_FLAG_WRITE = 0x57
-OCTOQUAD_FLAG_WRITE_STICKY = 0x53
-OCTOQUAD_FLAG_READ = 0x52
-
 SUPPORTED_FW_VERSION_MAJ = 2
+
 OCTOQUAD_CHIP_ID = 0x51
+OCTOQUAD_I2C_ADDR = 0x30
 
 OCTOQUAD_REG_CHIP_ID = 0
 OCTOQUAD_REG_FW_MAJ = 1
 OCTOQUAD_REG_ENC0 = 0x0C
+OCTOQUAD_REG_VEL0 = 0x2C
 
-#----------------------------------------------------------------
-#                      SPI XFER FUNTCIONS
-#----------------------------------------------------------------
-def sleepMicroseconds(us):
-    time.sleep(us * SECONDS_PER_US)
-
-def slaveSelectAssert():
-    digitalio.DigitalInOut(Pin(SS_PIN)).value = False
-    sleepMicroseconds(50)
-
-def slaveSelectUnassert():
-    digitalio.DigitalInOut(Pin(SS_PIN)).value = True
-    sleepMicroseconds(50)
-
-def octoquad_xfer(tx):
-    slaveSelectAssert()
-    rx = spi.xfer(tx)
-    slaveSelectUnassert()
-    return rx
-
-def writeRegisters(reg, data):
-    data.insert(0, OCTOQUAD_FLAG_WRITE)
-    data.insert(1, reg)
-    octoquad_xfer(data)
-
-def readRegisters(num):
-    tx = bytearray(num)
-    tx.insert(0, OCTOQUAD_FLAG_READ)
-    rx = octoquad_xfer(tx)
-    return rx[1:len(rx)]
-
-def setRegisterAddress(reg, sticky):
-    tx = bytearray(2)
-    if sticky == True:
-        tx[0] = OCTOQUAD_FLAG_WRITE_STICKY
-    else:
-        tx[0] = OCTOQUAD_FLAG_WRITE
-    tx[1] = reg
-    octoquad_xfer(tx)
+I2C_BUS_NUM = 1
 
 #----------------------------------------------------------------
 #                      HELPER FUNCTIONS
 #----------------------------------------------------------------
+
 
 def bytesToInt32(theBytes):
     if (len(theBytes) != sizeof_int32):
@@ -130,49 +82,31 @@ def parseVelocityData(theBytes):
 
     return counts
 
-def parseEncoderDataBlock(theBytes, enc, vel):
-    if (len(theBytes) != (CNT_PAYLOAD_LEN + VEL_PAYLOAD_LEN)):
-        print ("Err, len(theBytes)")
-        exit()
-
-    enc.clear()
-    vel.clear()
-
-    enc.extend(parseCountData(theBytes[0:CNT_PAYLOAD_LEN]))
-    vel.extend(parseVelocityData(theBytes[CNT_PAYLOAD_LEN:CNT_PAYLOAD_LEN+VEL_PAYLOAD_LEN]))
-
-def updateEncoderDataSticky(enc, vel):
-    parseEncoderDataBlock(readRegisters(ENC_DATA_PAYLOAD_LEN), enc, vel)
-    
 def readFwVersion():
-    setRegisterAddress(OCTOQUAD_REG_FW_MAJ, False)
-    fw = readRegisters(FW_PAYLOAD_LEN)
+    fw = i2c.read_i2c_block_data(OCTOQUAD_I2C_ADDR, OCTOQUAD_REG_FW_MAJ, FW_PAYLOAD_LEN)
     return fw
     
 def readChipID():
-    setRegisterAddress(OCTOQUAD_REG_CHIP_ID, False)
-    return readRegisters(1)[0]
+    return i2c.read_byte_data(OCTOQUAD_I2C_ADDR, OCTOQUAD_REG_CHIP_ID)    
+
+def readCounts():
+    theBytes = i2c.read_i2c_block_data(OCTOQUAD_I2C_ADDR, OCTOQUAD_REG_ENC0, CNT_PAYLOAD_LEN)
+    return parseCountData(theBytes)
+
+def readVelocities():
+    theBytes = i2c.read_i2c_block_data(OCTOQUAD_I2C_ADDR, OCTOQUAD_REG_VEL0, VEL_PAYLOAD_LEN)
+    return parseVelocityData(theBytes)
 
 #----------------------------------------------------------------
 #                      MAIN
 #----------------------------------------------------------------
 
-spi = spidev.SpiDev(SPI_BUS, SPI_CS)
+i2c = smbus.SMBus(I2C_BUS_NUM)
 
 class Encoder:
     counts: "list[int]"
     vels: "list[int]"
     def __init__(self) -> None:
-        # Setup slave select pin
-        digitalio.DigitalInOut(Pin(SS_PIN)).switch_to_output(True)
-
-        # We're not transmitting just yet
-        slaveSelectUnassert()
-
-        # Setup SPI peripheral
-        
-        spi.max_speed_hz = SPI_BAUD
-        spi.mode = SPI_MODE
 
         # Verify CHIP_ID
         print("Reading CHIP_ID")
@@ -194,11 +128,9 @@ class Encoder:
             print("Cannot continue: The connected OctoQuad is running a firmware with a different major version than this program expects (expect %d)" % SUPPORTED_FW_VERSION_MAJ)
             sys.exit()
 
-        # Set sticky register for reads of encoder data
-        setRegisterAddress(OCTOQUAD_REG_ENC0, True)
-
     def update(self) -> None:
-        updateEncoderDataSticky(self.counts, self.vels)
+        self.counts = readCounts()
+        self.vels = readVelocities()
     
     def getCounts(self) -> "list[int]":
         return self.counts

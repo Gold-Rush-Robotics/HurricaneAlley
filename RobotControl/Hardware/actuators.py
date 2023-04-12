@@ -47,7 +47,7 @@ class PWMMotor:
         '''
         power = clampRange(-1.0, 1.0, power)
         self.pca.channels[self.pwmPIN] = abs(power) * PWM_MAX
-        self.dirPIN.value = (power < 0) and not self.reversed
+        self.dirPIN.value = ((power < 0) and not self.reversed) or self.reversed
 
 class Servo(Actuator):
     pwmPin: int = 0
@@ -81,12 +81,13 @@ class GRRRoboClaw(Actuator):
         power = int(power)
         print(power)
         if(self.m1):
-            if((power < 0) and not self.reversed):
+            if((power < 0) and not self.reversed) or (self.reversed):
                 self.roboclaw.BackwardM1(self.rcAddress, abs(power))
             else:
                 self.roboclaw.ForwardM1(self.rcAddress, abs(power))
+               
         else:
-            if((power < 0) and not self.reversed):
+            if((power < 0) and not self.reversed) or (self.reversed):
                 self.roboclaw.BackwardM2(self.rcAddress, abs(power))
             else:
                 self.roboclaw.ForwardM2(self.rcAddress, abs(power))

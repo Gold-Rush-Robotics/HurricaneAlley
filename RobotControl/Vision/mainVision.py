@@ -10,7 +10,7 @@ from Robot.Marshmallows import MarshmallowColors
 MERGE_PASSES = 5 
 """this is how many itterations of bounding boxes for each color detection will merge to become bigger
 Higher = Slower? more work for each frame but less objects for the main loop to deal with"""
-CAMERA_NUM = 1
+CAMERA_NUM = 0
 '''Which camera to use (0 for pi, 1 if running with an external and internal webcam)''' 
 
 def detectColisions(rects: list[tuple[int, int, int, int]], depth: int) -> list[tuple[int, int, int, int]]:

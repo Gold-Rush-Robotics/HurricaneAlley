@@ -1,8 +1,8 @@
-from GoldRushAction import GoldRushAction
-from marshmallowActions import LoadStack
+from Actions.GoldRushAction import GoldRushAction
+from Actions.marshmallowActions import LoadStack
 from Robot.Robot import Robot
 from Robot.Marshmallows import MarshmallowColors
-from placementActions import PlaceStack
+from Actions.placementActions import PlaceStack
 
 from constants import *
 

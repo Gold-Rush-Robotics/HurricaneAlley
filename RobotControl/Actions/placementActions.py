@@ -1,4 +1,4 @@
-from GoldRushAction import GoldRushAction
+from Actions.GoldRushAction import GoldRushAction
 from Robot.Robot import Robot
 
 class PlacementAction(GoldRushAction):

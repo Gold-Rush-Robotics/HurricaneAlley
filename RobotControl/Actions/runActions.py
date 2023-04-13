@@ -1,10 +1,10 @@
-from GoldRushAction import GoldRushAction
+from Actions.GoldRushAction import GoldRushAction
 from Robot.Robot import Robot
-from StartupActions import StartupActions
-from foodActions import FoodAction
-from marshmallowActions import MarshAction
-from duckActions import DuckAction
-from placementActions import PlacementAction
+from Actions.StartupActions import StartupActions
+from Actions.foodActions import FoodAction
+from Actions.marshmallowActions import MarshAction
+from Actions.duckActions import DuckAction
+from Actions.placementActions import PlacementAction
 
 def getRun() -> GoldRushAction:
     return StartupActions("Startup")\

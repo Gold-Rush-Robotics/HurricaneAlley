@@ -1,8 +1,8 @@
 from __future__ import annotations
-from GoldRushAction import GoldRushAction
+from Actions.GoldRushAction import GoldRushAction
 from Robot.Robot import Robot
 from Robot.Duck import DuckArmLocations
-from DelayAction import DelayAction
+from Actions.DelayAction import DelayAction
 import numpy as np
 from constants import *
 

@@ -21,9 +21,9 @@ class Intake:
     cow_catcher_servo  : Servo
 
     def __init__(self, pca: PCA9685) -> None:
-        self.intake_motor = GRRRoboClaw(pca, 0x81, True)
+        self.intake_motor = GRRRoboClaw(pca, 0x80, True)
         self.intake_motor.reverse(True)
-        self.cow_catcher_motor = GRRRoboClaw(pca, 0x81, False)
+        self.cow_catcher_motor = GRRRoboClaw(pca, 0x80, False)
         self.cow_catcher_motor.reverse(True)
         self.agitator_bag_servo = Servo(pca, 1, 0, 180)
         self.dm_separator_servo = Servo(pca, 3, 0, 180)

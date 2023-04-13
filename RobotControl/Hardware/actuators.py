@@ -46,7 +46,7 @@ class PWMMotor:
         power -1.0 - 1.0
         '''
         power = clampRange(-1.0, 1.0, power)
-        self.pca.channels[self.pwmPIN] = abs(power) * PWM_MAX
+        self.pca.channels[self.pwmPIN].duty_cycle = int(abs(power) * PWM_MAX)
         self.dirPIN.value = ((power < 0) and not self.reversed) or self.reversed
 
 class Servo(Actuator):
@@ -59,7 +59,7 @@ class Servo(Actuator):
         self.rangeMax = rangeMax
         self.rangeMin = rangeMin
     def run(self, position: float) -> None:
-        self.pca.channels[self.pwmPin] = reMap(position, self.rangeMin, self.rangeMax, PWM_MAX, 0)
+        self.pca.channels[self.pwmPin].duty_cycle = int(reMap(position, self.rangeMin, self.rangeMax, PWM_MAX, 0))
 
 class GRRRoboClaw(Actuator):
     rcAddress: int = 0x00

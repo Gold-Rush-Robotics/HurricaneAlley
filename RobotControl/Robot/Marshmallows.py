@@ -5,6 +5,7 @@ from Hardware.encoders import Encoder
 from adafruit_pca9685 import PCA9685
 import adafruit_tcs34725 as ColorSensor
 from utils import PID
+from microcontroller import Pin
 import numpy as np
 import board
 
@@ -28,9 +29,9 @@ class MarshmallowColors(Enum):
             return MarshmallowColors.EMPTY
 
 class PringleStates(Enum):
-    OPEN = 0
-    TIGHT = 0
-    LOAD = 0
+    OPEN = 90
+    TIGHT = 30
+    LOAD = 39
     
 
 LOADER_UP = 162
@@ -76,8 +77,8 @@ class Marshmallows:
         self.placer = Servo(pca, 5, 0, 180)
         self.pringle_can = Servo(pca, 6, 0, 180)
         self.revolver_enc = Encoder()
-        self.revolver = PWMMotor(14, 0, pca)
-        self.agitator = PWMMotor(13, 0, pca)
+        self.revolver = PWMMotor(14, Pin(0), pca)
+        self.agitator = PWMMotor(13, Pin(0), pca)
         
         self.revolver_PID = PID(0.01, 0, 0, 1.0, -1.0)
         
@@ -163,7 +164,7 @@ class Marshmallows:
         Args:
             degree (PringleStates): which state the pringle servo should be in
         """
-        self.pringle_can.run(degree)
+        self.pringle_can.run(degree.value)
                 
     
     def place_pringle(self, lower:bool) -> None:

@@ -18,11 +18,17 @@ class Robot:
     vision: VisionBuilder
     def __init__(self) -> None:
         i2c = busio.I2C(SCL, SDA)
-        pca = PCA9685(i2c)
-        self.drivetrain = Drivetrain(pca)
-        self.duck = Duck(pca)
-        self.marshmallow = Marshmallows(pca, i2c)
-        self.intake = Intake(pca)
+        self.pca = PCA9685(i2c)
+        self.pca.frequency = 300
+        self.drivetrain = Drivetrain(self.pca)
+        self.duck = Duck(self.pca)
+        self.marshmallow = Marshmallows(self.pca, i2c)
+        self.intake = Intake(self.pca)
         self.vision = VisionBuilder()
+    
+    def clear(self):
+        for channel in self.pca.channels:
+            channel.duty_cycle = 0
+        self.pca.deinit()
         
         

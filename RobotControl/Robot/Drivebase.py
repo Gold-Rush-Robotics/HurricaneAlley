@@ -105,7 +105,7 @@ class Drivetrain:
             [0, 0, 1]
         ])
 
-        v2 = m1 @ m2 @ v
+        v2 = np.dot(m1, m2).dot(v).tolist()[0]
 
         self.position[0] += v2[0]
         self.position[1] += v2[1]

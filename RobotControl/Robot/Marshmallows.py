@@ -11,7 +11,7 @@ import board
 
 class MarshmallowColors(Enum):
     EMPTY = (0, 0, 0)
-    WHITE = (0, 0, 0)
+    WHITE = (1, 1, 1)
     RED =   (0, 0, 0)
     GREEN = (0, 0, 0)
     REDFOOD =   (0, 0, 0)
@@ -45,7 +45,7 @@ PRINGLE_CLOSED = 39
 
 AGITATOR_SPEED = 0.5
 
-REVOLVER_ENCODER_PORT = 3
+REVOLVER_ENCODER_PORT = 7
 
 # Tick Positions of Marshmallow Chambers in Relation to Pringle
 ENCODER_POS = [1792, 2534, 3254, 320, 1024]
@@ -77,17 +77,21 @@ class Marshmallows:
         self.placer = Servo(pca, 5, 0, 180)
         self.pringle_can = Servo(pca, 6, 0, 180)
         self.revolver_enc = Encoder()
-        self.revolver = PWMMotor(14, Pin(0), pca)
-        self.agitator = PWMMotor(13, Pin(0), pca)
+        self.revolver = PWMMotor(13, Pin(16), pca)
+        self.agitator = PWMMotor(12, Pin(17), pca)
+        self.agitator.reverse(True)
         
-        self.revolver_PID = PID(0.01, 0, 0, 1.0, -1.0)
+        self.revolver_PID = PID(0.001, 0, 0, 1.0, -1.0)
         
         self.color_sensor = ColorSensor.TCS34725(i2c, 0x29)
-        self.stored_in_revolver = [ MarshmallowColors.GREENFOOD, 
+        self.stored_in_revolver = [MarshmallowColors.WHITE, MarshmallowColors.EMPTY, MarshmallowColors.EMPTY, MarshmallowColors.EMPTY, MarshmallowColors.EMPTY]
+        print(self.stored_in_revolver)
+        
+        """[ MarshmallowColors.GREENFOOD, 
                                     MarshmallowColors.REDFOOD, 
                                     MarshmallowColors.EMPTY,
                                     MarshmallowColors.EMPTY,
-                                    MarshmallowColors.EMPTY,]
+                                    MarshmallowColors.EMPTY,]"""
         self.state = 0
 
     def agitate(self, marsh_color : MarshmallowColors) -> bool:
@@ -139,9 +143,16 @@ class Marshmallows:
         """
         index = self.stored_in_revolver.index(color)
         curr_count = self.revolver_enc.getCounts()[REVOLVER_ENCODER_PORT]
-        self.revolver.run( self.revolver_PID.calculate(ENCODER_POS[index] + AGITATOR_MOD, curr_count) )
-        if np.isclose(ENCODER_POS[index] + AGITATOR_MOD if to_agitator else 0, curr_count):
-            self.revolver.run(0)
+        goal = ENCODER_POS[index] + (AGITATOR_MOD if to_agitator else 0)
+
+        print(goal, curr_count)
+
+        correction =  self.revolver_PID.calculate(goal, curr_count)
+        print(correction)
+
+        self.revolver.run(np.sign(correction)*  max(abs(correction), .15))
+        if np.isclose(goal, curr_count):
+            self.revolver.run(0.0)
             self.curr_chamber = index
             return True
         return False

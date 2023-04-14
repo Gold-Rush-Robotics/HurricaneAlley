@@ -8,6 +8,10 @@ from utils import PID
 from microcontroller import Pin
 import numpy as np
 import board
+import smbus
+
+import busio
+
 
 class MarshmallowColors(Enum):
     EMPTY     = 0
@@ -38,21 +42,23 @@ class PringleStates(Enum):
 LOADER_UP = 130
 LOADER_DOWN = 55
 
-PLACER_UP = 149
-PLACER_DOWN = 10
+PLACER_UP = 90
+PLACER_DOWN = 0
 
-PRINGLE_OPEN = 90
+PRINGLE_OPEN = 120
 PRINGLE_CLOSED = 39
 
 AGITATOR_SPEED = 0.5
 
 REVOLVER_ENCODER_PORT = 7
 
+COUNTS_IN_RANGE = 5
+
 # Tick Positions of Marshmallow Chambers in Relation to Pringle
-ENCODER_POS = [1098, 1557, 2005, 2460, 2912]
+ENCODER_POS = [1140, 1569, 2015, 2470, 2918]
 
 # Mod to add to ENCODER_POS to go to Agitator
-AGITATOR_MOD = -1098
+AGITATOR_MOD = -1125
 
 class Marshmallows:
     
@@ -73,6 +79,8 @@ class Marshmallows:
     state : int 
     curr_chamber : int
     
+    counter: int
+    
     def __init__(self, pca: PCA9685, i2c: type[board.I2C]) -> None:
         self.loader = Servo(pca, 0, 0, 180)
         self.placer = Servo(pca, 5, 0, 180)
@@ -82,11 +90,15 @@ class Marshmallows:
         self.agitator = PWMMotor(12, Pin(17), pca)
         self.agitator.reverse(True)
         
-        self.revolver_PID = PID(0.0005, .0002, 0, .6, -.6)
+        self.revolver_PID = PID(0.004, .01, .00008, .6, -.6)
+        self.counter = 0
         
-        self.color_sensor = ColorSensor.TCS34725(i2c, 0x29)
+        i2c4 = busio.I2C(Pin(1), Pin(0))
+
+        
+        self.color_sensor = ColorSensor.TCS34725(i2c4, 0x29)
         self.color_sensor.integration_time = 5
-        self.stored_in_revolver = [MarshmallowColors.WHITE, MarshmallowColors.GREEN, MarshmallowColors.RED, MarshmallowColors.EMPTY, MarshmallowColors.EMPTY]
+        self.stored_in_revolver = [MarshmallowColors.RED, MarshmallowColors.GREEN, MarshmallowColors.WHITE, MarshmallowColors.REDFOOD, MarshmallowColors.GREENFOOD]
         print(self.stored_in_revolver)
         self.curr_chamber = 0
         
@@ -153,11 +165,15 @@ class Marshmallows:
         correction =  self.revolver_PID.calculate(goal, curr_count)
         print(correction)
 
-        self.revolver.run(np.sign(correction)*  max(abs(correction), .2))
-        if np.isclose(goal, curr_count, atol=2):
-            self.revolver.run(0.0)
-            self.curr_chamber = index
-            return True
+        self.revolver.run(np.sign(correction)*  max(abs(correction), .08))
+        if np.isclose(goal, curr_count, atol=2, rtol=0.01):
+            self.counter += 1
+            if(self.counter >= COUNTS_IN_RANGE):
+                self.revolver.run(0.0)
+                self.curr_chamber = index
+                return True
+        else:
+            self.counter = 0
         return False
     
     def set_loader(self, load: bool) -> None:

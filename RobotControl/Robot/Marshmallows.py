@@ -10,32 +10,33 @@ import numpy as np
 import board
 
 class MarshmallowColors(Enum):
-    EMPTY = (0, 0, 0)
-    WHITE = (1, 1, 1)
-    RED =   (0, 0, 0)
-    GREEN = (0, 0, 0)
-    REDFOOD =   (0, 0, 0)
-    GREENFOOD = (0, 0, 0)
+    EMPTY     = 0
+    WHITE     = 1
+    RED       = 2
+    GREEN     = 3
+    REDFOOD   = 4
+    GREENFOOD = 5
     
     @staticmethod   
-    def getMarshFromRGB(color : list[int, int, int]) -> MarshmallowColors:
-        if color[0] > 200 and color[1] > 200 and color[2] > 200 :
+    def getMarshFromRGB(color : tuple[int, int, int, int]) -> MarshmallowColors:
+        if color[3] < 50:
+            return MarshmallowColors.EMPTY
+        if color[3] > 300 :
             return MarshmallowColors.WHITE
         elif color[0] > 200:
             return MarshmallowColors.RED
         elif color[1] > 200:
             return MarshmallowColors.GREEN
-        else:
-            return MarshmallowColors.EMPTY
+
 
 class PringleStates(Enum):
     OPEN = 90
     TIGHT = 30
-    LOAD = 39
+    LOAD = 57
     
 
-LOADER_UP = 162
-LOADER_DOWN = 0
+LOADER_UP = 130
+LOADER_DOWN = 55
 
 PLACER_UP = 149
 PLACER_DOWN = 10
@@ -48,10 +49,10 @@ AGITATOR_SPEED = 0.5
 REVOLVER_ENCODER_PORT = 7
 
 # Tick Positions of Marshmallow Chambers in Relation to Pringle
-ENCODER_POS = [1792, 2534, 3254, 320, 1024]
+ENCODER_POS = [1098, 1557, 2005, 2460, 2912]
 
 # Mod to add to ENCODER_POS to go to Agitator
-AGITATOR_MOD = -1792
+AGITATOR_MOD = -1098
 
 class Marshmallows:
     
@@ -81,11 +82,13 @@ class Marshmallows:
         self.agitator = PWMMotor(12, Pin(17), pca)
         self.agitator.reverse(True)
         
-        self.revolver_PID = PID(0.001, 0, 0, 1.0, -1.0)
+        self.revolver_PID = PID(0.0005, .0002, 0, .6, -.6)
         
         self.color_sensor = ColorSensor.TCS34725(i2c, 0x29)
-        self.stored_in_revolver = [MarshmallowColors.WHITE, MarshmallowColors.EMPTY, MarshmallowColors.EMPTY, MarshmallowColors.EMPTY, MarshmallowColors.EMPTY]
+        self.color_sensor.integration_time = 5
+        self.stored_in_revolver = [MarshmallowColors.WHITE, MarshmallowColors.GREEN, MarshmallowColors.RED, MarshmallowColors.EMPTY, MarshmallowColors.EMPTY]
         print(self.stored_in_revolver)
+        self.curr_chamber = 0
         
         """[ MarshmallowColors.GREENFOOD, 
                                     MarshmallowColors.REDFOOD, 
@@ -150,8 +153,8 @@ class Marshmallows:
         correction =  self.revolver_PID.calculate(goal, curr_count)
         print(correction)
 
-        self.revolver.run(np.sign(correction)*  max(abs(correction), .15))
-        if np.isclose(goal, curr_count):
+        self.revolver.run(np.sign(correction)*  max(abs(correction), .2))
+        if np.isclose(goal, curr_count, atol=2):
             self.revolver.run(0.0)
             self.curr_chamber = index
             return True

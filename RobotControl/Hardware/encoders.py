@@ -104,8 +104,8 @@ def readVelocities():
 i2c = smbus.SMBus(I2C_BUS_NUM)
 
 class Encoder:
-    counts: "list[int]"
-    vels: "list[int]"
+    counts: "list[int]" = [0, 0, 0, 0, 0, 0, 0, 0]
+    vels: "list[int]" = [0, 0, 0, 0, 0, 0, 0, 0]
     def __init__(self) -> None:
 
         # Verify CHIP_ID

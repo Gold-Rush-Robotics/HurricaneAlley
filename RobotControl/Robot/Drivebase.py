@@ -31,8 +31,11 @@ class Drivetrain:
     pca: PCA9685
     translatePid: PID = PID(1, 0, 0, 1.0, -1.0)
     roatatePid: PID = PID(1, 0, 0, 1.0, -1.0)
-    position: np.array = np.array([START_X, START_Y, 0])
+    position: list[float, float, float]
     encoderHandler: Encoder = Encoder()
+    oldH = 0
+    oldL = 0
+    oldR = 0
     
     def __init__(self, pca: PCA9685) -> None:
         self.fl = GRRRoboClaw(pca, 0x81, False)
@@ -41,6 +44,7 @@ class Drivetrain:
         self.bl = GRRRoboClaw(pca, 0x81, True)
         self.bl.reverse(True)
         self.br = GRRRoboClaw(pca, 0x82, False)
+        self.position = [START_X, START_Y, 0]
     
     def drivePow(self, forward: float, strafe: float, rotate:float) -> None:
         powerFL = forward + strafe - rotate
@@ -63,9 +67,7 @@ class Drivetrain:
         self.br.run(br)
     
     def updatePosition(self) -> np.array:
-        oldL = posL
-        oldR = posR
-        oldH = posH
+
         enc = self.encoderHandler.getCounts()
         posL = enc[LEFT_ODO_PORT]
         posR = enc[RIGHT_ODO_PORT]
@@ -108,6 +110,10 @@ class Drivetrain:
         self.position[0] += v2[0]
         self.position[1] += v2[1]
         self.position[2] += v2[2]
+
+        self.oldL = posL
+        self.oldR = posR
+        self.oldH = posH
 
         return self.position
     def driveToPoint(self, pose:np.array, distTol:float, angTol:float) -> bool:

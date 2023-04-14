@@ -46,7 +46,7 @@ class Duck:
     home_sensor : digitalio.DigitalInOut
     
     home : Pin  = Pin(18) # 18 on the pi hat
-    dir : Pin = Pin(0)
+    dir : Pin = Pin(27)
     
     def __init__(self, pca: PCA9685) -> None:
         self.j1 = Servo(pca, 7, 0, 180)
@@ -55,7 +55,7 @@ class Duck:
         self.duck_bag = Servo(pca, 4, 0, 180)
         self.duck_gripper = Servo(pca, 10, 0, 180)
         
-        self.duck_agitator = PWMMotor(15, self.dir, pca)
+        self.duck_agitator = PWMMotor(14, self.dir, pca)
         
         self.home_sensor = digitalio.DigitalInOut(self.home)
         self.home_sensor.direction = digitalio.Direction.INPUT

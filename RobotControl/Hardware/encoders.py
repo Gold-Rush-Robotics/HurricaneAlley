@@ -36,6 +36,10 @@ OCTOQUAD_REG_FW_MAJ = 1
 OCTOQUAD_REG_ENC0 = 0x0C
 OCTOQUAD_REG_VEL0 = 0x2C
 
+OCTOQUAD_REG_COMMAND = 0x04
+
+OCTOQUAD_CMD_RESET_EVERYTHING = 20
+
 I2C_BUS_NUM = 1
 
 #----------------------------------------------------------------
@@ -97,6 +101,10 @@ def readVelocities():
     theBytes = i2c.read_i2c_block_data(OCTOQUAD_I2C_ADDR, OCTOQUAD_REG_VEL0, VEL_PAYLOAD_LEN)
     return parseVelocityData(theBytes)
 
+def reset_all_positions():
+    i2c.write_i2c_block_data(OCTOQUAD_I2C_ADDR, OCTOQUAD_REG_COMMAND, [OCTOQUAD_CMD_RESET_EVERYTHING])
+
+
 #----------------------------------------------------------------
 #                      MAIN
 #----------------------------------------------------------------
@@ -131,6 +139,11 @@ class Encoder:
     def update(self) -> None:
         self.counts = readCounts()
         self.vels = readVelocities()
+    
+    def reset(self) -> None:
+        self.counts = [0, 0, 0, 0, 0, 0, 0, 0]
+        self.vels = [0, 0, 0, 0, 0, 0, 0, 0]
+        reset_all_positions()
     
     def getCounts(self) -> "list[int]":
         return self.counts

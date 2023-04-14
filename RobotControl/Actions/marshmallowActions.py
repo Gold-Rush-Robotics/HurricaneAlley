@@ -7,7 +7,7 @@ import numpy as np
 from constants import *
 
 PRINGLE_DELAY = 0.5
-LOADER_DELAY = 0.5
+LOADER_DELAY = 1.0
 
 RELEASE_DELAY = 2.0
 COW_CATCHER_DELAY = 0.5
@@ -147,32 +147,38 @@ class LoadStack(GoldRushAction):
         self.delay_loader = DelayAction(LOADER_DELAY)
         
     def run(self, robot: Robot, stack: tuple[MarshmallowColors], flag:bool) -> GoldRushAction:
+        print(self.state)
         if(flag):
             return self.nextAction
         match(self.state):
             case 0:
                 # Rotate color to Revolver
                 if robot.marshmallow.rotate_revolver(stack[self.index], False):
+                    return self.nextAction
                     self.state += 1
             case 1:
                 # Open Pringle Slightly
                 robot.marshmallow.set_pringle(PringleStates.LOAD)
                 if not (self.delay_pringle.run(robot)):
+                    self.delay_pringle.endTime = -1
                     self.state += 1
             case 2:
                 # Load into Pringle
                 robot.marshmallow.set_loader(True)
                 if not (self.delay_loader.run(robot)):
+                    self.delay_loader.endTime = -1
                     self.state += 1
             case 3:
                 # Tighten Pringle
                 robot.marshmallow.set_pringle(PringleStates.TIGHT)
                 if not (self.delay_pringle.run(robot)):
+                    self.delay_pringle.endTime = -1
                     self.state += 1
             case 4:
                 # Retract Loader
                 robot.marshmallow.set_loader(False)
                 if not (self.delay_loader.run(robot)):
+                    self.delay_loader.endTime = -1
                     if self.index < len(stack)-1:
                         self.index += 1
                         self.state = 0

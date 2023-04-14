@@ -42,8 +42,8 @@ class PringleStates(Enum):
 LOADER_UP = 130
 LOADER_DOWN = 55
 
-PLACER_UP = 90
-PLACER_DOWN = 0
+PLACER_UP = 40_600
+PLACER_DOWN = 18_000
 
 PRINGLE_OPEN = 120
 PRINGLE_CLOSED = 39
@@ -83,7 +83,7 @@ class Marshmallows:
     
     def __init__(self, pca: PCA9685, i2c: type[board.I2C]) -> None:
         self.loader = Servo(pca, 0, 0, 180)
-        self.placer = Servo(pca, 5, 0, 180)
+        self.placer = Servo(pca, 5, 0, 0xFFFF)
         self.pringle_can = Servo(pca, 6, 0, 180)
         self.revolver_enc = Encoder()
         self.revolver = PWMMotor(13, Pin(16), pca)
@@ -199,9 +199,9 @@ class Marshmallows:
     
     def place_pringle(self, lower:bool) -> None:
         if lower:
-            self.placer.run(PLACER_DOWN)
+            self.placer.runPWM(PLACER_DOWN)
         else:
-            self.placer.run(PLACER_UP)
+            self.placer.runPWM(PLACER_UP)
 
 #Three tall Statue: base level – white, second level – green, third level – red
 #Two Tall Statue: base level – white, second level – green

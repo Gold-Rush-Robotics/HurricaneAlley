@@ -15,6 +15,8 @@ def getRun() -> GoldRushAction:
         .setNext(FireWorksAction("Fireworks"))
 
 def runEachLoop(robot: Robot):
+    robot.drivetrain.encoderHandler.update()
+    robot.marshmallow.revolver_enc.update()
     robot.drivetrain.updatePosition()
 
 

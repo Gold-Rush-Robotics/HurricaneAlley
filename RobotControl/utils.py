@@ -34,11 +34,14 @@ class PID:
 
         #integral
         self._integral += error * self.dt
+        self._integral = clampRange(-.3, .3, self._integral)
         Iout = self.KI * self._integral
 
         #derivative
         derivative = (error - self._previousError) / self.dt
         Dout = self.KD * derivative
+        
+        print(Pout, Iout, Dout)
 
         output = Pout + Iout + Dout
 

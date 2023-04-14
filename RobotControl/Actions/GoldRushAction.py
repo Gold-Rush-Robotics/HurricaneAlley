@@ -3,7 +3,7 @@ from Robot.Robot import Robot
 
 class GoldRushAction:
     description: str
-    nextAction : GoldRushAction
+    nextAction : GoldRushAction = None
     def __init__(self, description: str = __qualname__) -> None:
         self.description = description
     def setNext(self, nextAction: GoldRushAction) -> GoldRushAction:

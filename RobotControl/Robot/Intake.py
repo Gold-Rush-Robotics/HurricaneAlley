@@ -33,6 +33,7 @@ class Intake:
         """Sets cow_catcher and dm_servo to intake a marshmallow
         """
         self.dm_separator_servo.run(DM_SEPARATOR_MARSHMALLOW)
+        self.intake_motor.run(.66)
         self.lower_cow_catcher()
     
     def stopIntaking(self) -> None:

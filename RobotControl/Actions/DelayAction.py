@@ -14,10 +14,15 @@ class DelayAction(GoldRushAction):
             description (str, optional): description to print. Defaults to ....
         """
         super().__init__(description)
-        self.endTime = (datetime.utcnow() / 1000) + delayTime
-
+        self.endTime = -1
+        self.delayTime = delayTime
     def run(self, robot: Robot) -> GoldRushAction:
-        if((datetime.utcnow() / 1000) >= self.endTime):
+        if(self.endTime == -1):
+            self.endTime = (datetime.utcnow().timestamp()) + (self.delayTime * 2)
+
+        curr = (datetime.utcnow().timestamp())
+        print(curr, self.endTime)
+        if( curr >= self.endTime):
             return self.nextAction
         else:
             return self

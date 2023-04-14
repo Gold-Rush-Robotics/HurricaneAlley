@@ -1,7 +1,7 @@
 from __future__ import annotations
 from GoldRushAction import GoldRushAction
 from Robot.Robot import Robot
-from Robot.Marshmallows import MarshmallowColors, PringleStates
+from Robot.Marshmallows import MarshmallowColors, PringleStates, AGITATOR_SPEED
 from DelayAction import DelayAction
 import numpy as np
 from constants import *

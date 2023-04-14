@@ -60,6 +60,8 @@ class Servo(Actuator):
         self.rangeMin = rangeMin
     def run(self, position: float) -> None:
         self.pca.channels[self.pwmPin].duty_cycle = int(reMap(position, self.rangeMin, self.rangeMax, PWM_MAX, 0))
+    def runPWM(self, pwm: int) -> None:
+        self.pca.channels[self.pwmPin].duty_cycle = int(pwm)
 
 class GRRRoboClaw(Actuator):
     rcAddress: int = 0x00

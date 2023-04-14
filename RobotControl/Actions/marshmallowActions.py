@@ -12,7 +12,9 @@ LOADER_DELAY = 1.0
 RELEASE_DELAY = 2.0
 COW_CATCHER_DELAY = 0.5
 
-SWEEPS = [[0,0,0], [1, 1, 1]]
+INTAKE_ANGLE = -PI/4
+
+SWEEPS = [[0, 56.0, 0], [1, 1, 1]]
 
 class MarshAction(GoldRushAction):
     state : int = 0

@@ -9,7 +9,8 @@ from constants import *
 PRINGLE_DELAY = 0.5
 LOADER_DELAY = 0.5
 
-OUTTAKE_DELAY = 1
+RELEASE_DELAY = 2.0
+DM_DELAY = 0.5
 COW_CATCHER_DELAY = 0.5
 
 SWEEPS = [[0,0,0], [1, 1, 1]]
@@ -17,7 +18,8 @@ SWEEPS = [[0,0,0], [1, 1, 1]]
 class MarshAction(GoldRushAction):
     state : int = 0
     pos : np.array
-    outtake_delay : DelayAction
+    release_delay : DelayAction
+    dm_delay : DelayAction
     cow_catcher_delay : DelayAction
     calculate_initial : bool = True
     stored_in_pringle : tuple
@@ -27,20 +29,26 @@ class MarshAction(GoldRushAction):
 
     def __init__(self, description: str = ...) -> None:
         super().__init__(description)
-        self.outtake_delay = DelayAction(OUTTAKE_DELAY)
+        self.release_delay = DelayAction(RELEASE_DELAY)
         self.cow_catcher_delay = DelayAction(COW_CATCHER_DELAY)
+        self.dm_delay = DelayAction(DM_DELAY)
         self.calculate_initial = True
         self.stacker = LoadStack()
 
     def run(self, robot: Robot) -> GoldRushAction:
         match(self.state):
             case 0:
-                # Outtake
-                robot.intake.outtake()
-                if not self.outtake_delay.run(robot):
+                # Prep DM_Servo for Intake Release
+                robot.intake.dm_separator_servo.run(DM_SEPARATOR_MARSHMALLOW)
+                if not self.dm_delay.run(robot):
                     self.state += 1
-                    robot.intake.stopIntaking()
             case 1:
+                # Release Intake 
+                robot.marshmallow.agitator.run(AGITATOR_SPEED)
+                if not self.release_delay.run(robot):
+                    self.state += 1
+                    robot.marshmallow.agitate(0.0)
+            case 2:
                 # Move Forward
                 if self.calculate_initial:
                     self.pos = robot.drivetrain.position
@@ -48,7 +56,7 @@ class MarshAction(GoldRushAction):
                     self.pos[0] += 10
                 if robot.drivetrain.driveToPoint(self.pos, 1, .01):
                     self.state += 1
-            case 2:
+            case 3:
                 # Move Backward
                 if not self.calculate_initial:
                     self.pos = robot.drivetrain.position
@@ -56,22 +64,21 @@ class MarshAction(GoldRushAction):
                     self.pos[0] -= 10
                 if robot.drivetrain.driveToPoint(self.pos, 1, .01):
                     self.state += 1
-            case 3:
-                # Lower Cow Catcher Prep Intake for Marshmallow
-                robot.intake.lower_cow_catcher()
+            case 4:
+                # Prep Intake for Marshmallow
                 robot.intake.intake_marshmallow()
                 # Delay
                 if not self.cow_catcher_delay.run(robot):
                     self.state += 1
-            case 4:
+            case 5:
                 # Drive to Marshmallow
                 if self.drive_to_marsh(robot):
                     self.state += 1
-            case 5:
+            case 6:
                 # Store the Marshmallow that was taken
                 if robot.marshmallow.storeMarsh():
                     self.state += 1
-            case 6:
+            case 7:
                 # Decide if we need to load pringle to store more
                 if robot.marshmallow.stored_in_revolver.count(MarshmallowColors.EMPTY) == 0:
                     if self.stored_in_pringle.index[MarshmallowColors.EMPTY] == 0:

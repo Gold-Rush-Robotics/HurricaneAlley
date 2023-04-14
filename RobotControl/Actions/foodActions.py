@@ -20,8 +20,9 @@ class FoodAction(GoldRushAction):
     def run(self, robot: Robot) -> GoldRushAction:
         match(self.state):
             case 0:
-                ## Intake init
-                state += 1 
+                ## Camera Release
+                robot.intake.dm_separator_servo.run(DM_SEPARATOR_INIT_CAMERA)
+                self.state += 1
             case 1:
                 if robot.drivetrain.driveToPoint([FOOD2[0] + FOOD2[2] + 15, FOOD2[1] + (FOOD2[3]/2), PI/2], 5, 0.01):
                     state += 1

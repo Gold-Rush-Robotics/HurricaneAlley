@@ -5,9 +5,10 @@ FIELD_X = 235
 FIELD_Y = 119
 START_X = 121.92
 START_Y = 106.679
-# (x, y, width, height)
+# (x, y, width(x), height(y))
 FOOD1 = (0, 0, 22.86, 30.48)
-FOOD2 = (0, 121.919, 22.86, 30.48)
+# FOOD2 = (0, 121.919, 22.86, 30.48) Old Philip Measured
+FOOD2 = (0, FIELD_Y-30.48, 22.86, 30.48)
 RECYCLE1 = (FIELD_X-30.48, 0, 30.48, 22.86)
 RECYCLE2 = (FIELD_X-30.48, FIELD_Y-22.86, 30.48, 22.86)
 # (x, y, radius)

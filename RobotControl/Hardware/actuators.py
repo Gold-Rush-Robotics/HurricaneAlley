@@ -77,19 +77,24 @@ class GRRRoboClaw(Actuator):
 
     def run(self, power: float) -> None:
         power = clampRange(-1, 1, power)
-        print(power)
         power = reMap(power, -1, 1, 126, -126)
-        print(power)
         power = int(power)
-        print(power)
+        
+        """
+        reversed     Power < 0      Backwards
+            T             T             F
+            T             F             T
+            F             T             T
+            F             F             F
+        """
         if(self.m1):
-            if((power < 0) and not self.reversed) or (self.reversed):
+            if((power < 0) ^ self.reversed):
                 self.roboclaw.BackwardM1(self.rcAddress, abs(power))
             else:
                 self.roboclaw.ForwardM1(self.rcAddress, abs(power))
                
         else:
-            if((power < 0) and not self.reversed) or (self.reversed):
+            if((power < 0) ^ self.reversed):
                 self.roboclaw.BackwardM2(self.rcAddress, abs(power))
             else:
                 self.roboclaw.ForwardM2(self.rcAddress, abs(power))

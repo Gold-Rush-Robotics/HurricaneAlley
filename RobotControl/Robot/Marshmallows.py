@@ -98,7 +98,7 @@ class Marshmallows:
         
         self.color_sensor = ColorSensor.TCS34725(i2c4, 0x29)
         self.color_sensor.integration_time = 5
-        self.stored_in_revolver = [MarshmallowColors.RED, MarshmallowColors.GREEN, MarshmallowColors.WHITE, MarshmallowColors.REDFOOD, MarshmallowColors.GREENFOOD]
+        self.stored_in_revolver = [MarshmallowColors.REDFOOD, MarshmallowColors.GREENFOOD, MarshmallowColors.EMPTY, MarshmallowColors.EMPTY, MarshmallowColors.EMPTY]
         print(self.stored_in_revolver)
         self.curr_chamber = 0
         

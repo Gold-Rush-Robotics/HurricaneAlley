@@ -7,14 +7,18 @@ import numpy as np
 import math
 
 ODO_R = 1.903190
+
 ODO_N = 8192
+
 CM_PER_TICK = 2.0 * math.pi * ODO_R / ODO_N
+
+
 ODO_L = 23.6
 ODO_B = 11.5
 
-LEFT_ODO_PORT = 0
-RIGHT_ODO_PORT = 1
-MIDDLE_ODO_PORT = 2
+LEFT_ODO_PORT = 1
+RIGHT_ODO_PORT = 2
+MIDDLE_ODO_PORT = 0
 
 posL = 0
 posR = 0
@@ -70,12 +74,16 @@ class Drivetrain:
 
         enc = self.encoderHandler.getCounts()
         posL = enc[LEFT_ODO_PORT]
-        posR = enc[RIGHT_ODO_PORT]
-        posH = enc[MIDDLE_ODO_PORT]
+        posR = -enc[RIGHT_ODO_PORT]
+        posH = -enc[MIDDLE_ODO_PORT]
+        
+        print(posL, self.oldL, posR, self.oldR, posH, self.oldH)
 
-        dR = posR - oldR
-        dL = posL - oldL
-        dH = posH - oldH
+        dR = posR - self.oldR
+        dL = posL - self.oldL
+        dH = posH - self.oldH
+        
+        print(dR, dL, dH)
 
 
         fi = CM_PER_TICK * (dR - dL) / ODO_L
@@ -105,7 +113,10 @@ class Drivetrain:
             [0, 0, 1]
         ])
 
-        v2 = np.dot(m1, m2).dot(v).tolist()[0]
+        v2 = m1.dot(m2).dot(v)
+        vList = v2.tolist()[0]
+        print(v2)
+        print(vList)
 
         self.position[0] += v2[0]
         self.position[1] += v2[1]

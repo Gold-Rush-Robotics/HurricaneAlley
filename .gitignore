@@ -41,3 +41,4 @@ Makefile
 Code/GoldRushTele
 Code/GoldRushDrive
 Code/GoldRushAuto
+RobotControl/Robot/helloWorld.py

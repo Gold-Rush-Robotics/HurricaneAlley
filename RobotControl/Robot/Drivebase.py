@@ -1,7 +1,7 @@
 from Hardware.actuators import GRRRoboClaw
 from Hardware.encoders import Encoder
 from adafruit_pca9685 import PCA9685
-from utils import PID, clampRange, normalizeAngle
+from utils import PID, clampRange, normalizeAngle, unitVectorinator
 from constants import *
 import numpy as np
 import math
@@ -33,8 +33,8 @@ class Drivetrain:
     bl : GRRRoboClaw
     br : GRRRoboClaw
     pca: PCA9685
-    translatePid: PID = PID(1, 0, 0, 1.0, -1.0)
-    roatatePid: PID = PID(1, 0, 0, 1.0, -1.0)
+    translatePid: PID = PID(1, 0, 0, 1.0, -1.0, 0.3)
+    roatatePid: PID = PID(1, 0, 0, 1.0, -1.0, 0.3)
     position: list[float, float, float]
     encoderHandler: Encoder = Encoder()
     oldH = 0
@@ -71,28 +71,38 @@ class Drivetrain:
         self.br.run(br)
     
     def updatePosition(self) -> np.array:
+        """Updates robot odometry position
+           Using X as robot forward and Y as TODO
+        Returns:
+            np.array: returns robot global position
+        """
 
+        # Get updated odometer positions
         enc = self.encoderHandler.getCounts()
         posL = enc[LEFT_ODO_PORT]
         posR = -enc[RIGHT_ODO_PORT]
         posH = -enc[MIDDLE_ODO_PORT]
-        
-        print(posL, self.oldL, posR, self.oldR, posH, self.oldH)
 
+        # Get changes in odometer positions
         dR = posR - self.oldR
         dL = posL - self.oldL
         dH = posH - self.oldH
-        
-        print(dR, dL, dH)
 
+        # Calculate Pose Exponential odomerty variables
+        phi = (dL - dR) / ODO_L # robot delta heading
+        dPoseC = (dL + dR) / 2 # robot delta x
+        dPoseP = (dH - (ODO_B * phi)) # robot delta y
 
-        fi = CM_PER_TICK * (dR - dL) / ODO_L
-        dXC = CM_PER_TICK * (dR + dL) / 2
-        dXh = CM_PER_TICK * (dH + (fi/CM_PER_TICK * ODO_B))
+        # Convert tick amounts into cm amounts
+        phi = phi * CM_PER_TICK
+        dPoseC = dPoseC * CM_PER_TICK
+        dPoseP = dPoseP * CM_PER_TICK
 
-        v = np.array([dXC, dXh, fi])
+        # Generate robot relative delta matrix
+        dPoseRobot = np.array([dPoseC, dPoseP, phi])
 
-        m1 = np.matrix([
+        # Build robot to global rotation matrix
+        robotToGlobalMatrix = np.matrix([
             [np.cos(self.position[2]), -np.sin(self.position[2]), 0],
             [np.sin(self.position[2]),  np.cos(self.position[2]), 0],
             [0, 0, 1]])
@@ -100,61 +110,83 @@ class Drivetrain:
         sineTerm = 0
         cosTerm = 0
 
-        if(np.isclose(fi, 0)):
-            sineTerm = 1.0 - ( fi * fi ) / 6.0
-            cosTerm = fi / 2.0
+        # Check to see if theta is close to zero which would make the trig terms indeterminate
+        if(np.isclose(phi, 0)):
+            # Approximate terms with taylor series
+            sineTerm = 1.0 - ( ( phi * phi ) / 6.0 )
+            cosTerm = phi / 2.0
         else:
-            sineTerm = np.sin(fi)/fi
-            cosTerm = (1-np.cos(fi))/fi
+            # Calculate full terms
+            sineTerm = np.sin(phi) / phi
+            cosTerm = (np.cos(phi) - 1) / phi
 
-        m2 = np.matrix([
-            [sineTerm, -cosTerm, 0],
-            [cosTerm, sineTerm, 0],
+        # Build arc following estimation matrix
+        robotDeltaEstimationMatrix = np.matrix([
+            [sineTerm, cosTerm, 0],
+            [-cosTerm, sineTerm, 0],
             [0, 0, 1]
         ])
 
-        v2 = m1.dot(m2).dot(v)
-        vList = v2.tolist()[0]
-        print(v2)
-        print(vList)
+        # Dot product all the matricies together to convert encoder delta movement to global delta pose
+        # dPoseGlobal = robotToGlobalMatrix.dot(robotDeltaEstimationMatrix).dot(dPoseRobot)
+        dPoseGlobal = np.dot(robotToGlobalMatrix, np.dot(robotDeltaEstimationMatrix, dPoseRobot))
 
-        self.position[0] += v2[0]
-        self.position[1] += v2[1]
-        self.position[2] += v2[2]
+        # Update robot position with new changes
+        self.position[0] += dPoseGlobal[0]
+        self.position[1] += dPoseGlobal[1]
+        self.position[2] += dPoseGlobal[2]
 
+        # Save old encoder values for next iteration
         self.oldL = posL
         self.oldR = posR
         self.oldH = posH
 
         return self.position
-    def driveToPoint(self, pose:np.array, distTol:float, angTol:float) -> bool:
-        '''
-        distTol in cm
-        angTol in radians
-        '''
-        ax, ay, atheta = self.position
-        bx, by, btheta = pose
-        distDif = np.linalg.norm(np.array([bx, by])-np.array([ax, ay]))
-        headingDif = normalizeAngle(btheta-atheta)
+    def driveToPoint(self, goalPose:np.array, distTol:float, angTol:float) -> bool:
+        """Drives to point along line connecting current point to goal point
+
+        Args:
+            goalPose (np.array): vector for goal pose
+            distTol (float): goal translational proximity exit condition tolerance in cm
+            angTol (float): goal angle proximity exit condition tolerance in radians
+
+        Returns:
+            bool: True if exit condition proximities are met
+        """
+
+        # Get current position and goal position
+        currGlobalX, currGlobalY, currGlobalH = self.position
+        goalPoseX, goalPoseY, goalPoseH = goalPose
+
+        # Calculate magnitude of distance from goal
+        distDif = np.linalg.norm(np.array([goalPoseX, goalPoseY]) - np.array([currGlobalX, currGlobalY]))
+
+        # Calculate angle error
+        headingError = normalizeAngle(goalPoseH - currGlobalH)
 
         xComp = 0
         yComp = 0
         tComp = 0
 
+        # Check to see if in exit condition proximity
         inDist = distDif <= distTol
-        inAng = headingDif <= angTol
+        inAng = headingError <= angTol
 
+        # Run translational corrections
         if(not inDist):
-            correction = self.translatePid.calculate(0, distDif)
-            unit_vector_1 = np.array([ax, ay]) / np.linalg.norm(np.array([ax, ay]))
-            unit_vector_2 = np.array([bx, by]) / np.linalg.norm(np.array([bx, by]))
-            angle = np.arccos(np.dot(unit_vector_1, unit_vector_2))
-            xComp -= correction * np.cos(angle)
-            yComp += correction * np.sin(angle)
+            correctionMagnitude = self.translatePid.calculate(0, distDif)
 
+            translationalError = np.array([goalPoseX - currGlobalX, goalPoseY - currGlobalY])
+
+            angleToDrive = np.arctan2(translationalError(1), translationalError(0))
+
+            xComp = correctionMagnitude * np.cos(angleToDrive)
+            yComp = correctionMagnitude * np.sin(angleToDrive) # TODO there may or may not need to be a negatie here depending upon y-axis definition
+        
+        # Run rotational corrections
         if(not inAng):
-            correction = self.roatatePid.calculate(0, headingDif)
-            tComp -= correction
+            correctionMagnitude = self.roatatePid.calculate(0, headingError)
+            tComp = correctionMagnitude
 
         self.drivePow(xComp, yComp, tComp)
         return (inDist and inAng)

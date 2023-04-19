@@ -7,12 +7,16 @@ from Actions.duckActions import DuckAction
 from Actions.placementActions import PlacementAction
 
 def getRun() -> GoldRushAction:
-    return StartupActions("Startup")\
-        .setNext(FoodAction("Food Action"))\
+    tree = StartupActions("Startup")
+    tree.setNext(FoodAction("Food Action"))
+    return tree
+"""\
         .setNext(MarshAction("Marshmellows"))\
         .setNext(DuckAction("Duck sweep"))\
         .setNext(PlacementAction("Placement Time"))\
-        .setNext(FireWorksAction("Fireworks"))
+        .setNext(FireWorksAction("Fireworks"))"""
+    
+    
 
 def runEachLoop(robot: Robot):
     robot.drivetrain.encoderHandler.update()

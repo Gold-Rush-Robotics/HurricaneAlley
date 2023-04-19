@@ -3,8 +3,8 @@ import math
 
 FIELD_X = 235
 FIELD_Y = 119
-START_X = 121.92
-START_Y = 106.679
+START_X = 122
+START_Y = 103
 
 # Field Entities
 # (x, y, width(x), height(y))
@@ -23,25 +23,26 @@ LIGHT_SWITCH = (FIELD_X, FIELD_Y/2)
 PI = math.pi
 
 # SWEEPS Calculation
-X_SEGMENTS = 5
+X_SEGMENTS = 2
 Y_SEGMENTS = 3
 X_SWEEP_START = 23.25
-Y_SWEEP_START = FIELD_Y - 30.48
+# Y_SWEEP_START = FIELD_Y - 30.48
+Y_SWEEP_START = FIELD_Y - 45.0
 X_END = FIELD_X - 53.5
 Y_END = 23.5
 HEADING = -PI/4
 
-X_POSITIONS : list
+X_POSITIONS : list = [0]
 X_SEG_DISTANCE = (X_END - X_SWEEP_START) / X_SEGMENTS
 for x in range(X_SEGMENTS):
 	X_POSITIONS.append(X_SWEEP_START + X_SEG_DISTANCE * x)
 
-Y_POSITIONS : list
+Y_POSITIONS : list = [0]
 Y_SEG_DISTANCE = (Y_SWEEP_START - Y_END) / Y_SEGMENTS
 for y in range(Y_SEGMENTS):
 	Y_POSITIONS.append(Y_SWEEP_START - Y_SEG_DISTANCE * y)
 
-SWEEPS : list
+SWEEPS : list = [0]
 for y in Y_POSITIONS:
 	for x in X_POSITIONS:
 		temp = (x, y, HEADING)

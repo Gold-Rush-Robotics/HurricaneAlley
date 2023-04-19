@@ -2,12 +2,13 @@ from adafruit_pca9685 import PCA9685
 from board import SCL, SDA
 import board
 import busio
+import adafruit_tcs34725 as ColorSensor
+
 
 from Robot.Drivebase import Drivetrain
 from Robot.Duck import Duck
 from Robot.Marshmallows import Marshmallows
 from Robot.Intake import Intake
-from Vision.mainVision import VisionBuilder
 
 
 class Robot:
@@ -15,7 +16,7 @@ class Robot:
     duck: Duck
     marshmallow:  Marshmallows
     intake: Intake
-    vision: VisionBuilder
+    start_color_sensor: ColorSensor.TCS34725
     def __init__(self) -> None:
         i2c = busio.I2C(SCL, SDA)
         self.pca = PCA9685(i2c)
@@ -24,7 +25,7 @@ class Robot:
         self.duck = Duck(self.pca)
         self.marshmallow = Marshmallows(self.pca, i2c)
         self.intake = Intake(self.pca)
-        self.vision = VisionBuilder()
+        self.start_color_sensor = ColorSensor.TCS34725(i2c, 0x29)
     
     def clear(self):
         for channel in self.pca.channels:

@@ -59,7 +59,7 @@ class Duck:
         
         self.home_sensor = digitalio.DigitalInOut(self.home)
         self.home_sensor.direction = digitalio.Direction.INPUT
-        self.home_sensor.pull = digitalio.Pull.UP
+        self.home_sensor.pull = digitalio.Pull.DOWN
 
     def prepDuckBag(self) -> None:
         """servo move to prep

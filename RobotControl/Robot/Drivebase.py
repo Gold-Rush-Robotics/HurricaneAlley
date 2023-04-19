@@ -5,15 +5,16 @@ from utils import PID, clampRange, normalizeAngle
 from constants import *
 import numpy as np
 import math
+import time
 
-ODO_R = 1.903190
+ODO_R = 2.4
 
 ODO_N = 8192
 
 CM_PER_TICK = 2.0 * math.pi * ODO_R / ODO_N
 
 
-ODO_L = 23.6
+ODO_L = 23.17
 ODO_B = 11.5
 
 LEFT_ODO_PORT = 1
@@ -33,8 +34,8 @@ class Drivetrain:
     bl : GRRRoboClaw
     br : GRRRoboClaw
     pca: PCA9685
-    translatePid: PID = PID(1, 0, 0, 1.0, -1.0)
-    roatatePid: PID = PID(1, 0, 0, 1.0, -1.0)
+    translatePid: PID = PID(.1, 0, .001, .5, -.5)
+    roatatePid: PID = PID(1, 0, 0, .25, -.25)
     position: list[float, float, float]
     encoderHandler: Encoder = Encoder()
     oldH = 0
@@ -69,39 +70,37 @@ class Drivetrain:
         self.fr.run(fr)
         self.bl.run(bl)
         self.br.run(br)
-    
-    def updatePosition(self) -> np.array:
-
-        enc = self.encoderHandler.getCounts()
-        posL = enc[LEFT_ODO_PORT]
-        posR = -enc[RIGHT_ODO_PORT]
-        posH = -enc[MIDDLE_ODO_PORT]
         
-        print(posL, self.oldL, posR, self.oldR, posH, self.oldH)
-
+    def encoderLogic(self, posL, posR, posH):
         dR = posR - self.oldR
         dL = posL - self.oldL
         dH = posH - self.oldH
+    
+
+        fi = (dL - dR) / ODO_L
+        dXC = (dR + dL) / 2.0
+        dXh = (dH - (fi * ODO_B))
+
+        robotLocalCorrection = np.array([dXC, dXh, fi])
         
-        print(dR, dL, dH)
+        m1 = np.matrix([
+            [np.sin(self.position[2]), np.cos(self.position[2]), 0],
+            [-np.cos(self.position[2]), np.sin(self.position[2]), 0],
+            [0, 0, 1]
+        ])
 
-
-        fi = CM_PER_TICK * (dR - dL) / ODO_L
-        dXC = CM_PER_TICK * (dR + dL) / 2
-        dXh = CM_PER_TICK * (dH + (fi/CM_PER_TICK * ODO_B))
-
-        v = np.array([dXC, dXh, fi])
-
+        """
         m1 = np.matrix([
             [np.cos(self.position[2]), -np.sin(self.position[2]), 0],
             [np.sin(self.position[2]),  np.cos(self.position[2]), 0],
             [0, 0, 1]])
+        """
 
         sineTerm = 0
         cosTerm = 0
 
         if(np.isclose(fi, 0)):
-            sineTerm = 1.0 - ( fi * fi ) / 6.0
+            sineTerm = 1.0 - fi * fi  / 6.0
             cosTerm = fi / 2.0
         else:
             sineTerm = np.sin(fi)/fi
@@ -113,20 +112,30 @@ class Drivetrain:
             [0, 0, 1]
         ])
 
-        v2 = m1.dot(m2).dot(v)
-        vList = v2.tolist()[0]
-        print(v2)
-        print(vList)
+        multiplied_matrices = np.dot(m1, m2)
+        
+        
+        v2 = np.dot(multiplied_matrices, robotLocalCorrection).tolist()[0]
 
-        self.position[0] += v2[0]
-        self.position[1] += v2[1]
-        self.position[2] += v2[2]
+        self.position[0] += v2[0] * CM_PER_TICK
+        self.position[1] += v2[1] * CM_PER_TICK
+        self.position[2] += v2[2] * CM_PER_TICK
 
         self.oldL = posL
         self.oldR = posR
         self.oldH = posH
 
         return self.position
+    
+    def updatePosition(self) -> np.array:
+
+        enc = self.encoderHandler.getCounts()
+        posL = enc[LEFT_ODO_PORT]
+        posR = -enc[RIGHT_ODO_PORT]
+        posH = -enc[MIDDLE_ODO_PORT]
+        
+        return self.encoderLogic(posL, posR, posH)
+
     def driveToPoint(self, pose:np.array, distTol:float, angTol:float) -> bool:
         '''
         distTol in cm
@@ -137,27 +146,43 @@ class Drivetrain:
         distDif = np.linalg.norm(np.array([bx, by])-np.array([ax, ay]))
         headingDif = normalizeAngle(btheta-atheta)
 
+        print(f" curr: {self.position} target: {pose}  distDif: {distDif} headingDif: {headingDif}")
+
         xComp = 0
         yComp = 0
         tComp = 0
-
-        inDist = distDif <= distTol
-        inAng = headingDif <= angTol
+        
+        inDist = np.isclose(distDif, 0, atol=distTol)
+        inAng = np.isclose(headingDif, 0, atol=angTol)
+        
+        robotLocalCorrection= [0, 0]
 
         if(not inDist):
             correction = self.translatePid.calculate(0, distDif)
-            unit_vector_1 = np.array([ax, ay]) / np.linalg.norm(np.array([ax, ay]))
-            unit_vector_2 = np.array([bx, by]) / np.linalg.norm(np.array([bx, by]))
-            angle = np.arccos(np.dot(unit_vector_1, unit_vector_2))
-            xComp -= correction * np.cos(angle)
+            angle = np.arctan2(bx - ax, -by + ay)
+            dunom = (bx - ax) if not (bx - ax) == 0 else 0.00000001
+            print(f"by: {by} ay: {ay} bx: {bx} ax: {ax} y: {by - ay} x: {bx- ax} ratio {(by-ay) / dunom} angle: {angle}")
+            
+            print(correction, angle)
+            xComp += correction * np.cos(angle)
             yComp += correction * np.sin(angle)
+            rotationMatrix = np.matrix([
+                [np.sin(self.position[2]), np.cos(self.position[2])],
+                [-np.cos(self.position[2]), -np.sin(self.position[2])]
+            ])
+            print(f"angle: {self.position[2]}")
+            robotLocalCorrection = np.dot(rotationMatrix, np.array([xComp, yComp])).tolist()[0]
+
+            print(f"robotLocalCorrection: {robotLocalCorrection}")
 
         if(not inAng):
             correction = self.roatatePid.calculate(0, headingDif)
             tComp -= correction
 
-        self.drivePow(xComp, yComp, tComp)
+        print(f"Driving Forward: {-robotLocalCorrection[1]} Strafe: {robotLocalCorrection[0]} Turn: {tComp}")
+        self.drivePow(-robotLocalCorrection[1], robotLocalCorrection[0], tComp)
         return (inDist and inAng)
 
 
-    
+if __name__ == "__main__":
+    pass

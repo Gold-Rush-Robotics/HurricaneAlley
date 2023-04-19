@@ -14,7 +14,6 @@ COW_CATCHER_DELAY = 0.5
 
 INTAKE_ANGLE = -PI/4
 
-SWEEPS = [[0, 56.0, 0], [1, 1, 1]]
 
 class MarshAction(GoldRushAction):
     state : int = 0
@@ -101,7 +100,6 @@ class MarshAction(GoldRushAction):
         Returns:
             bool: returns true when marshmallow no longer detected (was taken by intake)
         """
-        marshmallows_detected = robot.vision.detectMarshmallows()
         priority_marshmallows : list[tuple[tuple[int,int,float,MarshmallowColors], float]] = []
         non_priority_marshmallows : list[tuple[tuple[int,int,float,MarshmallowColors], float]] = []
         for marshmallow in marshmallows_detected:
@@ -148,7 +146,7 @@ class LoadStack(GoldRushAction):
         self.delay_pringle = DelayAction(PRINGLE_DELAY)
         self.delay_loader = DelayAction(LOADER_DELAY)
         
-    def run(self, robot: Robot, stack: tuple[MarshmallowColors], flag:bool) -> GoldRushAction:
+    def run(self, robot: Robot, stack: tuple, flag:bool) -> GoldRushAction:
         print(self.state)
         if(flag):
             return self.nextAction
@@ -156,7 +154,6 @@ class LoadStack(GoldRushAction):
             case 0:
                 # Rotate color to Revolver
                 if robot.marshmallow.rotate_revolver(stack[self.index], False):
-                    return self.nextAction
                     self.state += 1
             case 1:
                 # Open Pringle Slightly

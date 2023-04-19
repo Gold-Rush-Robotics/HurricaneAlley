@@ -41,7 +41,7 @@ class PID:
         derivative = (error - self._previousError) / self.dt
         Dout = self.KD * derivative
         
-        print(Pout, Iout, Dout)
+        print(f"PID: P: {Pout}, I:{Iout}, D:{Dout}")
 
         output = Pout + Iout + Dout
 

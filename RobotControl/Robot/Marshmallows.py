@@ -18,8 +18,8 @@ class MarshmallowColors(Enum):
     WHITE     = 1
     RED       = 2
     GREEN     = 3
-    REDFOOD   = 4
-    GREENFOOD = 5
+    CLOSE   = 4
+    FAR = 5
     
     @staticmethod   
     def getMarshFromRGB(color : tuple[int, int, int, int]) -> MarshmallowColors:
@@ -35,8 +35,8 @@ class MarshmallowColors(Enum):
 
 class PringleStates(Enum):
     OPEN = 90
-    TIGHT = 30
-    LOAD = 57
+    TIGHT = 35
+    LOAD = 65
     
 
 LOADER_UP = 130
@@ -46,7 +46,7 @@ PLACER_UP = 40_600
 PLACER_DOWN = 18_000
 
 PRINGLE_OPEN = 120
-PRINGLE_CLOSED = 39
+PRINGLE_CLOSED = 42
 
 AGITATOR_SPEED = 0.5
 
@@ -98,7 +98,7 @@ class Marshmallows:
         
         self.color_sensor = ColorSensor.TCS34725(i2c4, 0x29)
         self.color_sensor.integration_time = 5
-        self.stored_in_revolver = [MarshmallowColors.REDFOOD, MarshmallowColors.GREENFOOD, MarshmallowColors.EMPTY, MarshmallowColors.EMPTY, MarshmallowColors.EMPTY]
+        self.stored_in_revolver = [MarshmallowColors.CLOSE, MarshmallowColors.FAR, MarshmallowColors.EMPTY, MarshmallowColors.EMPTY, MarshmallowColors.EMPTY]
         print(self.stored_in_revolver)
         self.curr_chamber = 0
         

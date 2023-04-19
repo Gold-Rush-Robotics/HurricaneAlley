@@ -33,8 +33,8 @@ class Drivetrain:
     bl : GRRRoboClaw
     br : GRRRoboClaw
     pca: PCA9685
-    translatePid: PID = PID(1, 0, 0, 1.0, -1.0, 0.3)
-    roatatePid: PID = PID(1, 0, 0, 1.0, -1.0, 0.3)
+    translatePid: PID =  PID(.1, 0, .1, .2, -.2, 0.3)
+    roatatePid: PID = PID(1, 0, 0, .2, -.2, 0.3)
     position: list[float, float, float]
     encoderHandler: Encoder = Encoder()
     oldH = 0
@@ -48,7 +48,7 @@ class Drivetrain:
         self.bl = GRRRoboClaw(pca, 0x81, True)
         self.bl.reverse(True)
         self.br = GRRRoboClaw(pca, 0x82, False)
-        self.position = [START_X, START_Y, 0]
+        self.position = [START_X, START_Y, 0.0]
     
     def drivePow(self, forward: float, strafe: float, rotate:float) -> None:
         powerFL = forward + strafe - rotate
@@ -81,7 +81,7 @@ class Drivetrain:
         enc = self.encoderHandler.getCounts()
         posL = enc[LEFT_ODO_PORT]
         posR = -enc[RIGHT_ODO_PORT]
-        posH = -enc[MIDDLE_ODO_PORT]
+        posH = enc[MIDDLE_ODO_PORT]
 
         # Get changes in odometer positions
         dR = posR - self.oldR
@@ -89,10 +89,10 @@ class Drivetrain:
         dH = posH - self.oldH
 
         # Calculate Pose Exponential odomerty variables
-        phi = (dL - dR) / ODO_L # robot delta heading
+        phi = -1 * (dL - dR) / ODO_L # robot delta heading
         dPoseC = (dL + dR) / 2 # robot delta x
-        dPoseP = (dH - (ODO_B * phi)) # robot delta y
-
+        dPoseP = (dH + (ODO_B * phi)) # robot delta y
+        
         # Convert tick amounts into cm amounts
         phi = phi * CM_PER_TICK
         dPoseC = dPoseC * CM_PER_TICK
@@ -128,14 +128,14 @@ class Drivetrain:
         ])
 
         # Dot product all the matricies together to convert encoder delta movement to global delta pose
-        # dPoseGlobal = robotToGlobalMatrix.dot(robotDeltaEstimationMatrix).dot(dPoseRobot)
-        dPoseGlobal = np.dot(robotToGlobalMatrix, np.dot(robotDeltaEstimationMatrix, dPoseRobot))
+        dPoseGlobal = robotToGlobalMatrix.dot(robotDeltaEstimationMatrix).dot(dPoseRobot).tolist()[0]
+        #dPoseGlobal = np.dot(robotToGlobalMatrix, np.dot(robotDeltaEstimationMatrix, dPoseRobot))
 
         # Update robot position with new changes
         self.position[0] += dPoseGlobal[0]
         self.position[1] += dPoseGlobal[1]
         self.position[2] += dPoseGlobal[2]
-
+        
         # Save old encoder values for next iteration
         self.oldL = posL
         self.oldR = posR
@@ -178,10 +178,10 @@ class Drivetrain:
 
             translationalError = np.array([goalPoseX - currGlobalX, goalPoseY - currGlobalY])
 
-            angleToDrive = np.arctan2(translationalError(1), translationalError(0))
+            angleToDrive = np.arctan2(translationalError[1], translationalError[0])
 
             xComp = correctionMagnitude * np.cos(angleToDrive)
-            yComp = correctionMagnitude * np.sin(angleToDrive) # TODO there may or may not need to be a negatie here depending upon y-axis definition
+            yComp = correctionMagnitude * -np.sin(angleToDrive) # TODO there may or may not need to be a negatie here depending upon y-axis definition
         
         # Run rotational corrections
         if(not inAng):

@@ -34,13 +34,15 @@ class PID:
     def calculate(self, goal:float, current:float) -> float:
         error = current - goal
 
+        Iout = 0
         #proportional
         Pout = self.KP * error
 
         #integral
-        self._integral += error * self.dt
-        self._integral = clampRange(-self._integralAntiWindup / self.KI, self._integralAntiWindup / self.KI, self._integral)
-        Iout = self.KI * self._integral
+        if(self.KI):
+            self._integral += error * self.dt
+            self._integral = clampRange(-self._integralAntiWindup / self.KI, self._integralAntiWindup / self.KI, self._integral)
+            Iout = self.KI * self._integral
 
         #derivative
         derivative = (error - self._previousError) / self.dt

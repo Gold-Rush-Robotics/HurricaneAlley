@@ -31,17 +31,17 @@ X_END = FIELD_X - 53.5
 Y_END = 23.5
 HEADING = -PI/4
 
-X_POSITIONS : list
+X_POSITIONS : list = [0]
 X_SEG_DISTANCE = (X_END - X_SWEEP_START) / X_SEGMENTS
 for x in range(X_SEGMENTS):
 	X_POSITIONS.append(X_SWEEP_START + X_SEG_DISTANCE * x)
 
-Y_POSITIONS : list
+Y_POSITIONS : list = [0]
 Y_SEG_DISTANCE = (Y_SWEEP_START - Y_END) / Y_SEGMENTS
 for y in range(Y_SEGMENTS):
 	Y_POSITIONS.append(Y_SWEEP_START - Y_SEG_DISTANCE * y)
 
-SWEEPS : list
+SWEEPS : list = [0]
 for y in Y_POSITIONS:
 	for x in X_POSITIONS:
 		temp = (x, y, HEADING)

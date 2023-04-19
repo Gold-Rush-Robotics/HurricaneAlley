@@ -30,5 +30,6 @@ class Robot:
         for channel in self.pca.channels:
             channel.duty_cycle = 0
         self.pca.deinit()
+        self.drivetrain.driveM(0, 0, 0, 0)
         
         

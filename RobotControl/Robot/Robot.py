@@ -31,5 +31,7 @@ class Robot:
             channel.duty_cycle = 0
         self.pca.deinit()
         self.drivetrain.driveM(0, 0, 0, 0)
+        self.intake.intake_motor.run(0)
+        self.intake.cow_catcher_motor.run(0)
         
         

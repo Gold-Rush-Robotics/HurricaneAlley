@@ -40,6 +40,7 @@ class Drivetrain:
     oldH = 0
     oldL = 0
     oldR = 0
+    maxSPEED = .25
     
     def __init__(self, pca: PCA9685) -> None:
         self.fl = GRRRoboClaw(pca, 0x81, False)
@@ -63,12 +64,15 @@ class Drivetrain:
             powerBR /= powerMax
 
         self.driveM(powerFL, powerFR, powerBL, powerBR)
+    
+    def _makeSmallerThanMaxSpeed(self, val:float) -> float:
+        return np.sign(val) * min(abs(val), self.maxSPEED)
         
     def driveM(self, fl: float, fr: float, bl: float, br: float) -> None:
-        self.fl.run(fl)
-        self.fr.run(fr)
-        self.bl.run(bl)
-        self.br.run(br)
+        self.fl.run(self._makeSmallerThanMaxSpeed(fl))
+        self.fr.run(self._makeSmallerThanMaxSpeed(fr))
+        self.bl.run(self._makeSmallerThanMaxSpeed(bl))
+        self.br.run(self._makeSmallerThanMaxSpeed(br))
     
     def updatePosition(self) -> np.array:
         """Updates robot odometry position

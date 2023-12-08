@@ -34,6 +34,8 @@ def calcMecanumOutput(magnitude:float, angle:float) -> np.matrix:
 
     powers = drivePow(robot_x, robot_y, 0.0)
 
+    print(f'{angle:.{2}f}: {powers[0]:.{2}f}, {powers[1]:.{2}f}, {powers[2]:.{2}f}, {powers[3]:.{2}f}')
+
     omega = np.array(powers)
 
     # des_velo = magnitude * np.array([np.cos(angle), np.sin(angle)])
@@ -48,6 +50,8 @@ def calcMecanumOutput(magnitude:float, angle:float) -> np.matrix:
 
     V = forward_matrix.dot(omega) * wheel_r
 
+    print(V)
+
     return V
 
 direction_magnitude = 1.0
@@ -55,11 +59,12 @@ direction_magnitude = 1.0
 list = []
 fig, ax, = plt.subplots(subplot_kw={'projection': 'polar'})
 
-for i in np.linspace(-np.pi, np.pi, 50):
+for i in np.linspace(-np.pi, np.pi, 9):
     list.append([i, calcMecanumOutput(direction_magnitude, i)])
 
 with np.printoptions(precision=3, suppress=True):
-    print(list)
-    ax.plot(list[0], 1)
+    #print(list)
+    #ax.plot(list[0], 1)
+    ...
 
 plt.show()
